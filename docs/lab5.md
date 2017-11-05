@@ -1,5 +1,5 @@
 ## LAB 5: INTRODUCTION TO DYNAMICS
-###### by by [Dr. David Busath](http://busathlab.byu.edu/) and Matt Durrant
+###### by [Dr. David Busath](http://busathlab.byu.edu/) and Matt Durrant
 
 ---
 

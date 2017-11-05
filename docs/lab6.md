@@ -1,5 +1,5 @@
 ## LAB 6: UMBRELLA SAMPLING
-###### by by [Dr. David Busath](http://busathlab.byu.edu/)
+###### by [Dr. David Busath](http://busathlab.byu.edu/)
 
 ---
 
