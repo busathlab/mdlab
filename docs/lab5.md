@@ -144,7 +144,7 @@ Now prepare the submission script for equilibration. If you want to perform this
 We will use VMD to perform an analysis of the Root-Mean-Square Deviation (RMSD), as well as graph the distance between two residues over time.
 
 #### RMSD Analysis
-In WinSCP (or scp transfer program of your choice), transfer the "system_min.psf", "1.crd", and "1.dcd" files onto your local computer. When complete, open VMD on your computer. Go to `File > New Molecule`. Load "1.crd", be sure to specify that the file contains CHARMM coordinates in the drop down menu. Load "system_min.psf" and "1.dcd" into the molecule.
+In WinSCP (or scp transfer program of your choice), transfer the "system_min.psf" and "1.dcd" files onto your local computer. When complete, open VMD on your computer. Go to `File > New Molecule`. Load "system_min.psf" and then load "1.dcd" into the molecule.
 
 Once all the frames are loaded, go to `Extensions > Analysis > RMSD Visualizer Tool`. In the new window, type `all segid PROA` in the atom selection dialogue box. Next, click `ALIGN` and then `RMSD`. Select `Plot Result.`
 

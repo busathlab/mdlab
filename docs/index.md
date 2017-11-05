@@ -25,3 +25,11 @@ Welcome to the home page of Dr. David Busath's Molecular Modeling and Dynamics c
 ### Resources:
 - [Linux Cheatsheet](https://busathlab.github.io/mdlab/cheatsheet.html)
 - [Glossary](https://busathlab.github.io/mdlab/glossary.html)
+
+### Contributors:
+- [Dr. David Busath](http://busathlab.byu.edu/): Labs 1-4, 6
+- Richard Swensen: Various
+- Mitchell Gleed: Lab 8, NAMD labs 1-3, Github pages
+- Curtis Evans: Labs 7, 8
+- Mark Fowler: Lab 7
+- Matt Durrant: Lab 5

@@ -1,5 +1,5 @@
 ## LAB 8: FREE-ENERGY PERTURBATION
-###### by Mitch Gleed
+###### by Mitch Gleed and Curtis Evans
 
 ---
 
