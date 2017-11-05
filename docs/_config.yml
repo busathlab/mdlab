@@ -1,3 +1,7 @@
 name: Busath Lab Molecular Dynamics 
+<<<<<<< HEAD
 title: Busath Lab Molecular Dynamics 
 theme: jekyll-theme-cayman
+=======
+theme: jekyll-theme-slate
+>>>>>>> 06863b74c9856b2220f2d1f9de22e87d71d1afa6
