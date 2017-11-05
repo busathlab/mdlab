@@ -4,7 +4,9 @@
 - Learn basic commands with Linux Bash
 - Get comfortable with the rudiments of CHARMM 
 - Create a simple polypeptide in CHARMM and perform minimization
+
 ---
+
 ### 1. Linux Basics
 Molecular dynamics simulations often require very large amounts of computational power. Because of this, CHARMM was written with the capability to use more than one processor at a time. This is part of the reason why CHARMM was written to run on the Unix or Linux operating system instead of the Windows operating system. 
 
@@ -38,7 +40,7 @@ Like Windows, Linux has many different options for editing text. Unlike Windows,
 Here is an example of how to use vi to enter in a new file and save it: first type `vi myfirstfile` to open a new file named "myfirstfile". Next enter insert mode, so that you can enter text, by pushing `i`. Now type some text and note how the backspace and delete keys work. Once you are done entering text, exit insert mode to return to command mode in order to save your file. Exit insert mode by pushing `esc`. To save your file, enter `:w` (you don’t have to specify a name because you already named it myfirstfile when you opened it). Once your file is saved, enter `:q` to quit vi. If you want to quit without saving changes, use `:q!`. If you just want to quit AND save changes, enter `:wq`. To quickly escape, enter `ZZ`.
 
 In the shell command line, list the contents of your directory with the `ls` command to verify that you created a new file. The long listing (`ls -l`) can be helpful as it gives more info.
----
+
 ### 2. CHARMM Basics
 
 CHARMM is a command line program. This means that it is runs from a shell window with typed commands. Each command can be typed into the command line one at a time or each command can be read from a script file (commonly referred to as a **stream file** and given the extension ".str"). Like computer languages, CHARMM has a certain vocabulary and syntax to be learned. Some syntax in CHARMM is forgiving. For example, CHARMM commands can be truncated to their first four letters. Also, empty lines and multiple spaces between commands or pieces of commands are know as white space and are ignored by CHARMM.
@@ -52,7 +54,7 @@ CHARMM doesn’t even enter into the picture until we are completely finished wi
 Using vi, open a new file named "ptrpmin.str". This will be where your script will be written.
 
 > The [CHARMM online documentation](https://www.charmm.org/charmm/documentation/by-version/) offers a list of available commands and options. See [Basic Usage](https://www.charmm.org/charmm/documentation/basicusage/) for a detailed description on CHARMM syntax, structure, and organization.
----
+
 #### Writing CHARMM scripts
 All CHARMM scripts begin with a title. This is useful later in identifying old scripts. Title lines begin with an asterisk. (Also in non-title lines, exclamation points can be used to initiate comments.) The title must finish with a line consisting of only one asterisk, so enter:
 ```
@@ -63,13 +65,13 @@ All CHARMM scripts begin with a title. This is useful later in identifying old s
 > For your learning purposes, avoid "copy-pasting" the code in these labs. Typing in code in different contexts interleaves learning practices that forces your brain to understand patterns and learn more efficiently, while "copy-pasting" is merely reading.
 
 CHARMM already knows what atoms and amino acids look like, and how to connect them (i.e., atom masses and charges, bond angles and strengths, etc. are stored in the topology and parameter files).  In the next lab, we’ll learn how to write an Residue Topology File (RTF) that creates an amino acid from scratch; for now, let’s use the ones the CHARMM programmers wrote. In order for you to make reference to a TRP residue, CHARMM must have first called up all these pre-calculated residue structure and parameter files. The instructions for calling up this stored information have already been written for you in a file called "TOPPARM.STR."
----
+
 Any CHARMM commands can be stored in a file and read into CHARMM by using the STREAM command ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)).  Your first instruction to CHARMM should be:
 ```
 STREAM TOPPARM.STR
 ```
 > Filenames enclosed in quotes, such as "TOPPARM.STR," are case-sensitive in CHARMM. This means that if the filename is truly TOPPARM.STR and you type in "topparm.str," it won’t work.
----
+
 Now we’re ready to build our 5-mer of tryptophan. The command `READ SEQUENCE` ([struct.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/struct/)) tells CHARMM to read a sequence of residue topologies from the RTFs previously loaded. We specify `CARD` because the sequence is going to be a list of ASCII characters. `READ SEQUENCE` is always followed by 
 1. A title (prefaced by asterisks, just like before) 
 2. The number of residues, and 
@@ -108,7 +110,7 @@ PRINT IC
 > Later, after you execute your CHARMM script, come back to these questions.
 
 > **Question 1:**  From the contents of the IC table, what is the angle between 1 CG, 1 CD2, and 1 CE2? What is the length of the bond between 4 CD2 and 4 CG? (Clue: is there a bond between those two atoms? If not, why not?)
----
+
 We said at the outset that we were interested in finding the energy of this peptide. Typing `ENER` ([energy.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/energy/)) will calculate the potential energy--you will learn how in future labs, so for now we will leave it at that. But an important parameter in calculating energy is the cutoff distance for non-bonded interactions. In other words, how far apart do two atoms have to be before their effect on each other is deemed ‘negligible’ and ignored? The following three commands will compute the potential energy three times, each time with different parameters:
 
 ```
@@ -123,7 +125,7 @@ In the first line we just type `ENER`. CHARMM would use the default values.
 > **Question 2:** From the information that follows the ENER commands in your log file, what is the total energy in each case? What is the largest contributor to the energy? (Ignore the "WARNING" messages for now.)
 
 CHARMM potential energy computation depends on the cutoff parameters. The bigger these parameters the more pairs of atoms are included in the computation. But that does NOT necessarily mean a bigger energy (why?).
----
+
 **"Energy minimization"** and "geometry optimization" are synonymous terms for algorithms that change the coordinates of the peptide (i.e., its shape) to result in a lower potential energy structure. Because we are going to change the coordinates of the peptide, let’s keep a copy of the original structure in the **comparison set**, which is a secondary coordinate file where active coordinates can be kept in CHARMM ([corman.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/corman/)):
 
 ```
@@ -137,7 +139,7 @@ MINIMIZE ABNR NSTEP 25 NPRINT 1
 ```
 
 > **Question 3**: Judging from the lines that follow the `MINIMIZE` command, what does the command `NPRINT` do?
----
+
 CHARMM has temporarily stored the original coordinates of poly-TRP (in the COMParison coordinate set) and the coordinates of the new minimized structure (in the MAIN coordinate set). If we had CHARMM run this script and then finish, both sets of coordinates would be lost, unless we save them to permanent, humanly readable files on disk. To do this we have to start by designating a **FORTRAN logical unit number** ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)). This unit number could be any number from 1 – 99, but don’t use 5 or 6. These are standard input (the keyboard) and standard output (the monitor). Don’t use the same unit number twice in a script unless the first unit is closed or you want to write again to the same file. We also specify that the file type will be ASCII, with the keyword CARD. Then we name the file, adding the suffix ".CRD" as we do with any set of coordinates. We haven’t actually saved the coordinates to this file yet; we’ve just named it. To save coordinates to any unit, the command is WRITE COOR, or in the case of coordinates stored in the COMP set, WRITE COOR COMP. Then, just to be neat, we close the unit. If you forget this on occasion, CHARMM’s sub-program RDTITL will do it for you.
 
 ```
@@ -149,7 +151,7 @@ OPEN WRITE UNIT 20 CARD NAME "ptrpmin.crd"
 WRITE COOR UNIT 20 CARD
 CLOSE UNIT 20
 ```
----
+
 How did poly-tryptophan change upon ABNR minimization? To find out we should compare the two coordinate sets, both in Cartesian coordinates and in internal coordinates. The command to calculate the difference between the internal coordinates (preminimization minus postminimization) is:
 
 ```
@@ -179,7 +181,7 @@ STOP
 > **Question 5**: The structure seems to be shrinking, but not much. (To see this, check the change in distance between two atoms on opposite ends of the peptide). Why? (Hint: think about the absence of solvent or other molecules in the environment.)
 
 Now save your file and exit vi. We will next run the script in CHARMM.
----
+
 #### Running scripts
 To submit a CHARMM script, open the "submit.sh" file and change the value of "infile" to the name of your script. You can also change the value of "outfile" to the name of the file you will store CHARMM’s log. Save the modified file and return to the shell command line. Now all you have to do to submit your script is type `./submit.sh` and push enter. This will submit your job. When CHARMM is done, you will notice that there is a new log file from CHARMM in your working directory.
 
