@@ -43,32 +43,39 @@ In the shell command line, list the contents of your directory with the `ls` com
 
 CHARMM is a command line program. This means that it is runs from a shell window with typed commands. Each command can be typed into the command line one at a time or each command can be read from a script file (commonly referred to as a **stream file** and given the extension ".str"). Like computer languages, CHARMM has a certain vocabulary and syntax to be learned. Some syntax in CHARMM is forgiving. For example, CHARMM commands can be truncated to their first four letters. Also, empty lines and multiple spaces between commands or pieces of commands are know as white space and are ignored by CHARMM.
 
-Other syntax in CHARMM, however, is extremely sensitive.  For example, if you tell CHARMM to open a file, the filename will be converted to all lower case unless you put the name in quotes. This can be a problem because Linux is case sensitive. This means that if you want to open the file "MyFile," and you leave off the quotes, CHARMM will look for the file "myfile" which is not the same as "MyFile" in Linux. The [CHARMM online documentation](http://www.charmm.org) offers a list of available commands and options. To see how CHARMM commands are used, we’ll start off by creating a simple polypeptide, finding its energy, and applying an energy minimization to it. Rather than typing each of these series of commands in one at a time, we will create a stream file that contains all of the options.
+Other syntax in CHARMM, however, is extremely sensitive.  For example, if you tell CHARMM to open a file, the filename will be converted to all lower case unless you put the name in quotes. This can be a problem because Linux is case sensitive. This means that if you want to open the file "MyFile," and you leave off the quotes, CHARMM will look for the file "myfile" which is not the same as "MyFile" in Linux. To see how CHARMM commands are used, we’ll start off by creating a simple polypeptide, finding its energy, and applying an energy minimization to it. Rather than typing each of these series of commands in one at a time, we will create a stream file that contains all of the options.
 
-CHARMM doesn’t even enter into the picture until we are completely finished with the script, at which time we’ll invoke CHARMM. So, remember during the next few minutes, as you type in the commands explained in this section, that you’re only using the editor program, and that no calculations have taken place until the script is submitted.  Using vi, open a new file named "ptrpmin.str". This will be where your script will be written.
+> One useful practice to avoid case issues is to keep all of your file names completely in lower case
 
-> You won’t be able to answer the questions in this lab without writing and executing the CHARMM script first.
+CHARMM doesn’t even enter into the picture until we are completely finished with the script, at which time we’ll invoke CHARMM. Remember, as you type in the commands explained in this section, that you’re only using the editor program, and that no calculations have taken place until the script is submitted.  
+
+Using vi, open a new file named "ptrpmin.str". This will be where your script will be written.
+
+> The [CHARMM online documentation](https://www.charmm.org/charmm/documentation/by-version/) offers a list of available commands and options. See [Basic Usage](https://www.charmm.org/charmm/documentation/basicusage/) for a detailed description on CHARMM syntax, structure, and organization.
 
 #### Writing CHARMM scripts
-**1.** All CHARMM scripts begin with a title. This is useful later in identifying old scripts. Title lines begin with an asterisk. (Also in non-title lines, exclamation points can be used to initiate comments.) The title must finish with a line consisting of only one asterisk, so type:
+All CHARMM scripts begin with a title. This is useful later in identifying old scripts. Title lines begin with an asterisk. (Also in non-title lines, exclamation points can be used to initiate comments.) The title must finish with a line consisting of only one asterisk, so enter:
 ```
 * To create poly-tryptophan and calculate its energy
 *
 ```
+
+> For your learning purposes, avoid "copy-pasting" the code in these labs. Typing in code in different contexts interleaves learning practices that forces your brain to understand patterns and learn more efficiently, while "copy-pasting" is merely reading.
+
 CHARMM already knows what atoms and amino acids look like, and how to connect them (i.e., atom masses and charges, bond angles and strengths, etc. are stored in the topology and parameter files).  In the next lab, we’ll learn how to write an Residue Topology File (RTF) that creates an amino acid from scratch; for now, let’s use the ones the CHARMM programmers wrote. In order for you to make reference to a TRP residue, CHARMM must have first called up all these pre-calculated residue structure and parameter files. The instructions for calling up this stored information have already been written for you in a file called "TOPPARM.STR."
 
-2.	Any CHARMM commands can be stored in a file and read into CHARMM by using the STREAM command (miscom.doc).  Your first instruction to CHARMM should be:
-
+Any CHARMM commands can be stored in a file and read into CHARMM by using the STREAM command ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)).  Your first instruction to CHARMM should be:
+```
 STREAM TOPPARM.STR
+```
+> Filenames enclosed in quotes, such as "TOPPARM.STR," are case-sensitive in CHARMM. This means that if the filename is truly TOPPARM.STR and you type in "topparm.str," it won’t work.
 
-Filenames enclosed in quotes, such as "TOPPARM.STR," are case-sensitive in CHARMM. This means that if you type "topparm.str," it won’t work.
+Now we’re ready to build our 5-mer of tryptophan. The command `READ SEQUENCE` ([struct.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/struct/)) tells CHARMM to read a sequence of residue topologies from the RTFs previously loaded. We specify `CARD` because the sequence is going to be a list of ASCII characters. `READ SEQUENCE` is always followed by 
+1. A title (prefaced by asterisks, just like before) 
+2. The number of residues, and 
+3. The residue names
 
-3.	Now we’re ready to build our 5-mer of tryptophan. The command READ SEQUENCE (struct.doc) tells CHARMM to read a sequence of residue topologies from the RTFs previously loaded. We specify CARD because the sequence is going to be a list of ASCII characters. READ SEQUENCE is always fol-
- 
-lowed by 1) a title (prefaced by asterisks, just like before), 2) the number of residues, and 3) the residue names.
-
-Now we’ve primed CHARMM for the next command, GENERATE, which constructs one segment in the Principle Structure File (PSF) from the residues we specified with READ SEQUENCE. GENERATE must be followed by a name for the segment, which in this case is "PTRP." A segment is any group of residues. Imagine modeling hemoglobin, for example, which has four separate subunits. Each subunit would be a different segment. Once all 4 segments (monomers) are generated, the PSF would contain the whole protein.  Water and salt segments might be added to create the proper environment.
-Organic solvent, lipid, DNA, ligand molecules, or sets of such molecules are other common segments. If we want internal coordinate (IC) tables set up, which we do, the option SETUP must also be specified after GENERATE. These internal coordinate tables are "empty" until CHARMM reads the IC PARAMETER (intcor.doc) command, which fills the IC tables with values from the parameter table which we opened and read in 2.
+Now we’ve primed CHARMM for the next command, `GENERATE`, which constructs one segment in the **Principle Structure File (PSF)** from the residues we specified with `READ SEQUENCE`. `GENERATE` must be followed by a name for the segment, which in this case is `PTRP`. A segment is any group of residues. Imagine modeling hemoglobin, for example, which has four separate subunits. Each subunit would be a different segment. Once all four segments (monomers) are generated, the PSF would contain the whole protein.  Water and salt segments might be added to create the proper environment. Organic solvent, lipid, DNA, ligand molecules, or sets of such molecules are other common segments. If we want internal coordinate (IC) tables set up, which we do, the option `SETUP` must also be specified after `GENERATE`. These internal coordinate tables are "empty" until CHARMM reads the `IC PARAMETER` ([intcor.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/intcor/)) command, which fills the IC tables with values from the parameter table which we opened and read previously.
 
 In order to compute the Cartesian coordinates in the next step, the relation of the structure to the origin (0,0,0), must be specified. The IC SEED command places the first atom specified at the origin, the second on the x axis, and the third in the x-y plane, using bond lengths and bond angles from the IC table.
 
