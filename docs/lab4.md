@@ -1,5 +1,5 @@
 ## LAB 4: ENERGY MINIMIZATION
-###### by Dr. David Busath
+###### by [Dr. David Busath](http://busathlab.byu.edu/)
 
 ---
 

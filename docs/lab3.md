@@ -1,5 +1,5 @@
 ## LAB 3: MOLECULAR STRUCTURE MANIPULATION
-###### by Dr. David Busath
+###### by [Dr. David Busath](http://busathlab.byu.edu/)
 
 ---
 
