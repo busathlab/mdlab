@@ -270,7 +270,7 @@ With the previous scripts as a model, answer the following question.
 Copy the files for this lab into your personal directory. ALPHA.STR and ALPHAHLX.STR have been provided for you, with the line numbers omitted. Run ALPHA.STR with CHARMM to create alphahlx.pdb. Import this PDB into VMD and examine it. Create the 3-10 helix PDB file (change ALPHA.STR to make "3_10.STR" which in turn creates "3_10.PDB"). Import this "3_10.PDB" into VMD. *Examine the difference between 3-10 and α-helices and describe them in your answer to Question 5.*
 
 ### 3. Debugging
-``` Fatal Errors`
+#### Fatal Errors
 If the writer of a stream file makes a mistake somewhere, CHARMM will often stop before finishing the task. If this happens, there will be a message about 15 lines from the end of the ".LOG" file saying, `Execution terminated due to the detection of a fatal error.` The process of reading the ".LOG" file and trying to decipher what the problem is called debugging, and it consumes most of the lab time of every computer scientist in existence and most molecular modelers too. To witness this gruesome spectacle, read "ALPHA_MESSED.STR." You will find this file after you run ALPHA.STR. It will be with all of the other job files. This is the same program as the one you commented in Question 2, but if you look carefully at line 23 you’ll see a mistake (`SETR` should be `SET`). Save "ALPHA_MESSED.STR" and rename a copy to "MESSED.STR," and run it.
 
 When "MESSED.STR" is finished, read the log file. The last lines, below the one starting `MAXIMUM SPACE USED IS…`, are normal information lines given in every log file whether CHARMM has abnormally terminated or not. The "fatal error" message just above them is what we’re interested in: `Unrecognized command: SETR.` If we were writing a stream file, this message would tell us that something was wrong with the `SETR` command in line 23. We’d have to go back to the stream file, change that command to `SET`, and run our script again. Of course, if our change was also incorrect, then CHARMM would stop this time as well. When debugging, it is often necessary to repeat this process many times in order to execute the file correctly. The most common bugs are often simple typos. For this reason, it is a good idea to take your time when typing scripts.
@@ -278,35 +278,63 @@ When "MESSED.STR" is finished, read the log file. The last lines, below the one 
 #### Warning Levels and `BOMLEV`
 In this context of bugs and fatal errors, it’s important to take a minute to talk about `BOMLEV`. We just saw CHARMM die when it hit a mistake in "MESSED.STR." CHARMM doesn’t die every time it reads something wrong. In the Introduction to CHARMM lab, for example, CHARMM didn’t think that our choice of non-bonded cutoffs was appropriate, so it gave us a "WARNING" (check "TRPMIN.LOG" from last week if you don’t remember this). In fact, every error in CHARMM programming has a `BOMLEV` ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)) associated with it, ranging from 5 to -5. The negative levels are pretty severe and the positive, not so bad. In "MESSED.STR" you can see that an unrecognized command is level 0. The command `BOMLEV` dictates at what level error CHARMM crashes. Right now `BOMLEV` is set at the default, zero.
 
-Managing your BOMLEV is sort of a tricky business, and you can be content to use 0 for now. To show you a bit of the complexity involved, first, correct line 23 of "ALPHA_MESSED.STR." Then, change line 29 from "ALPHAHLX.STR" to "ALPHAHLX." Now, there’s no such file as "ALPHAHLX" in your directory, so when you tell CHARMM to read this stream file, it won’t be able to read anything. Save your file and run "ALPHA_MESSED.STR" again. Look carefully at the new log file.
+Managing your BOMLEV is sort of a tricky business, and you can be content to use 0 for now. To show you a bit of the complexity involved, first, correct line 23 of "ALPHA_MESSED.STR." Then, change line 29 from "ALPHAHLX.STR" to "ALPHAHLX." 
 
 ```diff
 - 23: SETR FSTRES 2 ! First residue to be modified.
 + 23: SET FSTRES 2 ! First residue to be modified.
 ...
 - 29: OPEN READ UNIT 18 CARD NAME "ALPHAHLX.STR" 
-+ 29: OPEN READ UNIT 18 CARD NAME "ALPHAHLX.STR" 
++ 29: OPEN READ UNIT 18 CARD NAME "ALPHAHLX" 
 ```
 
-Although CHARMM was not able to read "ALPHAHLX," the program doesn’t crash because the BOMLEV wasn’t low enough. Of course, without the stream file, "MESSED.STR" won’t change the dihedrals of our polypeptide to build an alpha-helix. This is why you must always read your log files even if CHARMM doesn’t crash openly. This raises a question: if it’s such a nuisance to allow CHARMM to continue even after an error like this, why not raise the BOMLEV? If we did raise the BOMLEV,
-22
-Lab 3: Molecular Structure Manipulation
-CHARMM would have crashed in the Introduction to CHARMM lab when it disliked our non-bonded cutoffs, and that would have been a nuisance too.
-IV. Good Programming Practice
+Now, there’s no such file as "ALPHAHLX" in your directory, so when you tell CHARMM to read this stream file, it won’t be able to read anything. Save your file and run "ALPHA_MESSED.STR" again. Look carefully at the new log file.
+
+Although CHARMM was not able to read "ALPHAHLX," the program doesn’t crash because the `BOMLEV` wasn’t set low enough. Of course, without the stream file, "MESSED.STR" won’t change the dihedrals of our polypeptide to build an alpha-helix. This is why you must always read your log files even if CHARMM doesn’t crash openly. This raises a question: if it’s such a nuisance to allow CHARMM to continue even after an error like this, why not raise the BOMLEV? If we did raise the BOMLEV, CHARMM would have crashed in the Introduction to CHARMM lab when it disliked our non-bonded cutoffs, and that would have been a nuisance too.
+
+### 4. Good Programming Practice
 One indicator of good computer programmers is the readability of their code. This applies to molecular modelers as well. There are several small tricks that help humans be able to understand scripts.
-White Space
+
+##### White Space
 If this lab had been written as one long paragraph without tabs or blank lines, it would have been harder to read. Scripts can also be easier to read if they contain an appropriate usage of white space. Extra tabs, spaces, and line breaks are considered white space. In stream files, CHARMM does not care if you have one blank space or twenty blank spaces, one blank line or 4 blank lines, they are run the same. Format your scripts so that they are easy to read.
-Comments
-The "!" character is the comment character in CHARMM stream files. This means that anything that comes after "!" is not read by CHARMM. Take a minute and look at "top_all27_prot_lipid.rtf." Compare the residues defined in this file to those printed at the end of this lab. You will notice that in the "top_all27_prot_lipid.rtf" file, there are diagrams of each residue. CHARMM does not read these diagrams because of the "!" on each line. Comments are a great way to explain a cryptic part of your script to make it more readable.
-Variable Names
-When you name variables in your script, make them short and descriptive. For example, if you need a variable to count the number of molecules outside a particular region, you could call it NumInBox or num_in_box. Notice the capitalization. CHARMM is not case-sensitive, meaning it does not distinguish between NumInBox and numinbox. Variations in capitalization can be used to make the program more readable. In these labs, we are using the old-fashioned tradition of capitalizing everything as a syntactical convention to make it easier for you to read the handout. Notice the difference shown between examples 1 and 2 below.
-! Example 1SET 1 6SET 2 10SET 3 4SET 4 5SET 5 1LABEL THINGYINCR 2 BY @2INCR 3 BY @3INCR 4 BY @4INCR 5 BY 1IF 5 LE @1 GOTO THINGYINCR 1 by @2INCR 1 by @3! Example 2! script computes x(a+b+c)SET x 6SET a 10SET b 4SET c 5! Add a, b, and c x timesSET count 1LABEL startINCR a BY @aINCR b BY @bINCR c BY @cINCR count BY 1 IF count LE @x GOTO start! sum the productsSET answer @aINCR answer by @bINCR answer by @c
-23
-Lab 3: Molecular Structure Manipulation
-Question 6: Write a script that builds a polypeptide ALA-GLU-TRP and produces three "PDB" files called "ALA.PDB," " GLU.PDB," and "TRP.PDB" which contain only the atoms in the first, second, or third residues, respectively. Use the SELE, ATOM, SET, and LABEL (loop) commands in your script. Use a separate stream file and call it "ala_glu_trp.str".When writing this script, keep the sheet from the Introduction to CHARMM lab close by your side. Don’t forget, right after your title, your first commands to CHARMM must be lines 1-6 from "ALPHA.STR," which are the commands in "TOPPARM.STR." One more reminder: you must close a unit if you wish to use its number again.
-Run "ala_glu_trp.str." Read "ala_glu_trp.log". If you have any errors, make an effort to correct the problem on your own. Go back to your "ala_glu_trp.log" and try to see what went wrong (look for typos, and make sure you phrased things exactly as they’re listed in previous labs), make a change, and rerun. Comment the file appropriately. When you submit your answers for this lab to the T.A., please attach your copy of the working stream file.
-V. RTF files
-A Residue Topology File (RTF) (rtop.doc) is a collection of information about the charge, connectivity, and arrangement in space of a polymeric residue or a molecule. On the attached pages are some sample RTFs for different amino acids. The GROU lines are used for simplifying electrostatic calculations when needed.
+
+#### Comments
+The `!` character is the comment character in CHARMM stream files. This means that anything that comes after `!` is not read by CHARMM. Take a minute and look at "top_all27_prot_lipid.rtf." Compare the residues defined in this file to those printed at the end of this lab. You will notice that in the "top_all27_prot_lipid.rtf" file, there are diagrams of each residue. CHARMM does not read these diagrams because of the `!` on each line. Comments are a great way to explain a cryptic part of your script to make it more readable.
+
+#### Variable Names
+When you name variables in your script, make them short and descriptive. For example, if you need a variable to count the number of molecules outside a particular region, you could call it NumInBox or num_in_box. Notice the capitalization. CHARMM is not case-sensitive, meaning it does not distinguish between NumInBox and numinbox. Variations in capitalization can be used to make the program more readable. In these labs, we are using the old-fashioned tradition of capitalizing everything as a syntactical convention to make it easier for you to read the handout. Notice the difference shown between the two examples shown below, which perform the same function.
+
+```
+- ! Poor Example
+- SET 1 6
+- SET 2 10
+- SET 3 4
+- SET 4 5
+- SET 5 1 LABEL THINGY INCR 2 BY @2 INCR 3 BY @3 INCR 4 BY @4 INCR 5 BY 1
+- IF 5 LE @1 GOTO THINGY
+- INCR 1 by @2 INCR 1 by @3
+
++ ! Better Example
++ ! script computes x(a+b+c) SET x 6
++ SET a 10
++ SET b 4
++ SET c 5
++ 
++ ! Add a, b, and c x times SET count 1
++ LABEL start INCR a BY @a INCR b BY @b INCR c BY @c INCR count BY 1
++ IF count LE @x GOTO start
++ 
++ ! sum the products SET answer @a
++ INCR answer by @b
++ INCR answer by @c
+```
+
+> **Question 6**: Write a script that builds a polypeptide ALA-GLU-TRP and produces three "PDB" files called "ALA.PDB," " GLU.PDB," and "TRP.PDB" which contain only the atoms in the first, second, or third residues, respectively. Use the `SELE`, `ATOM`, `SET`, and `LABEL` (loop) commands in your script. Use a separate stream file and call it "ala_glu_trp.str". When writing this script, keep the sheet from the Introduction to CHARMM lab close by your side. Don’t forget, right after your title, your first commands to CHARMM must be lines 1-6 from "ALPHA.STR," which are the commands in "TOPPARM.STR." One more reminder: you must close a unit if you wish to use its number again.
+
+Run "ala_glu_trp.str." Read "ala_glu_trp.log". If you have any errors, make an effort to correct the problem on your own. Go back to your "ala_glu_trp.log" and try to see what went wrong (look for typos, and make sure you phrased things exactly as they’re listed in previous labs), make a change, and rerun. Comment the file appropriately. *When you submit your answers for this lab to the T.A., please attach your copy of the working stream file.*
+
+### 5. RTF files
+A **Residue Topology File (RTF)** ([rtop.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/rtop/)) is a collection of information about the charge, connectivity, and arrangement in space of a polymeric residue or a molecule. On the attached pages are some sample RTFs for different amino acids. The GROU lines are used for simplifying electrostatic calculations when needed.
 The first lines, which begin with ATOM, are quite simply a list of all the atoms that the residues (and molecules) in the file could contain. The atom list information is in the order ATOM atomname atomtype partial charge.
 AUTOGENERATE ANGLES causes the angle list to be generated from the bond list.
 The lines which begin with BOND determine which atoms are covalently bonded. The bond information is in the form BOND atomname (i) atomname (j). Don’t get confused if there are several of these in a row. The purpose of these lines is to create listed of bonded interactions for the ENERGY function (not to specify the internal coordinates – that is the purpose of the IC lines alone, which are found below).
