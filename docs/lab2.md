@@ -105,7 +105,9 @@ IC BUILD IC PURGE
 PRINT IC
 ```
 
-> **Question 1:** (Later, after you execute your CHARMM script, come back to this question.) From the contents of the IC table, what is the angle between 1 CG, 1 CD2, and 1 CE2? What is the length of the bond between 4 CD2 and 4 CG? (Clue: is there a bond between those two atoms? If not, why not?)
+> Later, after you execute your CHARMM script, come back to these questions.
+
+> **Question 1:**  From the contents of the IC table, what is the angle between 1 CG, 1 CD2, and 1 CE2? What is the length of the bond between 4 CD2 and 4 CG? (Clue: is there a bond between those two atoms? If not, why not?)
 
 We said at the outset that we were interested in finding the energy of this peptide. Typing `ENER` ([energy.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/energy/)) will calculate the potential energy--you will learn how in future labs, so for now we will leave it at that. But an important parameter in calculating energy is the cutoff distance for non-bonded interactions. In other words, how far apart do two atoms have to be before their effect on each other is deemed ‘negligible’ and ignored? The following three commands will compute the potential energy three times, each time with different parameters:
 
@@ -116,69 +118,85 @@ ENER CUTNB 8.0 CTONNB 6.5 CTOFNB 7.5
 ENER CUTNB 15.0 CTONNB 11.0 CTOFNB 14.0
 ```
 
-In the first line we just type ENER. CHARMM would use the default values.
+In the first line we just type `ENER`. CHARMM would use the default values.
 
-Question 2: From the information that follows the ENER commands in your LOG file (see VI and VII), what is the total energy in each case? What is the largest contributor to the energy? (Ignore the "WARNING" messages for now.)
+> **Question 2:** From the information that follows the ENER commands in your log file, what is the total energy in each case? What is the largest contributor to the energy? (Ignore the "WARNING" messages for now.)
 
 CHARMM potential energy computation depends on the cutoff parameters. The bigger these parameters the more pairs of atoms are included in the computation. But that does NOT necessarily mean a bigger energy (why?).
 
-5.	"Energy minimization" and "geometry optimization" are synonymous terms for algorithms that change the coordinates of the peptide (i.e., its shape) to result in a lower potential energy structure. Because we are going to change the coordinates of the peptide, let’s keep a copy of the original structure in the comparison set, which is a secondary coordinate file where active coordinates can be kept in CHARMM (corman.doc):
+**"Energy minimization"** and "geometry optimization" are synonymous terms for algorithms that change the coordinates of the peptide (i.e., its shape) to result in a lower potential energy structure. Because we are going to change the coordinates of the peptide, let’s keep a copy of the original structure in the **comparison set**, which is a secondary coordinate file where active coordinates can be kept in CHARMM ([corman.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/corman/)):
 
-COORDINATE COPY COMP
+```
+COORDINATE COPY COMP`
+```
 
-6.	One method of minimization which will be discussed in lectures to come is Adopted-Basis New-
-ton-Raphson (ABNR) (minimiz.doc). The following command instructs CHARMM to perform 25 steps of ABNR minimization on our PTRP:
+One method of minimization which will be discussed in lectures to come is Adopted-Basis Newton-Raphson (ABNR) ([minimiz.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/minimiz/)). The following command instructs CHARMM to perform 25 steps of ABNR minimization on our PTRP:
 
+```
 MINIMIZE ABNR NSTEP 25 NPRINT 1
- 
-Question 3: Judging from the lines that follow the MINIMIZE command, what does the command "NPRINT" do?
+```
 
-7.	CHARMM has temporarily stored the original coordinates of poly-TRP (in the COMParison coordinate set) and the coordinates of the new minimized structure (in the MAIN coordinate set). If we had CHARMM run this script and then finish, both sets of coordinates would be lost, unless we save them to permanent, humanly readable files on disk. To do this we have to start by designating a FORTRAN logical unit number (miscom.doc). This unit number could be any number from 1 – 99, but don’t use 5 or 6. These are standard input (the keyboard) and standard output (the monitor). Don’t use the same
-unit number twice in a script unless the first unit is closed or you want to write again to the same file. We also specify that the file type will be ASCII, with the keyword CARD. Then we name the file, adding the suffix ".CRD" as we do with any set of coordinates. We haven’t actually saved the coordinates to this file yet; we’ve just named it. To save coordinates to any unit, the command is WRITE COOR, or in the case of coordinates stored in the COMP set, WRITE COOR COMP. Then, just to be neat, we close the unit. If you forget this on occasion, CHARMM’s sub-program RDTITL will do it for you.
+> **Question 3**: Judging from the lines that follow the `MINIMIZE` command, what does the command `NPRINT` do?
 
+CHARMM has temporarily stored the original coordinates of poly-TRP (in the COMParison coordinate set) and the coordinates of the new minimized structure (in the MAIN coordinate set). If we had CHARMM run this script and then finish, both sets of coordinates would be lost, unless we save them to permanent, humanly readable files on disk. To do this we have to start by designating a **FORTRAN logical unit number** ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)). This unit number could be any number from 1 – 99, but don’t use 5 or 6. These are standard input (the keyboard) and standard output (the monitor). Don’t use the same unit number twice in a script unless the first unit is closed or you want to write again to the same file. We also specify that the file type will be ASCII, with the keyword CARD. Then we name the file, adding the suffix ".CRD" as we do with any set of coordinates. We haven’t actually saved the coordinates to this file yet; we’ve just named it. To save coordinates to any unit, the command is WRITE COOR, or in the case of coordinates stored in the COMP set, WRITE COOR COMP. Then, just to be neat, we close the unit. If you forget this on occasion, CHARMM’s sub-program RDTITL will do it for you.
+
+```
 OPEN WRITE UNIT 10 CARD NAME "ptrp.crd" WRITE COOR COMP UNIT 10 CARD
 CLOSE UNIT 10
 
 OPEN WRITE UNIT 20 CARD NAME "ptrpmin.crd" WRITE COOR UNIT 20 CARD
 CLOSE UNIT 20
+```
 
-How did poly-tryptophan change upon ABNR minimization? To find out we should compare the two coordinate sets, both in Cartesian coordinates and in internal coordinates.
+How did poly-tryptophan change upon ABNR minimization? To find out we should compare the two coordinate sets, both in Cartesian coordinates and in internal coordinates. The command to calculate the difference between the internal coordinates (preminimization minus postminimization) is:
 
-8.	The command to calculate the difference between the internal coordinates (preminimization minus postminimization) is:
-
+```
 IC DIFF
+```
 
 The command to calculation the difference between Cartesian coordinates (preminimization minus postminimization) is:
 
+```
 COOR DIFF
+```
 
-9.	Now, to print out these differences to the log file, we print out the MAIN Cartesian coordinate set and the IC table, just like we did above to print the coordinates themselves. The original coordinates in these two tables have all been replaced by differences in the coordinates!
+Now, to print out these differences to the log file, we print out the MAIN Cartesian coordinate set and the IC table, just like we did above to print the coordinates themselves. The original coordinates in these two tables have all been replaced by differences in the coordinates!
 
+```
 PRINT COOR PRINT IC
+```
 
-Question 4: Judging from the IC table here and above (before minimization), what changed in the structure?
+> **Question 4**: Judging from the IC table here and above (before minimization), what changed in the structure?
  
-Question 5: The structure seems to be shrinking, but not much. (To see this, check the change in distance between two atoms on opposite ends of the peptide). Why? (Hint: think about the absence of solvent or other molecules in the environment.)
+> **Question 5**: The structure seems to be shrinking, but not much. (To see this, check the change in distance between two atoms on opposite ends of the peptide). Why? (Hint: think about the absence of solvent or other molecules in the environment.)
 
 10.	Finally, be sure to tell CHARMM that your stream file is finished:
 
+```
 STOP
+```
 
 11.	Now save your file and exit vi. We will next run the script in CHARMM.
 
-Running scripts
-To submit a CHARMM script, open the submit.sh file and change the value of "infile" to the name of your script. You can also change the value of "outfile" to the name of the file you will store CHARMM’s log. Save the modified file and return to the shell command line. Now all you have to do to submit your script is type ./submit.sh and push enter. This will submit your job. When CHARMM is done, you will notice that there is a new log file from CHARMM in your working directory.
+#### Running scripts
+To submit a CHARMM script, open the "submit.sh" file and change the value of "infile" to the name of your script. You can also change the value of "outfile" to the name of the file you will store CHARMM’s log. Save the modified file and return to the shell command line. Now all you have to do to submit your script is type `./submit.sh` and push enter. This will submit your job. When CHARMM is done, you will notice that there is a new log file from CHARMM in your working directory.
 
-In our stream file, we asked CHARMM to give us some information such as coordinates and energies. These values are recorded in a log file. Log files contain not only the information that you requested, but also all the interaction between different subprograms in CHARMM. You’ll recognize your own ptrpmin.str commands showing up as part of these conversations.
+> If you encounter permission errors when attempting to use the `./` command on a script, use `chmod 774 [filename]` to grant r/w/e privileges to you and your group.
+
+In our stream file, we asked CHARMM to give us some information such as coordinates and energies. These values are recorded in a **log file**. Log files contain not only the information that you requested, but also all the interaction between different subprograms in CHARMM. You’ll recognize your own ptrpmin.str commands showing up as part of these conversations.
 
 With the log file open, go back and answer questions 1-5, then finish the remaining questions.
 
-Question 6: What are the components of the energy? Does the system have any kinetic energy? Question 7: What changed in coordinates and potential energies upon minimization of PTRP?
+> **Question 6**: What are the components of the energy? Does the system have any kinetic energy? 
+
+> **Question 7**: What changed in coordinates and potential energies upon minimization of PTRP?
+
 CRD files: Open "ptrp.crd" and "ptrpmin.crd." Again, if they don’t open, you might try holding ‘Ctrl’ while clicking on the file name. Review the structure of the coordinate files, noting how they compare to the output in the logfile from PRINT COOR and notice how the x, y, and z coordinates changed for a few of the atoms.
 
 To finish, send an email to your TA containing the answers to the questions in the lab.
 
-   This isn’t required, but remember how we said CHARMM is a command-line program? If you’re
-feeling ambitious, you can try out CHARMM on the command line on MaryLou by executing, from
-the Linux command line, module load charmm and then $(which charmm). You can now
-perform commands in CHARMM and view output on the fly! (remember to start with a title!)
+> This isn’t required, but remember how we said CHARMM is a command-line program? If you’re feeling ambitious, you can try out CHARMM on the command line on MaryLou by executing, from the Linux command line, module load charmm and then $(which charmm). You can now perform commands in CHARMM and view output on the fly! (remember to start with a title!)
+
+**[Lab 3](https://busathlab.github.io/mdlab/lab3.html)**
+
+**[Return to home page](https://busathlab.github.io/mdlab/index.html)**
