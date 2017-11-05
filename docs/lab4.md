@@ -1,4 +1,5 @@
 ## LAB 4: ENERGY MINIMIZATION
+###### by Dr. David Busath
 
 ---
 
@@ -8,6 +9,7 @@
 - Implement the `PATCH` command
 - Use the various types of minimization methods
 - Understand how to use `NOE` contraints
+
 ---
 
 In the previous labs we have, on a number of occasions, asked you to perform an energy minimization without going into detail about the process. In this lab we will explore minimization and the Energy function, but first, let’s learn more about the next level in the CHARMM data structures: the PSF file.
