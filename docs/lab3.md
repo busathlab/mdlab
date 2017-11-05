@@ -336,7 +336,9 @@ When you name variables in your script, make them short and descriptive. For exa
 + INCR answer by @c
 ```
 
-> **Question 6**: Write a script that builds a polypeptide ALA-GLU-TRP and produces three "PDB" files called "ALA.PDB," " GLU.PDB," and "TRP.PDB" which contain only the atoms in the first, second, or third residues, respectively. Use the `SELE`, `ATOM`, `SET`, and `LABEL` (loop) commands in your script. Use a separate stream file and call it "ala_glu_trp.str". When writing this script, keep the sheet from the Introduction to CHARMM lab close by your side. Don’t forget, right after your title, your first commands to CHARMM must be lines 1-6 from "ALPHA.STR," which are the commands in "TOPPARM.STR." One more reminder: you must close a unit if you wish to use its number again.
+> **Question 6**: Write a script that builds a polypeptide ALA-GLU-TRP and produces three "PDB" files called "ALA.PDB," " GLU.PDB," and "TRP.PDB" which contain only the atoms in the first, second, or third residues, respectively. Use the `SELE`, `ATOM`, `SET`, and `LABEL` (loop) commands in your script. Use a separate stream file and call it "ala_glu_trp.str". 
+
+> When writing this script, keep the sheet from the Introduction to CHARMM lab close by your side. Don’t forget, right after your title, your first commands to CHARMM must be lines 1-6 from "ALPHA.STR," which are the commands in "TOPPARM.STR." One more reminder: you must close a unit if you wish to use its number again.
 
 Run "ala_glu_trp.str." Read "ala_glu_trp.log". If you have any errors, make an effort to correct the problem on your own. Go back to your "ala_glu_trp.log" and try to see what went wrong (look for typos, and make sure you phrased things exactly as they’re listed in previous labs), make a change, and rerun. Comment the file appropriately. *When you submit your answers for this lab to the T.A., please attach your copy of the working stream file.*
 
