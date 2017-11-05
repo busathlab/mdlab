@@ -1,5 +1,7 @@
 ## LAB 1: INTRODUCTION TO THE PROTEIN DATA BANK AND VMD
 
+---
+
 #### Objectives:
 - Familiarize with the Protein Databank
 - Find a protein in the database and download the protein’s .pdb file

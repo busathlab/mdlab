@@ -1,5 +1,7 @@
 ## LAB 2: INTRODUCTION TO CHARMM
 
+---
+
 #### Objectives:
 - Learn basic commands with Linux Bash
 - Get comfortable with the rudiments of CHARMM 
