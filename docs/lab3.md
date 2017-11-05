@@ -13,9 +13,10 @@ The Introduction to CHARMM lab previewed how to create molecules from scratch, u
 
 As has been mentioned previously, the language of CHARMM consists of many one- or two-word commands. You already know `OPEN`, `CLOSE`, `WRITE COOR`, and the commands needed to build a PSF. In this lab, we take you through a few more of the absolute basics. After you have learned these commands, you can start writing programs in CHARMM. Again, if you ever have any questions about these or any other commands, your first stop should be the [CHARMM Documentation](https://www.charmm.org/charmm/documentation/).
 
-#### Wildcards, Selections, and Variables
+#### Wildcards
 In both UNIX and CHARMM, the asterisk `*` can sometimes be used as a wildcard to mean "any set of characters." See the definition of `SELECT...END` below for an example of the wild card in CHARMM.
 
+#### Selections
 Imagine having a structure consisting of several segments, but wanting to apply the ENERGY command to only one, or wanting to know the COOR DIFF between only certain atoms in a structure. The set of atoms to which most commands are applied can be shrunk with an **atom selection** using the `SELECT` command ([select.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/select/)). You can specify the subset by using the keywords `ATOMS`, `SEGID` (segment name), `ISEG` (segment number), `RESN` (residue name), or another keyword. Here we use the `SELECT ATOM` command, which is always followed by
 
 1. The segment ID
@@ -31,6 +32,7 @@ SELECT ATOM SEG1 * * END
 
 > When two selections are called for, the entire `SELECT...END` command must be repeated twice. To select all atoms of the first residue of SEG1 for the first selection, and second residue of SEG1 for the second selection, the command would be `SELECT ATOM SEG1 1 * END SELECT ATOM SEG1 2 * END`.
 
+#### Variables
 There will be occasions when you will need to use a **variable** in a CHARMM script. The `SET` command assigns a value to a variable. For instance, `SET dist 15.3` gives the variable named "dist" a value of 15.3. When you wish to use the value of a variable where CHARMM is expecting a number, you use the variable with a `@` sign in front of it. CHARMM then reads the command containing the variable, as though it contained the value of that variable. An example of this is demonstrated in the following sequence of commands:
 
 ```
@@ -45,6 +47,8 @@ The command will then be interpreted by CHARMM as:
 + OPEN READ UNIT 10 CARD NAME "SPIFFY13.CRD"
 ```
 
+> Sometimes variable substitution errors might occur due to quotation marks, multiple names, etc. In cases where you can't figure out why a variable isn't substituting properly, try "protecting" the variable with brackets: `@{variable}`
+
 Variables can also be SET to the values of other internal CHARMM variables. For example, `SET TEMP ?ENER` would set the variable "TEMP" to the total potential energy computed most recently. The command `SET TEMP MINIMIZED` would set the variable "TEMP" to contain the word (or string, for you programmers) "MINIMIZED."
 
 You can manipulate the values stored in variables using `INCR` and `DECR`. The syntax for both of them is the command, the variable name, and the amount to add or subtract. The following command will add 10 to the value stored in number so that the final value of "number" is 10:
@@ -54,6 +58,7 @@ SET number 0
 INCR number 10
 ```
 
+#### Variable Arrays
 Charmm also supports referencing variables in an array-like fashion. For example, if you set a variable with a constant prefix and integer suffix, you can access various variable values later using an `@` in front of the variable name prefix followed by `@@` and the array index you wish to access. Here is an example:
 
 ```
@@ -63,54 +68,106 @@ SET segName3 M2C
 SET segName4 M2D
 SET index 3
 
-DEFINE INTEREST SELE SEGNAME @segName@@index END 
+COOR STAT SELE SEGNAME @segName@@index END 
 ```
 
 In the above example, four sequential variables with the prefix "segName" are set to four different strings. To access the third string in the sequence, or array, of variables, a variable "index" is set to "3". Invoking `@segName@@index` gets the third variable in the array. The final command would be interpreted as follows:
 
 ```diff
-- DEFINE INTEREST SELE SEGNAME @segName@@index END 
-+ DEFINE INTEREST SELE SEGNAME M2C END 
+- COOR STAT SELE SEGNAME @segName@@index END 
++ COOR STAT SELE SEGNAME M2C END 
 ```
 
-Conditional statements
-Often conditional statements and loops are handy in CHARMM scripts (miscom.doc). If you have some experience with FORTRAN or the C programming language, the ideas are the same.
+#### Save Selections with `DEFINE`
+The `DEFINE` command can be used to save a selection for use throughout a script. For example:
+
+```
+DEFINE WATEROXYGENS SELE TYPE OH2 .and. SEGNAME TIP3 END 
+```
+
+This defines a selection named "WATEROXYGENS" to be all of oxygens with the atom type OH2 and belonging to the segment named TIP3. This definition can then be used later, such as in this example (interpreted):
+
+```diff
+- COOR STAT SELE WATEROXYGENS END 
++ COOR STAT SELE TYPE OH2 .and. SEGNAME TIP3 END 
+```
+
+#### Conditional Statements and Boolean Logic
+Often conditional statements and loops are handy in CHARMM scripts ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)). If you have some experience with FORTRAN or the C programming language, the ideas are the same.
+
 Sometimes you only want to run a command if a certain condition is true. Let’s say you minimize your structure for 200 steps of ABNR, and then you want to minimize it again if the total energy is greater than a given value (say, -100 kcal/mol). In this case you could use an if statement. Here’s how you could do it:
+
+```
 MINIMIZE ABNR NSTEP 200
 SET MYENERGY ?ENER
 IF MYENERGY GT -100 MINIMIZE ABNR NSTEP 200
-17
-Lab 3: Molecular Structure Manipulation
-The condition in this example was the greater than (GT) conditional statement. If the value stored in MYENERGY is greater than -100, then CHARMM will execute 200 more steps of minimization. If the value stored in MYENERGY is not greater than -100, then CHARMM will skip over the additional minimization. Besides "greater than", GT, we could use the conditionals EQ ("equal to"), NE ("not equal to"), GE ("greater than or equal to"), LT ("less than"), or LE ("less than or equal to"). "IF" is always followed by a variable (not preceded by a "@"), a conditional, a reference (either a value or another variable proceeded by a "@"), and a CHARMM command.
-Loops
-A loop is a piece of a program designed to repeat itself many times (miscom.doc). Loops can be created using the GOTO and LABEL commands. LABEL designates the beginning of a loop, and is always followed by the name of the loop. GOTO is the command that allows for the repetition (iteration) of the loop. GOTO must also be followed by the name of the labeled line that CHARMM is to be directed to. If we wanted to minimize a structure again and again until the potential energy was less than -100, a loop could be used. Once the energy went below -100, the conditional would not be met, and CHARMM would ignore the GOTO command and go on to the next line. The code would look like this:
+```
+
+The condition in this example is given by the (`GT`) operator. If the value stored in `MYENERGY` is greater than -100, then CHARMM will execute 200 more steps of minimization. If the value stored in MYENERGY is not greater than -100, then CHARMM will skip over the additional minimization. Besides "greater than", `GT`, we could use the conditionals `EQ` ("equal to"), `NE ("not equal to"), `GE` ("greater than or equal to"), `LT` ("less than"), or `LE` ("less than or equal to"). 
+
+`IF` is always followed by 
+1. A variable (not preceded by a "@")
+2. A conditional
+3. A reference (either a value or another variable proceeded by a "@")
+4. A CHARMM command
+
+#### Loops
+A loop is a piece of a program designed to repeat itself many times ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)). Loops can be created using the `GOTO` and `LABEL` commands. 
+
+`LABEL` designates the beginning of a loop, and is always followed by the name of the loop. 
+
+`GOTO` is the command that allows for the repetition (iteration) of the loop. `GOTO` must also be followed by the name of the labeled line that CHARMM is to be directed to. 
+
+If we wanted to minimize a structure again and again until the potential energy was less than -100, a loop could be used. Once the energy went below -100, the conditional would not be met, and CHARMM would ignore the GOTO command and go on to the next line. The code would look like this:
+
+```
 LABEL LOOP1
 MINIMIZE ABNR NSTEP 200
 SET MYENERGY ?ENER
 IF MYENERGY GT -100 GOTO LOOP1
+```
+
 What if we wanted to minimize our structure 200, then 300, then 400 times? We could attack the problem by using 3 different parameters:
+
+```
 SET 1 200
 SET 2 300
 SET 3 400
 MINIMIZE ABNR NSTEP @1
 MINIMIZE ABNR NSTEP @2
 MINIMIZE ABNR NSTEP @3
-But if we want to increase the number of steps by 100 until the number reached 10000, it would take a long time to enter in all of the commands. Instead of typing 100 commands, you could use a loop.
+```
+
+But if we want to increase the number of steps by 100 until the number reached 10000, it would take a long time to enter in all of the commands. Instead of typing 100 commands, you could use a loop:
+
+```
 SET n 200
 LABEL min_loop
 MINIMIZE ABNR NSTEP @n
 INCR n BY 100
 IF n LE 10000 GOTO min_loop
-Question 1: What would happen if the SET command were inside the loop?
-IC Edit
-As you might guess, IC EDIT (intcor.doc) is used to edit internal coordinates. The command can be followed by as many lines as desired: each containing 1) the keywords DIST, ANGLE, or DIHEDRAL, 2) an atom selection of two, three, or four atoms for DIST, ANGL, or DIHE, respectively, taking the form residuenumber atomname, 3) a value in angstroms or degrees for the distance, angle, or dihedral. On another line must appear END. Improper dihedrals, as in the IC table, are indicated by an asterisk
-18
-Lab 3: Molecular Structure Manipulation
-before the third atom specification. To change the length of a bond (DISTANCE) to 2.0 angstroms, for example, IC EDIT is used in the following manner:
+```
+
+> Loop statements do not work with CHARMM running in parallel across multiple processors. On jobs where this is unavoidable, you must nest the loop within another script and use the `STREAM` command.
+
+> **Question 1**: What would happen if the SET command were inside the loop?
+
+#### `IC EDIT`
+As you might guess, `IC EDIT` ([intcor.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/intcor/)) is used to edit internal coordinates. The command can be followed by as many lines as desired, with each containing 
+1. The keywords DIST, ANGLE, or DIHEDRAL
+2. An atom selection of two, three, or four atoms for DIST, ANGL, or DIHE, respectively, taking the form `residuenumber atomname` 
+3. A value in angstroms or degrees for the distance, angle, or dihedral. 
+4. `END` 
+
+Improper dihedrals, as in the IC table, are indicated by an asterisk before the third atom specification. To change the length of a bond (`DISTANCE`) to 2.0 angstroms, for example, `IC EDIT` is used in the following manner:
+
+```
 IC EDIT
 DIST 3 N 3 C 2.0
 END
-Write Title
+```
+
+#### `WRITE TITLE`
 Sometimes CHARMM won’t let you write to a file unless it has a title first. Other times you really need the title, to include information about the data in the file. WRITE TITLE (miscom.doc) is always followed by the information you want at the top of the file, preceded by asterisks:
 WRITE TITLE
 * This is where you describe the file
