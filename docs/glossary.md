@@ -45,10 +45,4 @@
 - **VMD**: 3D Molecular visualization software used for analyzing biomolecular systems.
 - **WILDCARD**: A character with specific interpretations in the Unix shell. Includes characters such as `?`, `*`, `~`, etc.
 
-
-
-
-
-
-
-
+**[Return to home page](https://busathlab.github.io/mdlab/index.html)**
