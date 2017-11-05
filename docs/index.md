@@ -9,3 +9,4 @@ Welcome to the home page of Dr. David Busath's Molecular Modeling and Dynamics c
 
 ### Labs:
 - [Introduction to the Protein Data Bank and VMD](https://busathlab.github.io/mdlab/lab1.html)
+- [Introduction to CHARMM](https://busathlab.github.io/mdlab/lab2.html)
