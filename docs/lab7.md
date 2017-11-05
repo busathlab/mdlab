@@ -21,11 +21,11 @@ In this lab, you will be introduced to a simple fitting algorithm in the Swiss-P
 
 The **Influenza A M2 channel** is a tetrameric transmembrane protein found in viral lipid. It is the target of anti-flu agents Amantadine and Rimantadine which block infection. The wild type apo structure for the M2 channel was well defined using solid-state NMR and published in 2010 by Sharma et al with the pdb id 2L0J. 2L0J includes the inter membrane domain and amphipathic helices (residues 22-62) of the Influenza A M2 channel. Single amino acid mutations, such as S31N, can render the channel insensitive to anti-flu drugs. We will use homology modeling to create a tetrameter with a single amino acid mutation in each monomer that is similar in structure to the wild type. 
 
-### 1. Instructions
+### Instructions
 1. Browse to [http://spdbv.vital-it.ch/disclaim.html](http://spdbv.vital-it.ch/disclaim.html), click Download, accept agreement, and download the proper version to your desktop.
 2. Unzip the folder by clicking on it and clicking "Extract all files."
 3. Navigate down one directory and click on the SPDBV executable (black icon). Hit Run if you get the security warning, and click on the About Swiss-PDB Viewer window to close it.
-4. Search for 2L0J at [rscb.org](http://rscb.org) and download the FASTA sequences for the 2010 M2 Channel by [Sharma et al](https://www.ncbi.nlm.nih.gov/pubmed/20966252). Copy the sequence to notepad and delete the first 3 primer amino acids (SNA). 
+4. Search for 2L0J at [rscb.org](http://rscb.org) and download the FASTA sequences for the [2010 M2 Channel by Sharma et al](https://www.ncbi.nlm.nih.gov/pubmed/20966252). Copy the sequence to notepad and delete the first 3 primer amino acids (SNA). 
 5. Edit the primary sequence to resemble an S31N mutant. Note that the first amino acid in the given sequence is number 22. Exclude the B, C, and D sequences and save the new sequence as "s31n.txt."
 6. Copy the lab files directory to your personal directory, and then download the four PDB files for the monomers of 2L0J from the segments folder. These monomer files are designated by a-d following the protein name.
 7. Open your S31N mutated 2L0J FASTA sequence and open it in SPDBV by going to the tab "Swiss Model" and selecting "Load Raw Sequence from Amino Acids." A log box will appear, check it out and close it. It appears in the black window as a default alpha helix.
@@ -40,15 +40,12 @@ The **Influenza A M2 channel** is a tetrameric transmembrane protein found in vi
 16. In the "str" directory you will find one "dyna" script that will perform minimization, heating, and equilibration for your 2L0J wild-type tetramer. You may be required to change one of the variables for the script to run successfully. Submit the script and view the log file to ensure it ran properly. You will want to refer to the log file to answer questions later in the lab.
 17. Download 2l0j.psf (in channels directory) and 2l0j_2eq.dcd (in dynafiles directory) to your computer.
 18. Open VMD, load the .psf file, and then add the .dcd file to the psf. Click the Extensions tab, navigate to Analysis, open RMSD Visualizer Tool. Check "Frames from..." box, check "Backbone" box, click RMSD, then (once RMSD finishes calculating) click Align.
-19. Click "Heatmap plot." Take a minute to understand the plot, and zoom out if necessary. Change the max threshold to 6, hit "apply," and save the heatmap plot. 
-
-> While you can render from VMD, it is easiest and sometimes better to take a screenshot. The heatmap plot can be saved as a .gif with the File menu, but it loses the axes.
-
+19. Click "Heatmap plot." Take a minute to understand the plot, and zoom out if necessary. Change the max threshold to 6, hit "apply," and save the heatmap plot. While you can render from VMD, it is easiest and sometimes better to take a screenshot. The heatmap plot can be saved as a .gif with the File menu, but it loses the axes.
 20. Repeat steps 16-19 for S31N channel.
 
 > **Question 1**: What is the total energy of the wild-type tetramer before minimization? How about the mutant? Why are the energies so different? What are the energies of each species following minimization? Is this energy potential or kinetic energy?
 
-> **Question 2**: Watch both trajectories for wild-type and mutant M2 in VMD, and comparWhy might an S31N mutant change drug binding affinities? Hint: M2 blockers bind to the inner pocket of the M2 channel.
+> **Question 2**: Watch both trajectories for wild-type and mutant M2 in VMD, and compare them. Why might an S31N mutant change drug binding affinities? Hint: M2 blockers bind to the inner pocket of the M2 channel.
 
 > **Question 3**: What are the main differences in the heat plots? Why might a simple substitution mutation give rise to these differences?
 
