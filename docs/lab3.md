@@ -40,7 +40,7 @@ OPEN READ UNIT 10 CARD NAME "SPIFFY@unlucky.CRD"
 
 The command will then be interpreted by CHARMM as:
 
-```
+```diff
 - OPEN READ UNIT 10 CARD NAME "SPIFFY@unlucky.CRD"
 + OPEN READ UNIT 10 CARD NAME "SPIFFY13.CRD"
 ```
@@ -68,7 +68,7 @@ DEFINE INTEREST SELE SEGNAME @segName@@index END
 
 In the above example, four sequential variables with the prefix "segName" are set to four different strings. To access the third string in the sequence, or array, of variables, a variable "index" is set to "3". Invoking `@segName@@index` gets the third variable in the array. The final command would be interpreted as follows:
 
-```
+```diff
 - DEFINE INTEREST SELE SEGNAME @segName@@index END 
 + DEFINE INTEREST SELE SEGNAME M2C END 
 ```
