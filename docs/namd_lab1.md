@@ -183,26 +183,6 @@ Again, CHARMM wins with flexibility and amount of options, as evidenced here whe
 
 Particle Mesh Ewald lengths are also required to be input manually in CHARMM, while in NAMD, the integers are computed automatically (though they can be input manually if desired).
 
-#### Constraints
-
-For now, we will provide a quick preview of the difference between constraints/restraints in CHARMM vs NAMD, as we will discuss the NAMD implementation through the Collective Variables Module later in the lab. The difference is pretty drastic!
-
-###### CHARMM:
-
-```fortran
-! Use positional restraints for equilibration
-	define PROT sele ( segid PROA ) end
-	
-	define BB   sele ( ( type C   .or. type O   .or. type N   .or. type CA ) .and. PROT ) end
-	define SC   sele .not. BB .and. .not. hydrogen .and. PROT end
-	
-	cons harm force 1.0 sele BB end
-	cons harm force 0.1 sele SC end
-```
-
-###### NAMD:
-See `namdrestraints/namd.restraintsetup_eq.col`
-
 #### Minimization
 
 Another drastic change is how minimization is handled in CHARMM vs NAMD. 
@@ -246,11 +226,38 @@ One of the nicer features of NAMD is how simplified the dynamics process is, esp
 		iunread -1 iunwri 12 iuncrd -1 iunvel -1 kunit -1 -
 		nsavc 0 nsavv 0 -
 		nose rstn tref @temp qref 50 ncyc 10 firstt @temp
+	
+	open write unit 10 card name output/charmm/leptin_eq.pdb
+	write coor unit 10 pdb
+	
+	open write unit 10 card name output/charmm/leptin_eq.crd
+	write coor unit 10 card
+	close unit 10
+	
+	open write unit 40 card name output/charmm/leptin_eq.xtl
+	write title unit 40
+	* set xtla ?xtla
+	* set xtlb ?xtlb
+	* set xtlc ?xtlc
+	*			
 ```
 
 ###### NAMD:
 
 ```tcl
+set temp           *REPLACE*;
+set outputname 	   output/namd/leptin_eq;
+outputName         $outputname;
+firsttimestep        0;
+restartfreq        500;
+dcdfreq           1000;
+dcdUnitCell        yes; 
+xstFreq           1000;
+outputEnergies     125;
+outputTiming      1000;
+
+...
+									   
 # Integrator Parameters
 timestep            2.0;               # fs/step
 rigidBonds          all;               # Bound constraint all bonds involving H are fixed in length
@@ -285,6 +292,10 @@ langevinPistonTemp      $temp
 run 25000
 ```
 
-For the equilibration phase, both CHARMM and NAMD are performing simulation with the NPT ensemble, hence the `DYNA VVER` command by CHARMM. Again, notice here that NAMD is essentially a list of variable definitions, and the `run` command at the end reads these. You can perform `run` as many times as you like without having to repeat code! 
+For the equilibration phase, both CHARMM and NAMD are performing simulation with the NPT ensemble, hence the `DYNA VVER` command by CHARMM. Again, notice here that NAMD is essentially a list of variable definitions, and the `run` command at the end reads these. You can perform `run` as many times as you like without having to repeat code! Also, by specifying `outputName` in NAMD, all of your output files will have that pattern and be created automatically, which is significantly easier than CHARMM.
+
+### 2. Collective Variables Module
+
+
 
 
