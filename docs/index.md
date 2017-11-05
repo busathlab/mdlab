@@ -21,3 +21,7 @@ Welcome to the home page of Dr. David Busath's Molecular Modeling and Dynamics c
 1. [Introduction to NAMD and Collective Variables](https://busathlab.github.io/mdlab/namd_lab1.html)
 2. [Building and Simulating a Protein-Bilayer System](https://busathlab.github.io/mdlab/namd_lab2.html)
 3. [Ligand Umbrella Sampling in a Protein-Bilayer System](https://busathlab.github.io/mdlab/namd_lab3.html)
+
+### Resources:
+- [Linux Cheatsheet](https://busathlab.github.io/mdlab/cheatsheet.html)
+- [Glossary](https://busathlab.github.io/mdlab/glossary.html)

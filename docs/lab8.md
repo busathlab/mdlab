@@ -74,9 +74,9 @@ mpirun $(which charmm) [variables to pass] < [input] > [output]
 #### Heating
 Open the file labeled "tsm.heat_2kqt.str." This file is the CHARMM script used to heat the drugs in the 2KQT model of the M2 proton channel in a lipid bilayer. You should be familiar with many of the commands seen in this script from previous labs. You will also notice the use of **absolute references** and pathnames, rather than the usual **relative references**, to allow CHARMM to access the files from any directory on the supercomputer. Variables not defined in the CHARMM script are passed from "submit.sh", as described previously. Use what you’ve learned in the previous labs to understand what each command is doing in this script, and consult the CHARMM documentation or the TA’s if necessary.
 
-> **Question 1***: What are the dimensions of the crystal for this protein system?
+> **Question 1**: What are the dimensions of the crystal for this protein system?
 
-> **Question 2***: You will notice a couple of lines that use the CHARMM command `DEFINE`. Do you remember what this command does? Describe what it influences later in the script.
+> **Question 2**: You will notice a couple of lines that use the CHARMM command `DEFINE`. Do you remember what this command does? Describe what it influences later in the script.
 
 The file labeled "tsm.restart_2kqt.str" takes restart information from the previous script and continues the simulation using CPT dynamics for equilibration.
 
