@@ -278,7 +278,7 @@ When "MESSED.STR" is finished, read the log file. The last lines, below the one 
 #### Warning Levels and `BOMLEV`
 In this context of bugs and fatal errors, it’s important to take a minute to talk about `BOMLEV`. We just saw CHARMM die when it hit a mistake in "MESSED.STR." CHARMM doesn’t die every time it reads something wrong. In the Introduction to CHARMM lab, for example, CHARMM didn’t think that our choice of non-bonded cutoffs was appropriate, so it gave us a "WARNING" (check "TRPMIN.LOG" from last week if you don’t remember this). In fact, every error in CHARMM programming has a `BOMLEV` ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)) associated with it, ranging from 5 to -5. The negative levels are pretty severe and the positive, not so bad. In "MESSED.STR" you can see that an unrecognized command is level 0. The command `BOMLEV` dictates at what level error CHARMM crashes. Right now `BOMLEV` is set at the default, zero.
 
-Managing your BOMLEV is sort of a tricky business, and you can be content to use 0 for now. To show you a bit of the complexity involved, first, correct line 23 of "ALPHA_MESSED.STR." Then, change line 29 from "ALPHAHLX.STR" to "ALPHAHLX." 
+Managing your`BOMLEV` is sort of a tricky business, and you can be content to use 0 for now. To show you a bit of the complexity involved, first, correct line 23 of "ALPHA_MESSED.STR." Then, change line 29 from "ALPHAHLX.STR" to "ALPHAHLX." 
 
 ```diff
 - 23: SETR FSTRES 2 ! First residue to be modified.
@@ -290,12 +290,12 @@ Managing your BOMLEV is sort of a tricky business, and you can be content to use
 
 Now, there’s no such file as "ALPHAHLX" in your directory, so when you tell CHARMM to read this stream file, it won’t be able to read anything. Save your file and run "ALPHA_MESSED.STR" again. Look carefully at the new log file.
 
-Although CHARMM was not able to read "ALPHAHLX," the program doesn’t crash because the `BOMLEV` wasn’t set low enough. Of course, without the stream file, "MESSED.STR" won’t change the dihedrals of our polypeptide to build an alpha-helix. This is why you must always read your log files even if CHARMM doesn’t crash openly. This raises a question: if it’s such a nuisance to allow CHARMM to continue even after an error like this, why not raise the BOMLEV? If we did raise the BOMLEV, CHARMM would have crashed in the Introduction to CHARMM lab when it disliked our non-bonded cutoffs, and that would have been a nuisance too.
+Although CHARMM was not able to read "ALPHAHLX," the program doesn’t crash because the `BOMLEV` wasn’t set low enough. Of course, without the stream file, "MESSED.STR" won’t change the dihedrals of our polypeptide to build an alpha-helix. This is why you must always read your log files even if CHARMM doesn’t crash openly. This raises a question: if it’s such a nuisance to allow CHARMM to continue even after an error like this, why not raise the`BOMLEV`? If we did raise the`BOMLEV`, CHARMM would have crashed in the Introduction to CHARMM lab when it disliked our non-bonded cutoffs, and that would have been a nuisance too.
 
 ### 4. Good Programming Practice
 One indicator of good computer programmers is the readability of their code. This applies to molecular modelers as well. There are several small tricks that help humans be able to understand scripts.
 
-##### White Space
+#### White Space
 If this lab had been written as one long paragraph without tabs or blank lines, it would have been harder to read. Scripts can also be easier to read if they contain an appropriate usage of white space. Extra tabs, spaces, and line breaks are considered white space. In stream files, CHARMM does not care if you have one blank space or twenty blank spaces, one blank line or 4 blank lines, they are run the same. Format your scripts so that they are easy to read.
 
 #### Comments
@@ -304,7 +304,7 @@ The `!` character is the comment character in CHARMM stream files. This means th
 #### Variable Names
 When you name variables in your script, make them short and descriptive. For example, if you need a variable to count the number of molecules outside a particular region, you could call it NumInBox or num_in_box. Notice the capitalization. CHARMM is not case-sensitive, meaning it does not distinguish between NumInBox and numinbox. Variations in capitalization can be used to make the program more readable. In these labs, we are using the old-fashioned tradition of capitalizing everything as a syntactical convention to make it easier for you to read the handout. Notice the difference shown between the two examples shown below, which perform the same function.
 
-```
+```diff
 - ! Poor Example
 - SET 1 6
 - SET 2 10
@@ -335,21 +335,34 @@ Run "ala_glu_trp.str." Read "ala_glu_trp.log". If you have any errors, make an e
 
 ### 5. RTF files
 A **Residue Topology File (RTF)** ([rtop.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/rtop/)) is a collection of information about the charge, connectivity, and arrangement in space of a polymeric residue or a molecule. On the attached pages are some sample RTFs for different amino acids. The GROU lines are used for simplifying electrostatic calculations when needed.
-The first lines, which begin with ATOM, are quite simply a list of all the atoms that the residues (and molecules) in the file could contain. The atom list information is in the order ATOM atomname atomtype partial charge.
-AUTOGENERATE ANGLES causes the angle list to be generated from the bond list.
-The lines which begin with BOND determine which atoms are covalently bonded. The bond information is in the form BOND atomname (i) atomname (j). Don’t get confused if there are several of these in a row. The purpose of these lines is to create listed of bonded interactions for the ENERGY function (not to specify the internal coordinates – that is the purpose of the IC lines alone, which are found below).
-Lines that begin with DOUBLE specify double bonds.
-There are no ANGLE lines because those are AUTOGENERATED from the BOND list.
-The lines that begin DIHE specify all the dihedral angles that will contribute to the ENERGY.
-The lines that begin IMPR specify "improper dihedral" relationships, which are artificial energy terms (or "penalties" if you like) used to enforce miscellaneous features of the molecular geometry related to electron structure such as chirality or planarity of conjugated ring structures.
+
+The first lines, which begin with `ATOM`, are quite simply a list of all the atoms that the residues (and molecules) in the file could contain. The atom list information is in the order `ATOM [atomname] [atomtype] [partial charge]`.
+
+`AUTOGENERATE ANGLES` causes the angle list to be generated from the bond list.
+
+The lines which begin with `BOND` determine which atoms are covalently bonded. The bond information is in the form `BOND [atomname (i)] [atomname (j)]`. Don’t get confused if there are several of these in a row. The purpose of these lines is to create listed of bonded interactions for the ENERGY function (not to specify the internal coordinates--that is the purpose of the IC lines alone, which are found below).
+
+Lines that begin with `DOUBLE` specify double bonds.
+
+There are no `ANGLE` lines because those are autogenerated from the bond list.
+
+The lines that begin `DIHE` specify all the dihedral angles that will contribute to the energy.
+
+The lines that begin `IMPR` specify "improper dihedral" relationships, which are artificial energy terms (or "penalties" if you like) used to enforce miscellaneous features of the molecular geometry related to electron structure such as chirality or planarity of conjugated ring structures.
+
 Following these lines are lists of hydrogen bond donors and acceptors, which are only used in the hydrogen-bond detection facility, and not for energy calculations.
-24
-Lab 3: Molecular Structure Manipulation
-The remainder of the residue specification is a list of IC lines. Recall from the Introduction to CHARMM lab that the numbers represent bond length, angle, dihedral, angle, and bond length. Many times, all but the dihedral angle are given as 0.0 in the RTF. Here the numbers serve as placeholders. Any 0.0 will be replaced by the parameter file value for the corresponding atom types when IC PARAM is executed prior to IC SEED and IC BUILD.
-Question 7: Identify residues A through E. Use your intuition, focusing first on the atoms that are listed as bonded together and the atom types in the ATOM lines. You may want to open top_all27_prot_lipid.rtf to check the atom types and their typical usage at the top of the file.
+
+The remainder of the residue specification is a list of IC lines. Recall from the Introduction to CHARMM lab that the numbers represent bond length, angle, dihedral, angle, and bond length. Many times, all but the dihedral angle are given as 0.0 in the RTF. Here the numbers serve as placeholders. Any 0.0 will be replaced by the parameter file value for the corresponding atom types when `IC PARAM` is executed prior to `IC SEED` and `IC BUILD`.
+
+> **Question 7**: Identify residues A through E. Use your intuition, focusing first on the atoms that are listed as bonded together and the atom types in the ATOM lines. You may want to open top_all27_prot_lipid.rtf to check the atom types and their typical usage at the top of the file.
+
 Now that you have a bit of experience in deciphering RTFs, it’s time to try something a little tougher: writing one. This will give you a better idea of what is contained in these files and will provide valuable practice.
-Question 8: Given the RTFs for phosphotyrosine and threonine, create an RTF for phosphothreonine. (Hint: threonine should be phosphorylated in a way analogous to tyrosine.) You are not expected to fill in the IC tables portion of the RTF, though you are welcome to attempt it if you desire.
-When you are done answering all of the questions, email your answers to your T.A. Be sure to attach "ala_glu_trp.str."
+
+> **Question 8**: Given the RTFs for phosphotyrosine and threonine, create an RTF for phosphothreonine. (Hint: threonine should be phosphorylated in a way analogous to tyrosine.) You are not expected to fill in the IC tables portion of the RTF, though you are welcome to attempt it if you desire.
+
+When you are done answering all of the questions, email your answers to your T.A. **_Be sure to attach "ala_glu_trp.str."_**
+
+```fortran
 RESI ??A?? 0.00
 GROUP
 ATOM N NH1 -0.47
@@ -377,11 +390,12 @@ IC +N CA *C O 1.3558 116.8400 180.0000 122.5200 1.2297
 IC CA C +N +CA 1.5390 116.8400 180.0000 126.7700 1.4613
 IC N C *CA CB 1.4592 114.4400 123.2300 111.0900 1.5461
 IC N C *CA HA 1.4592 114.4400 -120.4500 106.3900 1.0840
-25
-Lab 3: Molecular Structure Manipulation
 IC C CA CB HB1 1.5390 111.0900 177.2500 109.6000 1.1109
 IC HB1 CA *CB HB2 1.1109 109.6000 119.1300 111.0500 1.1119
 IC HB1 CA *CB HB3 1.1109 109.6000 -119.5800 111.6100 1.1114
+```
+
+```fortran
 RESI ??B?? 0.00
 GROUP
 ATOM N NH1 -0.47
@@ -430,8 +444,6 @@ IC -C CA *N HN 1.3482 123.5100 180.0000 115.0200 0.9972
 IC -C N CA C 1.3482 123.5100 180.0000 107.6900 1.5202
 IC N CA C +N 1.4507 107.6900 180.0000 117.5700 1.3505
 IC +N CA *C O 1.3505 117.5700 180.0000 121.0800 1.2304
-26
-Lab 3: Molecular Structure Manipulation
 IC CA C +N +CA 1.5202 117.5700 180.0000 124.8800 1.4526
 IC N C *CA CB 1.4507 107.6900 122.6800 111.2300 1.5560
 IC N C *CA HA 1.4507 107.6900 -117.0200 106.9200 1.0835
@@ -452,6 +464,9 @@ IC CZ2 CZ3 *CH2 HH2 1.4030 120.8700 -179.9200 119.5700 1.0811
 IC CE2 CH2 *CZ2 HZ2 1.3939 118.4200 179.8700 120.0800 1.0790
 IC CD1 CE2 *NE1 HE1 1.3752 108.8100 177.7800 124.6800 0.9767
 IC CG NE1 *CD1 HD1 1.3679 110.1000 178.1000 125.4300 1.0820
+```
+
+```fortran
 RESI ??C?? 0.00
 GROUP
 ATOM N NH1 -0.47
@@ -483,8 +498,6 @@ BOND N HN N CA C CA C +N
 BOND CA HA CB HB CG1 HG11 CG1 HG12 CG2 HG21
 BOND CG2 HG22 CG2 HG23 CD HD1 CD HD2 CD HD3
 DOUBLE O C
-27
-Lab 3: Molecular Structure Manipulation
 IMPR N -C CA HN C CA +N O
 DONOR HN N
 ACCEPTOR O C
@@ -507,6 +520,9 @@ IC CD CB *CG1 HG12 1.5381 114.0900 -120.5900 108.8900 1.1141
 IC CB CG1 CD HD1 1.5498 114.0900 -176.7800 110.3100 1.1115
 IC HD1 CG1 *CD HD2 1.1115 110.3100 119.7500 110.6500 1.1113
 IC HD1 CG1 *CD HD3 1.1115 110.3100 -119.7000 111.0200 1.1103
+```
+
+```fortran
 RESI ??D?? 0.00
 GROUP
 ATOM N NH1 -0.47
@@ -536,8 +552,6 @@ BOND N HN N CA C CA
 BOND C +N CA HA CB HB1 CB HB2 CG HG1
 BOND CG HG2 NE2 HE21 NE2 HE22
 DOUBLE O C CD OE1
-28
-Lab 3: Molecular Structure Manipulation
 IMPR N -C CA HN C CA +N O
 IMPR CD NE2 CG OE1 CD CG NE2 OE1
 IMPR NE2 CD HE21 HE22 NE2 CD HE22 HE21
@@ -563,6 +577,9 @@ IC CB CG CD OE1 1.5534 112.5000 180.0000 121.5200 1.2294
 IC OE1 CG *CD NE2 1.2294 121.5200 179.5700 116.8400 1.3530
 IC CG CD NE2 HE21 1.5320 116.8400 -179.7200 116.8600 0.9959
 IC HE21 CD *NE2 HE22 0.9959 116.8600 -178.9100 119.8300 0.9943
+```
+
+```fortran
 RESI ??E?? 1.00
 GROUP
 ATOM N NH1 -0.47
@@ -589,8 +606,6 @@ ATOM HH11 HC 0.46
 ATOM HH12 HC 0.46
 ATOM NH2 NC2 -0.80
 ATOM HH21 HC 0.46
-29
-Lab 3: Molecular Structure Manipulation
 ATOM HH22 HC 0.46
 GROUP
 ATOM C C 0.51
@@ -634,9 +649,11 @@ IC HH11 CZ *NH1 HH12 0.9903 120.6100 171.1900 116.2900 1.0023
 IC NH1 NE *CZ NH2 1.3311 118.0600 178.6400 122.1400 1.3292
 IC NE CZ NH2 HH21 1.3401 122.1400 -174.1400 119.9100 0.9899
 IC HH21 CZ *NH2 HH22 0.9899 119.9100 166.1600 116.8800 0.9914
-30
-Lab 3: Molecular Structure Manipulation
-Reference Residues
+```
+
+### Reference Residues
+
+```fortran
 RESI THR 0.00 ! Threonine
 GROUP
 ATOM N NH1 -0.47 ! |
@@ -679,8 +696,9 @@ IC CA CB OG1 HG1 1.5693 112.1600 -179.2800 105.4500 0.9633
 IC CA CB CG2 HG21 1.5693 115.9100 -173.6500 110.8500 1.1104
 IC HG21 CB *CG2 HG22 1.1104 110.8500 119.5100 110.4100 1.1109
 IC HG21 CB *CG2 HG23 1.1104 110.8500 -120.3900 111.1100 1.1113
-31
-Lab 3: Molecular Structure Manipulation
+```
+
+```fortran
 RESI TYR 0.00
 GROUP
 ATOM N NH1 -0.47 ! | HD1 HE1
@@ -733,8 +751,6 @@ IC N C *CA HA 1.4501 106.5200 -116.0400 107.1500 1.0833
 IC N CA CB CG 1.4501 111.4300 180.0000 112.9400 1.5113
 IC CG CA *CB HB1 1.5113 112.9400 118.8900 109.1200 1.1119
 IC CG CA *CB HB2 1.5113 112.9400 -123.3600 110.7000 1.1115
-32
-Lab 3: Molecular Structure Manipulation
 IC CA CB CG CD1 1.5606 112.9400 90.0000 120.4900 1.4064
 IC CD1 CB *CG CD2 1.4064 120.4900 -176.4600 120.4600 1.4068
 IC CB CG CD1 CE1 1.5113 120.4900 -175.4900 120.4000 1.4026
@@ -746,6 +762,9 @@ IC CZ CD1 *CE1 HE1 1.3978 120.0900 179.6400 120.5800 1.0799
 IC CZ CD2 *CE2 HE2 1.3979 119.9200 -178.6900 119.7600 1.0798
 IC CE1 CE2 *CZ OH 1.3978 120.0500 -178.9800 120.2500 1.4063
 IC CE1 CZ OH HH 1.3978 119.6800 175.4500 107.4700 0.9594
+```
+
+```fortran
 RESI PTYR -1.00
 GROUP
 ATOM N NH1 -0.47 ! | HD1 HE1
@@ -786,8 +805,6 @@ BOND N HN N CA C CA C +N
 BOND CA HA CB HB1 CB HB2 CD1 HD1 CD2 HD2
 BOND CE1 HE1 CE2 HE2 OH PO4 PO4 OC1 PO4 OC2
 BOND PO4 OC3
-33
-Lab 3: Molecular Structure Manipulation
 DOUBLE O C CD1 CG CE1 CZ CE2 CD2
 IMPR N -C CA HN C CA +N O
 DONOR HN N
@@ -814,4 +831,4 @@ IC CZ CD1 *CE1 HE1 1.3978 120.0900 179.6400 120.5800 1.0799
 IC CZ CD2 *CE2 HE2 1.3979 119.9200 -178.6900 119.7600 1.0798
 IC CE1 CE2 *CZ OH 1.3978 120.0500 -178.9800 120.2500 1.4063
 IC CE1 CZ OH HH 1.3978 119.6800 175.4500 107.4700 0.9594
-(And other ICs which you should figure out.)
+```
