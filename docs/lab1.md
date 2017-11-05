@@ -12,7 +12,7 @@ Many of your molecular models will contain proteins, many of which are common in
 To get started, use your internet browser to go to the [RSCB homepage at rcsb.org](http://www.rcsb.org). We will use the Botulinum Neurotoxin, often referred to as BoNT or BoTox, in this first lab.  If you knew the PDB ID number for your protein, you could simply type it into the search box and click Search. Since you probably don’t, you can just type **BoTox** in the search box and click Search. The search should bring a list of results. We want to use the crystal structure of Botulinum Neurotoxin Serotype A, which was the first one determined and was released in 1999. The four digit code on the left hand side above one of the small pictures is the PDB ID number. We are looking for **3BTA**. Click on it to bring up a page specific to our protein. This page contains a lot of information that we will not cover in this lab.
 
 #### Downloading PDB files
-You can download files from the PDB website to your computer so that you can use them in simulations. On the page specific to our BoTox protein, toggle the drop-down menu on the right-hand side labeled `Download files` and choose `PDB Format`. Save the file where you will be able to find it later.
+You can download files from the PDB website to your computer so that you can use them in simulations. On the page specific to our BoTox protein, toggle the drop-down menu on the right-hand side labeled "Download files" and choose "PDB Format." Save the file where you will be able to find it later.
 
 ### 2. VMD
 We will be using a program named CHARMM (Chemistry at HARvard Molecular Modeling) to run our simulations. While CHARMM is great at crunching numbers to simulate how systems work, it has no graphical component. VMD is a program that converts the output files from CHARMM to visual representations of molecular systems as if we were looking at them under a type of microscope.
@@ -83,3 +83,5 @@ In order to keep system size small while simulating large systems, CHARMM uses s
 ![alt text](https://github.com/busathlab/mdlab/raw/master/images/01_f03.PNG "Figure 3")
 
 Submit these three files along with the two files from the first two assignments in the lab to your T.A.
+
+**[Return to home page.](https://busathlab.github.io/mdlab/index.html)**
