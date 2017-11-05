@@ -5,6 +5,8 @@
 - Find a protein in the database and download the protein’s .pdb file
 - Familiarize with VMD and perform basic functions
 
+---
+
 ### 1. RCSB Protein Data bank
 Many of your molecular models will contain proteins, many of which are common in dynamics simulations. It would be very time consuming to have to recreate these proteins every time that you wanted to use one. The RCSB Protein Data bank contains a database of proteins that you can use in your models.
 
