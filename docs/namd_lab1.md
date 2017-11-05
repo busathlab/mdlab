@@ -31,7 +31,7 @@ Before digging into these files, take a brief overview of each. What patterns do
 
 One large distinction is that CHARMM scripts are very order-dependent--commands are executed chronologically. On the other hand, the NAMD configuration file is really a large "definition" file in which you describe the starting conditions of a run, and order of parameters matter less. This is somewhat of an oversimplification, but it sheds light on some of the advantages/disadvantages of each. 
 
-#### Topology and coordinates 
+#### Topology and Parameters 
 Typically among the very first things in any CHARMM script is loading topology and parameter files, and it won't take you long to find the analogous location in the NAMD configuration file.
 
 ###### CHARMM:
@@ -85,6 +85,7 @@ parameters          $topparloc/par_all36_water_ions.prm
 
 Notice NAMD depends on parameter files, but, unlike CHARMM, it does not require topology files! CHARMM PSF files do not, by default, contain atom connectivities, etc. that are described in topology files, so CHARMM must load these in. However, NAMD uses XPLOR PSF files, which do contain topologies of the molecules for each system, making the topology files redudant in NAMD. 
 
+#### PSF and Coordinates
 Now let's compare how coordinates and PSF's are loaded:
 
 ###### CHARMM:
@@ -106,3 +107,76 @@ structure          leptin.xplor.ext.psf
 coordinates        leptin.pdb
 ```
 
+What a relief, NAMD doesn't have the trouble Fortran units! However, only one set of coordinates can be loaded in NAMD, unlike CHARMM where you can append coordinates and PSF's. In other words, your system needs to be completely set up and ready before running NAMD. 
+
+Another important difference is that CHARMM can use PDB or CRD formatted coordinate files, while NAMD uses PDB format coordinates or NAMD binary .coor files. And, as discussed previously, CHARMM can read both XPLOR and standard PSF's, while NAMD requires XPLOR PSF's. 
+
+#### Periodic Boundaries and Molecule Wrapping
+Next on the comparison is how CHARMM and NAMD set up periodic conditions. 
+
+###### CHARMM:
+
+```fortran
+! Setup PBC (Periodic Boundary Condition)
+	crystal defi cubi 72 72 72 90.0 90.0 90.0
+	crystal build cutoff 14 nope 0
+! Image centering by residue
+	IMAGE BYRESID XCEN 0 YCEN 0 ZCEN 0 sele resname TIP3 end
+	IMAGE BYRESID XCEN 0 YCEN 0 ZCEN 0 sele ( segid SOD .or. segid CLA ) end
+```
+
+###### NAMD:
+
+```tcl
+# Periodic Boundary conditions
+cellBasisVector1    *REPLACE*	0.0   		0.0;
+cellBasisVector2    0.0    		*REPLACE*   0.0;
+cellBasisVector3    0.0   		0.0    		*REPLACE*;
+cellOrigin          0.0   		0.0   		0.0;
+
+wrapWater           on;
+wrapAll             on;
+wrapNearest        off;
+```
+
+Given your knowledge of CHARMM, it should be trivial to figure out what values belong in place of `*REPLACE*`, especially when the crystal type is a cube. See the NAMD user guide section on [Periodic Boundaries](http://www.ks.uiuc.edu/Research/namd/2.12/ug/node33.html) for more information.
+
+One difference between CHARMM and NAMD is that CHARMM gives more flexibility in what atoms are wrapped or centered using selection syntax. NAMD provides options to wrap water molecules or all molecules around periodic boundaries. These options should not affect the simulation in any drastic way, but they will affect how trajectories and output appear, and may influence time series coordinate information.
+
+#### Non-bonded options and Particle Mesh Ewald
+
+###### CHARMM:
+
+```fortran
+! Nonbonded Options
+	nbonds atom vatom vfswitch bycb -
+		ctonnb 10.0 ctofnb 12.0 cutnb 16.0 cutim 16.0 -
+		inbfrq -1 imgfrq -1 wmin 1.0 cdie eps 1.0 -
+		ewald pmew fftx 72 ffty 72 fftz 72 kappa .34 spline order 6
+	energy
+```
+
+###### NAMD:
+
+```tcl
+exclude             scaled1-4 
+1-4scaling          1.0
+switching            on
+vdwForceSwitching   yes;
+cutoff              *REPLACE*;
+switchdist          10.0;
+pairlistdist        16.0;
+stepspercycle       20;
+pairlistsPerCycle    2;
+
+# PME (for full-system periodic electrostatics)
+PME                yes;
+PMEGridSpacing      1.0	               # lets NAMD determine the PME dimensions automatically
+PMEInterpOrder       *REPLACE*;                # interpolation order (spline order in charmm)
+
+
+```
+
+Again, CHARMM wins with flexibility and amount of options, as evidenced here when adjusting non-bonded options and energy. However, NAMD simplifies the process significantly. Given the CHARMM comparison, can you figure out what should go in the stead of `*REPLACE*`? 
+
+Particle Mesh Ewald lengths are also required to be input manually in CHARMM, while in NAMD, the integers are computed automatically (though they can be input manually if desired).
