@@ -34,7 +34,6 @@ When VMD is opened, it starts three windows: a console window, a display window,
 *Perspective vs . Orthographic*: Perhaps you noticed that when you rotated the display, some bond lengths seemed to get smaller, and some got bigger--This is the result of using **perspective mode** in VMD. In an attempt to help visualize the three-dimensional structure, VMD makes atoms that are far away small and atoms that are close big. Often times this feature makes it hard to see what is going on in the system. To turn off perspective and enable **orthographic mode**, select “Orthographic” from the “Display” pull-down menu in the main window.
 
 *Stereo Vision*: Another tool to help visualize the three-dimensional structure of your system is **stereo vision**. In the Main window, select “Display,” “Stereo,” and then “Side by Side.” The display window should have two images side by side. This function is like magic eye pictures. The idea is that you want your right eye to look at the image on the right and your left eye to look at the image on the left. The images look the same, but are slightly different. When the two images are superimposed in your brain, you get the illusion of 3-D, or “stereo vision.”
- 
 
 This can be a little tricky at first, so here are some pointers. First, resize your window so that the centers of each image are about two inches apart. Next, get as close to the screen as possible without touching your nose to the glass. The idea is that if you are close enough, then your right eye can only see the right image because your nose blocks the left image. Your left eye likewise can only see the left image.  Relax your eyes as if you were looking across the room. You should see one unfocused image. Your brain will think that the two different images are really the same image. Slowly back away from the screen being careful to focus so that the single image remains super-imposed. As you back away, your right eye will begin to see the image on the left and your left eye will be able to see the image on the right. You will see a total of three images. The one in the middle will be in 3-D!  Sometimes it helps to slightly rotate the display with the mouse. You can also zoom in now (scale up), but not too far or you will lose focus.
 
@@ -54,8 +53,9 @@ Click on clipping plane number ‘0.’ When you first turn on a clipping plane,
 
 *Rendering*:  Often you want to use an image from VMD in an outside project such as a poster or a paper. You can export snapshots of VMD using the **render** command. These files are saved in the .bmp format. To save a picture of the display window, use the “File” pull-down menu and select “Render.” In the Render Controls window, choose a location to save the snapshot.
 
-> *Assignment 1*: open a copy of the BoTox molecule. Rotate it, rescale it, and translate it slightly.  Next, label an atom, a bond, an angle, and a dihedral angle.  Finally, render a copy of your display naming it “lab1_singleBoTox.bmp.” Save the file to submit it at the end of the lab.  Your display should resemble Figure 1 below.
+> **Assignment 1**: open a copy of the BoTox molecule. Rotate it, rescale it, and translate it slightly.  Next, label an atom, a bond, an angle, and a dihedral angle.  Finally, render a copy of your display naming it “lab1_singleBoTox.bmp.” Save the file to submit it at the end of the lab.  Your display should resemble Figure 1 below.
 
+*Figure 1*
 ![alt text](https://github.com/busathlab/mdlab/raw/master/images/01_f01.PNG "Figure 1")
 
 #### Multiple files
@@ -63,55 +63,23 @@ VMD is not limited to opening one file at a time. You can open many files and vi
 
 When you look at the display window, it looks like there is only one molecule. This is because they are all loaded on top of each other. Try to move them using translate mode. You will notice that they all move together. The same is true in rotate mode and scale mode.  To move each copy individually, use the “Move” command found in the “Mouse” pull-down menu. This command allows you to select and move individual groups of atoms. Select “Move Molecule” and drag one of the BoTox molecules off of the stack. To change the representations of any individual file, go to the graphical representation window and select the file name using the right arrow in the box under the heading “Selected Molecule.”
 
-> *Assignment 2*: open four copies of the BoTox molecule. Move and scale them so that all four molecules are visible and so that none are touching. Change the representations so that all four molecules have different coloring methods and different drawing methods. Render a copy of your display naming it “lab1_fourBoTox.bmp.” Save the file to submit it at the end of the lab.  Your display should resemble Figure 2 below.
+> **Assignment 2**: open four copies of the BoTox molecule. Move and scale them so that all four molecules are visible and so that none are touching. Change the representations so that all four molecules have different coloring methods and different drawing methods. Render a copy of your display naming it “lab1_fourBoTox.bmp.” Save the file to submit it at the end of the lab.  Your display should resemble Figure 2 below.
 
+*Figure 2.*
+![alt text](https://github.com/busathlab/mdlab/raw/master/images/01_f02.PNG "Figure 2")
 
+#### DCD files
+Up until now we have learned how VMD allows us to see molecular models graphically. We have learned how to manipulate the way we look at these models, but the models remain unchanged. We can also use VMD to watch simulations.  During dynamics simulations, CHARMM creates **.dcd files** that can be viewed with VMD much like DVD’s are viewed with a DVD player. To do this, you need to load at least two files. The first file is the .pdb file for the model. The **.pdb file** has all of the atom information including initial coordinates and atom names for each atom. The other is a .dcd file which tells how each atom moved during the simulation.  You can actually load many .dcd files at once.
 
+For this part of the lab, we will watch a lipid bilayer simulation using files in the lab directory.  First load the file named “bilayer.pdb” into VMD. When this file loads, you will be looking at the system, which consists of two types of lipid molecules sandwiched by water molecules, from the top.  Rotate the system so that you are looking at it from the side.  You should see red and white water molecules on the top and bottom of the system. Next, go to the Main window and select “Load Data into Molecule” from the “File” pull-down menu. You should see the Molecule File Browser window appear just like when you were loading a new .pdb file. Make sure that the Load files for box says “bilayer.pdb.” If it does not, then click on the arrow on the right of the box and select “bilayer.pdb.” Now browse, select, and load “bilayer.dcd.” You will notice that the number of frames in the Main window will start counting, and the display window will start showing the simulation. When the file is done loading, then the frame count will stop. The controls at the bottom of the main window control the simulation playback. The single arrows on the bottom right and bottom left corners play the simulation forwards and reverse respectively. Click on the play button again and the simulation playback will be paused. The arrows directly above the play buttons jump to the beginning or to the end. The last two arrows step through the simulation one frame at a time.
 
+In order to keep system size small while simulating large systems, CHARMM uses something called **periodic boundaries**. Simply, copies of the system are replicated about the original system in all directions. When you load a .dcd file, VMD only shows the primary image. To see the images in the periodic boundaries, defined in the header of the .dcd file, you have to turn them on. To do this go to the Graphical Representations window, select the “Periodic” tab, and click on the check boxes next to the dimensions that you want to show.
 
+> Frame 0 of the trajectory is simply the coordinates of the original pdb file, and it won’t demonstrate periodicity. To avoid this artifact, delete frame 0 to show only the frames from the dcd file.
 
+> **Assignment 3**: open the .pdb and the .dcd files for the lipid bilayer. Rotate the display so that you are looking at the side of the model. Make three representations with the following selections: “water”, “resname PALM or resname PCGL”, and “resname DLPC”. Change the drawing method of the representation with the ‘resname DLPC’ selection so that it is easily distinguishable from the representation with the “resname PALM and resname PCGL” selection. Turn on the periodicity for all the representations except the water representation in both the +x and –x directions. Render three snapshots: the first at the beginning of the run, the second in the middle of the run, and the last at the end of the run. Name these files “lab1_beg. bmp”, “lab1_mid.bmp”, and “lab1_end.bmp”. Your display should resemble Figure 3 below.
 
-
-
-
-
-
-
-
-
-
-
-
-
-Figure 2: Representations
-
-DCD files
-Up until now we have learned how VMD allows us to see molecular models graphically. We have learned how to manipulate the way we look at these models, but the models remain unchanged. We can also use VMD to watch simulations.  During dynamics simulations, CHARMM creates .dcd files that can be viewed with VMD much like DVD’s are viewed with a DVD player. To do this, you need to load at least two files. The first file is the .pdb file for the model. The .pdb file has all of the atom information including initial coordinates and atom names for each atom. The other is a .dcd file which tells how each atom moved during the simulation.  You can actually load many .dcd files at once.
-
-For this part of the lab, we will watch a lipid bilayer simulation using files in the lab directory.  First load the file named “bilayer.pdb” into VMD. When this file loads, you will be looking at the system, which consists of two types of lipid molecules sandwiched by water molecules, from the top.  Rotate the system so that you are looking at it from the side.  You should see red and white water molecules on
- 
-the top and bottom of the system. Next, go to the Main window and select “Load Data into Molecule” from the “File” pull-down menu. You should see the Molecule File Browser window appear just like when you were loading a new .pdb file. Make sure that the Load files for box says “bilayer.pdb.” If it does not, then click on the arrow on the right of the box and select “bilayer.pdb.” Now browse, select, and load “bilayer.dcd.” You will notice that the number of frames in the Main window will start counting, and the display window will start showing the simulation. When the file is done loading, then the frame count will stop. The controls at the bottom of the main window control the simulation playback. The single arrows on the bottom right and bottom left corners play the simulation forwards and reverse respectively. Click on the play button again and the simulation playback will be paused. The arrows directly above the play buttons jump to the beginning or to the end. The last two arrows step through the simulation one frame at a time.
-
-In order to keep system size small while simulating large systems, CHARMM uses something called periodic boundaries. Simply, copies of the system are replicated about the original system in all directions. When you load a .dcd file, VMD only shows the primary image. To see the images in the periodic boundaries, defined in the header of the .dcd file, you have to turn them on. To do this go to the Graphical Representations window, select the “Periodic” tab, and click on the check boxes next to the dimensions that you want to show.
-
-   Frame 0 of the trajectory is simply the coordinates of the original pdb file, and it won’t demonstrate periodicity. To avoid this artifact, delete frame 0 to show only the frames from the dcd file.
-
-Assignment 3: open the .pdb and the .dcd files for the lipid bilayer. Rotate the display so that you are looking at the side of the model. Make three representations with the following selections: “water”, “resname PALM or resname PCGL”, and “resname DLPC”. Change the drawing method of the representation with the ‘resname DLPC’ selection so that it is easily distinguishable from the representation with the “resname PALM and resname PCGL” selection. Turn on the periodicity for all the representations except the water representation in both the +x and –x directions. Render three snapshots: the first at the beginning of the run, the second in the middle of the run, and the last at the end of the run. Name these files “lab1_beg. bmp”, “lab1_mid.bmp”, and “lab1_end.bmp”. Your display should resemble Figure 3 below.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Figure 3: Periodicity
+*Figure 3.*
+![alt text](https://github.com/busathlab/mdlab/raw/master/images/01_f03.PNG "Figure 3")
 
 Submit these three files along with the two files from the first two assignments in the lab to your T.A.
