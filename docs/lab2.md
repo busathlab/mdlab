@@ -59,7 +59,7 @@ Using vi, open a new file named "ptrpmin.str". This will be where your script wi
 
 #### Writing CHARMM scripts
 All CHARMM scripts begin with a title. This is useful later in identifying old scripts. Title lines begin with an asterisk. (Also in non-title lines, exclamation points can be used to initiate comments.) The title must finish with a line consisting of only one asterisk, so enter:
-```
+```fortran
 * To create poly-tryptophan and calculate its energy
 *
 ```
@@ -69,7 +69,7 @@ All CHARMM scripts begin with a title. This is useful later in identifying old s
 CHARMM already knows what atoms and amino acids look like, and how to connect them (i.e., atom masses and charges, bond angles and strengths, etc. are stored in the topology and parameter files).  In the next lab, we’ll learn how to write an Residue Topology File (RTF) that creates an amino acid from scratch; for now, let’s use the ones the CHARMM programmers wrote. In order for you to make reference to a TRP residue, CHARMM must have first called up all these pre-calculated residue structure and parameter files. The instructions for calling up this stored information have already been written for you in a file called "TOPPARM.STR."
 
 Any CHARMM commands can be stored in a file and read into CHARMM by using the STREAM command ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)).  Your first instruction to CHARMM should be:
-```
+```fortran
 STREAM TOPPARM.STR
 ```
 > Filenames enclosed in quotes, such as "TOPPARM.STR," are case-sensitive in CHARMM. This means that if the filename is truly TOPPARM.STR and you type in "topparm.str," it won’t work.
@@ -89,7 +89,7 @@ It appears like that would be the end of things, except for the cleanup crew in 
 
 Now we want to see the result of our troubles so we ask CHARMM to show us what the IC table looks like, with the command `PRINT IC`. The information in the IC table is presented in columns labeled below, where I, J, K, and L are atom names, R stands for bond length, T stands for theta (angle), and PHI is the dihedral angle.
 
-```
+```fortran
 I   J   K   L   R(I-J or I-K)   T(I-J-K or I-K-J)   PHI   T(J-K-L)  R(K-L)
 ```
 
@@ -97,7 +97,7 @@ If an asterisk (*) is present in front of the third atom name, this indicates an
 
 The whole set of commands needed to build the PSF for the segment called PTRP and then print the contents of the IC table looks like this:
 
-```
+```fortran
 READ SEQUENCE CARD
 * Sequence for poly-tryptophan
 * 5
@@ -115,7 +115,7 @@ PRINT IC
 
 We said at the outset that we were interested in finding the energy of this peptide. Typing `ENER` ([energy.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/energy/)) will calculate the potential energy--you will learn how in future labs, so for now we will leave it at that. But an important parameter in calculating energy is the cutoff distance for non-bonded interactions. In other words, how far apart do two atoms have to be before their effect on each other is deemed ‘negligible’ and ignored? The following three commands will compute the potential energy three times, each time with different parameters:
 
-```
+```fortran
 ENER
 ENER CUTNB 5.0 CTONNB 4.0 CTOFNB 4.5
 ENER CUTNB 8.0 CTONNB 6.5 CTOFNB 7.5
@@ -130,13 +130,13 @@ CHARMM potential energy computation depends on the cutoff parameters. The bigger
 
 **"Energy minimization"** and "geometry optimization" are synonymous terms for algorithms that change the coordinates of the peptide (i.e., its shape) to result in a lower potential energy structure. Because we are going to change the coordinates of the peptide, let’s keep a copy of the original structure in the **comparison set**, which is a secondary coordinate file where active coordinates can be kept in CHARMM ([corman.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/corman/)):
 
-```
+```fortran
 COORDINATE COPY COMP
 ```
 
 One method of minimization which will be discussed in lectures to come is Adopted-Basis Newton-Raphson (ABNR) ([minimiz.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/minimiz/)). The following command instructs CHARMM to perform 25 steps of ABNR minimization on our PTRP:
 
-```
+```fortran
 MINIMIZE ABNR NSTEP 25 NPRINT 1
 ```
 
@@ -144,7 +144,7 @@ MINIMIZE ABNR NSTEP 25 NPRINT 1
 
 CHARMM has temporarily stored the original coordinates of poly-TRP (in the COMParison coordinate set) and the coordinates of the new minimized structure (in the MAIN coordinate set). If we had CHARMM run this script and then finish, both sets of coordinates would be lost, unless we save them to permanent, humanly readable files on disk. To do this we have to start by designating a **FORTRAN logical unit number** ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)). This unit number could be any number from 1 – 99, but don’t use 5 or 6. These are standard input (the keyboard) and standard output (the monitor). Don’t use the same unit number twice in a script unless the first unit is closed or you want to write again to the same file. We also specify that the file type will be ASCII, with the keyword CARD. Then we name the file, adding the suffix ".CRD" as we do with any set of coordinates. We haven’t actually saved the coordinates to this file yet; we’ve just named it. To save coordinates to any unit, the command is WRITE COOR, or in the case of coordinates stored in the COMP set, WRITE COOR COMP. Then, just to be neat, we close the unit. If you forget this on occasion, CHARMM’s sub-program RDTITL will do it for you.
 
-```
+```fortran
 OPEN WRITE UNIT 10 CARD NAME "ptrp.crd" 
 WRITE COOR COMP UNIT 10 CARD
 CLOSE UNIT 10
@@ -156,25 +156,25 @@ CLOSE UNIT 20
 
 How did poly-tryptophan change upon ABNR minimization? To find out we should compare the two coordinate sets, both in Cartesian coordinates and in internal coordinates. The command to calculate the difference between the internal coordinates (preminimization minus postminimization) is:
 
-```
+```fortran
 IC DIFF
 ```
 
 The command to calculation the difference between Cartesian coordinates (preminimization minus postminimization) is:
 
-```
+```fortran
 COOR DIFF
 ```
 
 Now, to print out these differences to the log file, we print out the MAIN Cartesian coordinate set and the IC table, just like we did above to print the coordinates themselves. The original coordinates in these two tables have all been replaced by differences in the coordinates!
 
-```
+```fortran
 PRINT COOR PRINT IC
 ```
 
 Finally, be sure to tell CHARMM that your stream file is finished:
 
-```
+```fortran
 STOP
 ```
 

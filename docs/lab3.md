@@ -81,7 +81,7 @@ In the above example, four sequential variables with the prefix "segName" are se
 #### Save Selections with `DEFINE`
 The `DEFINE` command can be used to save a selection for use throughout a script. For example:
 
-```
+```fortran
 DEFINE WATEROXYGENS SELE TYPE OH2 END 
 ```
 
@@ -130,7 +130,7 @@ A loop is a piece of a program designed to repeat itself many times ([miscom.doc
 
 If we wanted to minimize a structure again and again until the potential energy was less than -100, a loop could be used. Once the energy went below -100, the conditional would not be met, and CHARMM would ignore the GOTO command and go on to the next line. The code would look like this:
 
-```
+```fortran
 LABEL LOOP1
 MINIMIZE ABNR NSTEP 200
 SET MYENERGY ?ENER
@@ -139,7 +139,7 @@ IF MYENERGY GT -100 GOTO LOOP1
 
 What if we wanted to minimize our structure 200, then 300, then 400 times? We could attack the problem by using 3 different parameters:
 
-```
+```fortran
 SET 1 200
 SET 2 300
 SET 3 400
@@ -150,7 +150,7 @@ MINIMIZE ABNR NSTEP @3
 
 But if we want to increase the number of steps by 100 until the number reached 10000, it would take a long time to enter in all of the commands. Instead of typing 100 commands, you could use a loop:
 
-```
+```fortran
 SET n 200
 LABEL min_loop
 MINIMIZE ABNR NSTEP @n
@@ -162,7 +162,7 @@ IF n LE 10000 GOTO min_loop
 
 > **Question 1**: What would happen if the SET command were inside the loop?
 
-#### `IC EDIT`
+#### Editing internal coordinates with `IC EDIT`
 As you might guess, `IC EDIT` ([intcor.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/intcor/)) is used to edit internal coordinates. The command can be followed by as many lines as desired, with each containing 
 1. The keywords DIST, ANGLE, or DIHEDRAL
 2. An atom selection of two, three, or four atoms for DIST, ANGL, or DIHE, respectively, taking the form `residuenumber atomname` 
@@ -171,27 +171,37 @@ As you might guess, `IC EDIT` ([intcor.doc](https://www.charmm.org/charmm/docume
 
 Improper dihedrals, as in the IC table, are indicated by an asterisk before the third atom specification. To change the length of a bond (`DISTANCE`) to 2.0 angstroms, for example, `IC EDIT` is used in the following manner:
 
-```
+```fortran
 IC EDIT
 DIST 3 N 3 C 2.0
 END
 ```
 
-#### `WRITE TITLE`
-Sometimes CHARMM won’t let you write to a file unless it has a title first. Other times you really need the title, to include information about the data in the file. WRITE TITLE (miscom.doc) is always followed by the information you want at the top of the file, preceded by asterisks:
+#### Writing to text files with `WRITE TITLE`
+Sometimes CHARMM won’t let you write to a file unless it has a title first. Other times you really need the title, to include information about the data in the file. `WRITE TITLE` ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)) is always followed by the information you want at the top of the file, preceded by asterisks:
+
+```fortran
 WRITE TITLE
 * This is where you describe the file
 *
-WRITE TITLE really gets useful when you want to report the values of internal CHARMM variables not normally reported in the format you want. Imagine doing several energy calculations on different structures, and wanting a concise, sequentially numbered list of the energies. Inside a loop, you might write:
+```
+
+`WRITE TITLE` really gets useful when you want to report the values of internal CHARMM variables not normally reported in the format you want. Imagine doing several energy calculations on different structures, and wanting a concise, sequentially numbered list of the energies. Inside a loop, you might write:
+
+```fortran
 WRITE TITLE
 * @num ?ENER
 *
+```
+
 This will write the value of CHARMM variable "num" followed by the potential energy of the current structure to standard output, which is the monitor--unless it was redirected to an output file in the CHARMM command line, (or unless you have opened a file on a unit for writing, as exemplified in line 22 of ALPHAHLX.STR below, and you have specified the unit number in the WRITE TITLE line; but don’t bother with this approach for now).
-II. Sample Scripts
-Question 2: Look at the two scripts on the following pages (ALPHA.STR and ALPHAHLX.STR). The numbers at the far left are for convenience and should not appear in the CHARMM-ready script. Wherever the number at the far left is bold and underlined, tell what that command is doing and, where applicable, what sort of information is contained in the file it makes reference to. (Lab 2 may be helpful here.)
+
+### 2. Sample Scripts
+> **Question 2**: Look at the two scripts on the following pages (ALPHA.STR and ALPHAHLX.STR). The numbers at the far left are for convenience and should not appear in the CHARMM-ready script. Wherever the number at the far left is bold and underlined, tell what that command is doing and, where applicable, what sort of information is contained in the file it makes reference to. (Lab 2 may be helpful here.)
+
 Lines 1-6 are the content of "TOPPARM.STR," the function of which was discussed in Lab 2. Make note of them since you’ll need them in Question 3.
-19
-Lab 3: Molecular Structure Manipulation
+
+```fortran
 ************************ALPHA.STR************************
 * Copyright 1988 Polygen Corporation
 *This input file constructs an alpha helix for polyalanine
@@ -220,8 +230,9 @@ Lab 3: Molecular Structure Manipulation
 22 OPEN WRITE UNIT 40 CARD NAME "ALPHAHLX.PDB"
 23 WRITE COOR PDB CARD UNIT 40
 24 STOP
-20
-Lab 3: Molecular Structure Manipulation
+```
+
+```fortran
 ***********************APHAHLX.STR****************************
 * Copyright 1988 Polygen Corporation
 * This stream file edits the internal coordinate table by defining
@@ -244,20 +255,37 @@ Lab 3: Molecular Structure Manipulation
 10 INCR RES BY 1
 11 INCR NXTRES BY 1
 12 IF RES LE @LSTRES GOTO START
-.
+```
+
 With the previous scripts as a model, answer the following question.
-Question 3: After the first iteration of the loop in ALPHAHLX.STR (just after line 11), what are the values of FSTRES, LSTRES, RES, NXTRES, and PRERES? How would CHARMM interpret lines 6 and 7 of "ALPHAHLX.STR (what would the command look like after CHARMM substituted values for the parameters)?"
-Question 4: Why is ALPHA.STR set up to modify the dihedrals of residues 2 through 10 and not 1 or 11? (Hint: What would happen in ALPHAHLX.STR if res1 had been set to 1 or res2 had been set to 12?) .
-Question 5: How would you change this script to build a 3-10 helix with 14 ALA residues, given that in this sort of helix, φ = -49 and ψ = -26? How is it different from an α-helix?
-Copy the files for this lab into your personal directory. ALPHA.STR and ALPHAHLX.STR have been provided for you, with the line numbers omitted. Run ALPHA.STR with CHARMM to create alphahlx.pdb. Import this PDB into VMD and examine it. Create the 3-10 helix PDB file (change ALPHA.STR
-21
-Lab 3: Molecular Structure Manipulation
-to make "3_10.STR" which in turn creates "3_10.PDB"). Import this "3_10.PDB" into VMD. Examine the difference between 3-10 and α-helices and describe them in your answer to Question 5.
-III. Debugging
-1. If the writer of a stream file makes a mistake somewhere, CHARMM will often stop before finishing the task. If this happens, there will be a message about 15 lines from the end of the ".LOG" file saying, "Execution terminated due to the detection of a fatal error." The process of reading the ".LOG" file and trying to decipher what the problem is called debugging, and it consumes most of the lab time of every computer scientist in existence and most molecular modelers too. To witness this gruesome spectacle, read "ALPHA_MESSED.STR." You will find this file after you run ALPHA.STR. It will be with all of the other job files. This is the same program as the one you commented in Question 2, but if you look carefully at line 14 you’ll see a mistake ("SETR" should be "SET"). Save "ALPHA_MESSED.STR" to your computer, rename it "MESSED.STR," and run it.
-When "MESSED.STR" is finished, read the log file. The last lines, below the one starting "MAXIMUM SPACE USED IS…," are normal information lines given in every log file whether CHARMM has abnormally terminated or not. The "fatal error" message just above them is what we’re interested in: "Unrecognized command: SETR." If we were writing a stream file, this message would tell us that something was wrong with the SETR command in line 14. We’d have to go back to the stream file, change that command to SET, and run our script again. Of course, if our change was also incorrect, then CHARMM would stop this time as well. When debugging, it is often necessary to repeat this process many times in order to execute the file correctly. The most common bugs are often simple typos. For this reason, it is a good idea to take your time when typing scripts.
-2. In this context of bugs and fatal errors, it’s important to take a minute to talk about BOMLEV. We just saw CHARMM die when it hit a mistake in "MESSED.STR." CHARMM doesn’t die every time it reads something wrong. In the Introduction to CHARMM lab, for example, CHARMM didn’t think that our choice of non-bonded cutoffs was appropriate, so it gave us a "WARNING" (check "TRPMIN.LOG" from last week if you don’t remember this). In fact, every error in CHARMM programming has a BOMLEV (miscom.doc) associated with it, ranging from 5 to -5. The negative levels are pretty severe and the positive, not so bad. In "MESSED.STR" you can see that an unrecognized command is level 0. The command BOMLEV dictates at what level error CHARMM crashes. Right now BOMLEV is set at the default, zero.
-Managing your BOMLEV is sort of a tricky business, and you can be content to use 0 for now. To show you a bit of the complexity involved, first, correct line 14 of "ALPHA_MESSED.STR." Then, change line 16 from "ALPHAHLX.STR" to "ALPHAHLX." Now, there’s no such file as "ALPHAHLX" in your directory, so when you tell CHARMM to read this stream file, it won’t be able to read anything. Save your file and run "ALPHA_MESSED.STR" again. Look carefully at the new log file.
+
+> **Question 3**: After the first iteration of the loop in ALPHAHLX.STR (just after line 11), what are the values of `FSTRES`, `LSTRES`, `RES`, `NXTRES`, and `PRERES`? How would CHARMM interpret lines 6 and 7 of "ALPHAHLX.STR" (what would the command look like after CHARMM substituted values for the parameters)?
+
+> **Question 4**: Why is ALPHA.STR set up to modify the dihedrals of residues 2 through 10 and not 1 or 11? (Hint: What would happen in ALPHAHLX.STR if res1 had been set to 1 or res2 had been set to 12?)
+
+> **Question 5**: How would you change this script to build a 3-10 helix with 14 ALA residues, given that in this sort of helix, φ = -49 and ψ = -26? How is it different from an α-helix?
+
+Copy the files for this lab into your personal directory. ALPHA.STR and ALPHAHLX.STR have been provided for you, with the line numbers omitted. Run ALPHA.STR with CHARMM to create alphahlx.pdb. Import this PDB into VMD and examine it. Create the 3-10 helix PDB file (change ALPHA.STR to make "3_10.STR" which in turn creates "3_10.PDB"). Import this "3_10.PDB" into VMD. *Examine the difference between 3-10 and α-helices and describe them in your answer to Question 5.*
+
+### 3. Debugging
+``` Fatal Errors`
+If the writer of a stream file makes a mistake somewhere, CHARMM will often stop before finishing the task. If this happens, there will be a message about 15 lines from the end of the ".LOG" file saying, `Execution terminated due to the detection of a fatal error.` The process of reading the ".LOG" file and trying to decipher what the problem is called debugging, and it consumes most of the lab time of every computer scientist in existence and most molecular modelers too. To witness this gruesome spectacle, read "ALPHA_MESSED.STR." You will find this file after you run ALPHA.STR. It will be with all of the other job files. This is the same program as the one you commented in Question 2, but if you look carefully at line 23 you’ll see a mistake (`SETR` should be `SET`). Save "ALPHA_MESSED.STR" and rename a copy to "MESSED.STR," and run it.
+
+When "MESSED.STR" is finished, read the log file. The last lines, below the one starting `MAXIMUM SPACE USED IS…`, are normal information lines given in every log file whether CHARMM has abnormally terminated or not. The "fatal error" message just above them is what we’re interested in: `Unrecognized command: SETR.` If we were writing a stream file, this message would tell us that something was wrong with the `SETR` command in line 23. We’d have to go back to the stream file, change that command to `SET`, and run our script again. Of course, if our change was also incorrect, then CHARMM would stop this time as well. When debugging, it is often necessary to repeat this process many times in order to execute the file correctly. The most common bugs are often simple typos. For this reason, it is a good idea to take your time when typing scripts.
+
+#### Warning Levels and `BOMLEV`
+In this context of bugs and fatal errors, it’s important to take a minute to talk about `BOMLEV`. We just saw CHARMM die when it hit a mistake in "MESSED.STR." CHARMM doesn’t die every time it reads something wrong. In the Introduction to CHARMM lab, for example, CHARMM didn’t think that our choice of non-bonded cutoffs was appropriate, so it gave us a "WARNING" (check "TRPMIN.LOG" from last week if you don’t remember this). In fact, every error in CHARMM programming has a `BOMLEV` ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)) associated with it, ranging from 5 to -5. The negative levels are pretty severe and the positive, not so bad. In "MESSED.STR" you can see that an unrecognized command is level 0. The command `BOMLEV` dictates at what level error CHARMM crashes. Right now `BOMLEV` is set at the default, zero.
+
+Managing your BOMLEV is sort of a tricky business, and you can be content to use 0 for now. To show you a bit of the complexity involved, first, correct line 23 of "ALPHA_MESSED.STR." Then, change line 29 from "ALPHAHLX.STR" to "ALPHAHLX." Now, there’s no such file as "ALPHAHLX" in your directory, so when you tell CHARMM to read this stream file, it won’t be able to read anything. Save your file and run "ALPHA_MESSED.STR" again. Look carefully at the new log file.
+
+```diff
+- 23: SETR FSTRES 2 ! First residue to be modified.
++ 23: SET FSTRES 2 ! First residue to be modified.
+...
+- 29: OPEN READ UNIT 18 CARD NAME "ALPHAHLX.STR" 
++ 29: OPEN READ UNIT 18 CARD NAME "ALPHAHLX.STR" 
+```
+
 Although CHARMM was not able to read "ALPHAHLX," the program doesn’t crash because the BOMLEV wasn’t low enough. Of course, without the stream file, "MESSED.STR" won’t change the dihedrals of our polypeptide to build an alpha-helix. This is why you must always read your log files even if CHARMM doesn’t crash openly. This raises a question: if it’s such a nuisance to allow CHARMM to continue even after an error like this, why not raise the BOMLEV? If we did raise the BOMLEV,
 22
 Lab 3: Molecular Structure Manipulation
