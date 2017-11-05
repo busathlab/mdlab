@@ -109,7 +109,7 @@ IF MYENERGY GT -100 MINIMIZE ABNR NSTEP 200
 3. A reference (either a value or another variable proceeded by a "@")
 4. A CHARMM command
 
-The condition in this example is given by the (`GT`) operator. If the value stored in `MYENERGY` is greater than -100, then CHARMM will execute 200 more steps of minimization. If the value stored in MYENERGY is not greater than -100, then CHARMM will skip over the additional minimization. Besides "greater than", `GT`, we could use the conditionals `EQ` ("equal to"), `NE ("not equal to"), `GE` ("greater than or equal to"), `LT` ("less than"), or `LE` ("less than or equal to"). To add conditions, you can use the `.and.` operator or `.or` operator depending on what is desired. 
+The condition in this example is given by the (`GT`) operator. If the value stored in `MYENERGY` is greater than -100, then CHARMM will execute 200 more steps of minimization. If the value stored in MYENERGY is not greater than -100, then CHARMM will skip over the additional minimization. Besides "greater than", `GT`, we could use the conditionals `EQ` ("equal to"), `NE` ("not equal to"), `GE` ("greater than or equal to"), `LT` ("less than"), or `LE` ("less than or equal to"). To add conditions, you can use the `.and.` operator or `.or.` operator depending on what is desired. 
 
 > See [this guide](https://www.tutorialspoint.com/fortran/fortran_operators.htm) for more information on boolean operators.  
 
