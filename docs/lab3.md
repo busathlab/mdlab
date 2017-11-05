@@ -118,8 +118,10 @@ Here is a more complex example of boolean operators that demonstrates one way to
 ```fortran
 define PROT sele ( segid PROA .or. segid PROB .or. segid PROC .or. segid PROD ) end
 define BACKBONE sele ( type C   .or. type O   .or. type N   .or. type CA ) .and. PROT end
-define SIDECHAINS sele .not. BACKBONE .and. .not. hydrogen .and. ( PROT ) end
+define SIDECHAINS sele (.not. BACKBONE) .and. (.not. hydrogen) .and. PROT  end
 ```
+
+The first definition chooses atoms with the segment ID of PROA, PROB, PROC, or PROB. The second chooses any atoms of type C, O, N, or CA that also fall within the PROT definition. The third selects any atoms that are not selected by the BACKBONE definition, are not hydrogen atoms, and are selected by the PROT definition.
 
 #### Loops
 A loop is a piece of a program designed to repeat itself many times ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)). Loops can be created using the `GOTO` and `LABEL` commands. 
