@@ -195,7 +195,7 @@ CRD files: Open "ptrp.crd" and "ptrpmin.crd." Again, if they don’t open, you m
 
 To finish, send an email to your TA containing the answers to the questions in the lab.
 
-> This isn’t required, but remember how we said CHARMM is a command-line program? If you’re feeling ambitious, you can try out CHARMM on the command line on MaryLou by executing, from the Linux command line, module load charmm and then $(which charmm). You can now perform commands in CHARMM and view output on the fly! (remember to start with a title!)
+> This isn’t required, but remember how we said CHARMM is a command-line program? If you’re feeling ambitious, you can try out CHARMM on the command line on MaryLou by executing, from the Linux command line, `module load charmm` and then `$(which charmm)`. You can now perform commands in CHARMM and view output on the fly! (remember to start with a title!)
 
 **[Lab 3](https://busathlab.github.io/mdlab/lab3.html)**
 
