@@ -45,7 +45,7 @@ CHARMM is a command line program. This means that it is runs from a shell window
 
 Other syntax in CHARMM, however, is extremely sensitive.  For example, if you tell CHARMM to open a file, the filename will be converted to all lower case unless you put the name in quotes. This can be a problem because Linux is case sensitive. This means that if you want to open the file "MyFile," and you leave off the quotes, CHARMM will look for the file "myfile" which is not the same as "MyFile" in Linux. To see how CHARMM commands are used, we’ll start off by creating a simple polypeptide, finding its energy, and applying an energy minimization to it. Rather than typing each of these series of commands in one at a time, we will create a stream file that contains all of the options.
 
-> One useful practice to avoid case issues is to keep all of your file names completely in lower case
+> One useful practice to avoid case issues is to keep all of your file names completely in lower case and keep your code all in lower case.
 
 CHARMM doesn’t even enter into the picture until we are completely finished with the script, at which time we’ll invoke CHARMM. Remember, as you type in the commands explained in this section, that you’re only using the editor program, and that no calculations have taken place until the script is submitted.  
 
@@ -77,20 +77,23 @@ Now we’re ready to build our 5-mer of tryptophan. The command `READ SEQUENCE` 
 
 Now we’ve primed CHARMM for the next command, `GENERATE`, which constructs one segment in the **Principle Structure File (PSF)** from the residues we specified with `READ SEQUENCE`. `GENERATE` must be followed by a name for the segment, which in this case is `PTRP`. A segment is any group of residues. Imagine modeling hemoglobin, for example, which has four separate subunits. Each subunit would be a different segment. Once all four segments (monomers) are generated, the PSF would contain the whole protein.  Water and salt segments might be added to create the proper environment. Organic solvent, lipid, DNA, ligand molecules, or sets of such molecules are other common segments. If we want internal coordinate (IC) tables set up, which we do, the option `SETUP` must also be specified after `GENERATE`. These internal coordinate tables are "empty" until CHARMM reads the `IC PARAMETER` ([intcor.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/intcor/)) command, which fills the IC tables with values from the parameter table which we opened and read previously.
 
-In order to compute the Cartesian coordinates in the next step, the relation of the structure to the origin (0,0,0), must be specified. The IC SEED command places the first atom specified at the origin, the second on the x axis, and the third in the x-y plane, using bond lengths and bond angles from the IC table.
+In order to compute the Cartesian coordinates in the next step, the relation of the structure to the origin (0,0,0) must be specified. The `IC SEED` command places the first atom specified at the origin, the second on the x axis, and the third in the x-y plane, using bond lengths and bond angles from the IC table.
 
-IC BUILD computes the Cartesian coordinates from the data in the internal coordinate tables (which we just filled, thanks to IC PARAMETER).
+`IC BUILD` computes the Cartesian coordinates from the data in the internal coordinate tables (which we just filled, thanks to `IC PARAMETER`).
 
-Seems like that would be the end of things, except for the cleanup crew in the form of IC PURGE. This command deletes the IC table entries which contain undefined atoms. Remember that each residue includes an amino-terminus and a carboxyl-terminus. Now, connecting these residues with peptide bonds is going to get rid of some hydogens and oxygens, but IC PARAMETER doesn’t know that; it gives us bond and energy information for those extra atoms, too.  IC PURGE gets rid of this junk.
+It appears like that would be the end of things, except for the cleanup crew in the form of `IC PURGE`. This command deletes the IC table entries which contain undefined atoms. Remember that each residue includes an amino-terminus and a carboxyl-terminus. Now, connecting these residues with peptide bonds is going to get rid of some hydogens and oxygens, but `IC PARAMETER` doesn’t know that--it gives us bond and energy information for those extra atoms, too.  `IC PURGE` gets rid of this junk.
 
-Now we want to see the result of our troubles so we ask CHARMM to show us what the IC table looks like, with the command PRINT IC. The information in the IC table is presented in columns labeled:
+Now we want to see the result of our troubles so we ask CHARMM to show us what the IC table looks like, with the command `PRINT IC`. The information in the IC table is presented in columns labeled below, where I, J, K, and L are atom names, R stands for bond length, T stands for theta (angle), and PHI is the dihedral angle.
 
+```
 I   J   K   L   R(I-J or I-K)   T(I-J-K or I-K-J)   PHI   T(J-K-L)  R(K-L)
+```
 
-where I, J, K, and L are atom names, R stands for bond length, T stands for theta (angle), and PHI is the dihedral angle. If an asterisk (*) is present in front of the third atom name, this indicates an improper dihedral in the "PHI" column and R (I-K) and T (I-K-J) are to be used.
+If an asterisk (*) is present in front of the third atom name, this indicates an improper dihedral in the "PHI" column and R (I-K) and T (I-K-J) are to be used.
 
 The whole set of commands needed to build the PSF for the segment called PTRP and then print the contents of the IC table looks like this:
 
+```
 READ SEQUENCE CARD
 * Sequence for poly-tryptophan
 * 5
@@ -100,17 +103,18 @@ IC SEED 1 CA 1 C 2 N
 IC BUILD IC PURGE
 
 PRINT IC
+```
 
-(Later, after you execute your CHARMM script, you will come back to this question.)
+> **Question 1:** (Later, after you execute your CHARMM script, come back to this question.) From the contents of the IC table, what is the angle between 1 CG, 1 CD2, and 1 CE2? What is the length of the bond between 4 CD2 and 4 CG? (Clue: is there a bond between those two atoms? If not, why not?)
 
-Question 1: From the contents of the IC table, what is the angle between 1 CG, 1 CD2, and 1 CE2? What is the length of the bond between 4 CD2 and 4 CG? (Clue: is there a bond between those two atoms? If not, why not?)
+We said at the outset that we were interested in finding the energy of this peptide. Typing `ENER` ([energy.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/energy/)) will calculate the potential energy--you will learn how in future labs, so for now we will leave it at that. But an important parameter in calculating energy is the cutoff distance for non-bonded interactions. In other words, how far apart do two atoms have to be before their effect on each other is deemed ‘negligible’ and ignored? The following three commands will compute the potential energy three times, each time with different parameters:
 
-4.	We said at the outset that we were interested in finding the energy of this peptide. Typing ENER (energy.doc) will calculate the potential energy -you will learn how a bit later in the course and we could leave it at that. But an important parameter in calculating energy is the cutoff distance for non-bonded interactions: in other words, how far apart do two atoms have to be before their effect on each other is deemed ‘negligible’ and ignored? The following three commands will compute the potential energy three times, each time with different parameters:
-
+```
 ENER
 ENER CUTNB 5.0 CTONNB 4.0 CTOFNB 4.5
 ENER CUTNB 8.0 CTONNB 6.5 CTOFNB 7.5
 ENER CUTNB 15.0 CTONNB 11.0 CTOFNB 14.0
+```
 
 In the first line we just type ENER. CHARMM would use the default values.
 
