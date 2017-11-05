@@ -1,5 +1,5 @@
 ## LAB 1: INTRODUCTION TO THE PROTEIN DATA BANK AND VMD
-
+###### by Dr. David Busath
 ---
 
 #### Objectives:

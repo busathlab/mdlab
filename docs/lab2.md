@@ -1,4 +1,5 @@
 ## LAB 2: INTRODUCTION TO CHARMM
+###### by Dr. David Busath
 
 ---
 

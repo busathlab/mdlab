@@ -1,10 +1,15 @@
 ## LAB 3: MOLECULAR STRUCTURE MANIPULATION
+###### by Dr. David Busath
 
 ---
 
 #### Objectives:
 - Learn how to prepare a structure ready for simulations and visualization
-
+- Understand how to use wildcards, `SELECT`, variables, arrays, `DEFINE`, conditional statements, loops
+- Use `IC EDIT` to edit internal coordinates 
+- Understand the basics of troubleshooting / debuggging
+- Learn good coding practices
+- Be able to interpret an residue topology file (RTF)
 ---
 
 ### 1. Basic Commands
@@ -358,7 +363,7 @@ The remainder of the residue specification is a list of IC lines. Recall from th
 
 Now that you have a bit of experience in deciphering RTFs, it’s time to try something a little tougher: writing one. This will give you a better idea of what is contained in these files and will provide valuable practice.
 
-> **Question 8**: Given the RTFs for phosphotyrosine and threonine, create an RTF for phosphothreonine. (Hint: threonine should be phosphorylated in a way analogous to tyrosine.) You are not expected to fill in the IC tables portion of the RTF, though you are welcome to attempt it if you desire.
+> **Question 8**: Given the RTFs for phosphotyrosine and threonine, **create an RTF for phosphothreonine**. (Hint: threonine should be phosphorylated in a way analogous to tyrosine.) You are not expected to fill in the IC tables portion of the RTF, though you are welcome to attempt it if you desire.
 
 When you are done answering all of the questions, email your answers to your T.A. **_Be sure to attach "ala_glu_trp.str."_**
 
@@ -654,17 +659,17 @@ IC HH21 CZ *NH2 HH22 0.9899 119.9100 166.1600 116.8800 0.9914
 ### Reference Residues
 
 ```fortran
-RESI THR 0.00 ! Threonine
+RESI THR 0.00 		! Threonine
 GROUP
-ATOM N NH1 -0.47 ! |
-ATOM HN H 0.31 ! HN-N
-ATOM CA CT1 0.07 ! | OG1--HG1
-ATOM HA HB 0.09 ! | /
-GROUP ! HA-CA--CB-HB
-ATOM CB CT1 0.14 ! | \
-ATOM HB HA 0.09 ! | CG2--HG21
-ATOM OG1 OH1 -0.66 ! O=C / \
-ATOM HG1 H 0.43 ! | HG21 HG22
+ATOM N NH1 -0.47 	! |
+ATOM HN H 0.31 		! HN-N
+ATOM CA CT1 0.07 	! | OG1--HG1
+ATOM HA HB 0.09		! | /
+GROUP 				! HA-CA--CB-HB
+ATOM CB CT1 0.14 	! | \
+ATOM HB HA 0.09 	! | CG2--HG21
+ATOM OG1 OH1 -0.66	! O=C / \
+ATOM HG1 H 0.43 	! | HG21 HG22
 GROUP
 ATOM CG2 CT3 -0.27
 ATOM HG21 HA 0.09
@@ -699,16 +704,16 @@ IC HG21 CB *CG2 HG23 1.1104 110.8500 -120.3900 111.1100 1.1113
 ```
 
 ```fortran
-RESI TYR 0.00
+RESI TYR 0.00 		! Tyrosine
 GROUP
-ATOM N NH1 -0.47 ! | HD1 HE1
-ATOM HN H 0.31 ! HN-N | |
-ATOM CA CT1 0.07 ! | HB1 CD1--CE1
-ATOM HA HB 0.09 ! | | // \\
-GROUP ! HA-CA--CB--CG CZ--OH
-ATOM CB CT2 -0.18 ! | | \ __ / \
-ATOM HB1 HA 0.09 ! | HB2 CD2--CE2 HH
-ATOM HB2 HA 0.09 ! O=C | |
+ATOM N NH1 -0.47 	! | HD1 HE1
+ATOM HN H 0.31 		! HN-N | |
+ATOM CA CT1 0.07 	! | HB1 CD1--CE1
+ATOM HA HB 0.09 	! | | // \\
+GROUP 				! HA-CA--CB--CG CZ--OH
+ATOM CB CT2 -0.18 	! | | \ __ / \
+ATOM HB1 HA 0.09 	! | HB2 CD2--CE2 HH
+ATOM HB2 HA 0.09 	! O=C | |
 GROUP ! | HD2 HE2
 ATOM CG CA 0.00
 GROUP
@@ -765,16 +770,16 @@ IC CE1 CZ OH HH 1.3978 119.6800 175.4500 107.4700 0.9594
 ```
 
 ```fortran
-RESI PTYR -1.00
+RESI PTYR -1.00 	! Phosphotyrosine
 GROUP
-ATOM N NH1 -0.47 ! | HD1 HE1
-ATOM HN H 0.31 ! HN-N | |
-ATOM CA CT1 0.07 ! | HB1 CD1--CE1 OC1
-ATOM HA HB 0.09 ! | | // \\ |
-GROUP ! HA-CA--CB--CG CZ--OH--PO4—OC2
-ATOM CB CT2 -0.18 ! | | \ __ / |
-ATOM HB1 HA 0.09 ! | HB2 CD2--CE2 OC3
-ATOM HB2 HA 0.09 ! O=C | |
+ATOM N NH1 -0.47 	! | HD1 HE1
+ATOM HN H 0.31 		! HN-N | |
+ATOM CA CT1 0.07 	! | HB1 CD1--CE1 OC1
+ATOM HA HB 0.09 	! | | // \\ |
+GROUP 				! HA-CA--CB--CG CZ--OH--PO4—OC2
+ATOM CB CT2 -0.18 	! | | \ __ / |
+ATOM HB1 HA 0.09 	! | HB2 CD2--CE2 OC3
+ATOM HB2 HA 0.09 	! O=C | |
 GROUP ! | HD2 HE2
 ATOM CG CA 0.00
 GROUP
@@ -831,4 +836,9 @@ IC CZ CD1 *CE1 HE1 1.3978 120.0900 179.6400 120.5800 1.0799
 IC CZ CD2 *CE2 HE2 1.3979 119.9200 -178.6900 119.7600 1.0798
 IC CE1 CE2 *CZ OH 1.3978 120.0500 -178.9800 120.2500 1.4063
 IC CE1 CZ OH HH 1.3978 119.6800 175.4500 107.4700 0.9594
+(etc)
 ```
+
+**[Lab 4](https://busathlab.github.io/mdlab/lab4.html)**
+
+**[Return to home page](https://busathlab.github.io/mdlab/index.html)**
