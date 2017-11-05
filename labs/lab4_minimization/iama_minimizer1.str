@@ -1,0 +1,24 @@
+*  Minimizes the peptide using SD minimization 
+*
+
+BOMLEV -1
+
+open read unit 1 card name ~/top_all27_prot_lipid.rtf
+read rtf unit 1 card
+close unit 1
+
+open read unit 1 card name ~/par_all27_prot_lipid.prm
+read param unit 1 card
+close unit 1
+
+OPEN READ CARD UNIT 11 NAME snap25.psf
+READ PSF CARD UNIT 11
+CLOSE UNIT 11
+
+OPEN READ CARD UNIT 11 NAME snap25.crd
+READ COOR CARD UNIT 11
+CLOSE UNIT 11
+
+MINI SD NSTEP 500 NPRINT 10
+STOP
+

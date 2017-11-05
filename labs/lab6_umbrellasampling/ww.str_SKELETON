@@ -1,0 +1,110 @@
+* Lab 5 -Umbrella sampling 
+* 57 pairs of water molecules, simultaneously
+* Created Nov. 15, 2005 by Richard Swenson, revised by Dr. Busath
+*
+
+Bomlev -1
+
+!read in the topology and parameter files
+read rtf card name /panfs/pan.fsl.byu.edu/scr/grp/busathlab/charmmlab/toppar_c27/top_all27_prot_lipid.rtf
+read para card name /panfs/pan.fsl.byu.edu/scr/grp/busathlab/charmmlab/toppar_c27/par_all27_prot_lipid.prm
+
+set dist 2.2    !initial O-O separation
+set k 100       !force constant for target (NOE) constraint
+set counter 1   !umbrella counter for segment name
+set step .05    !umbrella movement stepsize
+
+label start
+
+calc zpos = @counter * 100   !z-position of "counter"th pair of waters
+
+read sequence card
+* two waters
+*
+2
+TIP3 TIP3
+
+generate w@counter FIRST none LAST #### SETUP WARN noangle nodihe
+
+coor set XDIR 0.0 YDIR 0.0 ZDIR @zpos sele atom w@counter 1 OH2 end
+coor ### XDIR @dist YDIR 0.0 ZDIR @zpos sele atom w@counter 2 OH2 end
+
+!from 2.2 to 5.0 step is .05
+
+noe
+  assi sele atom ######### # ### end sele atom ######### # ### end -
+  rmin @dist kmin @k rmax @dist kmax @k fmax 9999.0  !for parabolic constraint, F=kd
+end
+
+incr counter
+incr dist by @step
+if dist le 5.0 goto #####
+
+hbuild     !build hydrogen postions
+
+mini abnr ##### 500
+
+!dynamics
+
+!heat
+open write unit 31 card name heat.rst
+open write unit 32 file name heat.dcd
+
+dynamics verl strt nstep ### time 0.001 -
+ihtfrq 10 ieqfrq 0 iprfrq 100 - 
+inbfrq -1 ihbfrq 0 cdie -
+iunrea -1 iunwri 31 iuncrd 32 -
+iunvel -1 kunit -1 -
+nprint 50 -
+isvfrq 50 nsavc 50 nsavv 50 -
+firstt 0.0 finalt 300.0 teminc 6 -
+twindl -10.0 twindh 10.0 -
+iasors 1 iasvel 1 
+
+!equilibrate
+
+open read unit 30 card name heat.rst
+open write unit 31 card name equil.rst
+open write unit 32 file name equil.dcd
+ 
+dynamics verl rest nstep 500 time ##### -
+ihtfrq 0 ieqfrq 10 iprfrq 100 -  
+inbfrq 5 ihbfrq 0 - 
+iunrea 30 iunwri 31 iuncrd 32 -
+iunvel -1 kunit -1 -
+nprint 50 - 
+nsavc 50 nsavv 0 isvfrq 50 -
+firstt 0.0 finalt 300.0 - 
+twindl -10.0 twindh 10.0 - 
+ichecw 1 iasors 0 iscvel 1
+
+!simulation
+
+open read unit 30 card name equil.rst
+open write unit 31 card name simul.rst
+open write unit 32 file name simul.dcd
+  
+dynamics verl rest nstep 1000 time 0.001 -
+ihtfrq 0 ieqfrq 0 iprfrq 100 -   
+inbfrq 5 ihbfrq 0 -  
+iunrea 30 iunwri 31 iuncrd 32 -
+iunvel -1 kunit -1 -
+nprint 50 -
+nsavc ## nsavv 0 isvfrq 50 - 
+firstt 0.0 finalt 300.0 -  
+twindl -10.0 twindh 10.0 -  
+ichecw 0
+
+open write unit 2 card name water.pdb
+write coor pdb unit 2
+close unit 2
+
+open write unit 2 card name water.psf
+write psf unit 2 card
+close unit 2
+
+open write unit 2 card name water.crd
+write coor unit 2 card
+close unit 2
+
+stop

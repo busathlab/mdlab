@@ -1,0 +1,84 @@
+*Matt Durrant
+*This script combines the protein and the ligand, with the ligand in the active site.
+*
+
+stream ../toppar.str
+
+read psf card name protein.psf
+read coor card name protein.crd
+
+read psf card append name ligand.psf
+read coor card append name ligand.crd
+ 
+coor set xdir	16.264			ydir	25.981		   	zdir   10.856			sele atom LIG 1 C1  end
+coor set xdir   18.136			ydir	18.459		   	zdir	7.448			sele atom LIG 1 C10 end
+coor set xdir   19.313          ydir    17.741          zdir   7.265            sele atom LIG 1 C11 end
+coor set xdir   16.862          ydir    29.185          zdir   10.272           sele atom LIG 1 C12 end
+coor set xdir   18.202          ydir    29.864          zdir   10.376           sele atom LIG 1 C13 end
+coor set xdir   18.806          ydir    30.175          zdir   9.018            sele atom LIG 1 C14 end
+coor set xdir   20.278          ydir    30.315          zdir   9.377            sele atom LIG 1 C15 end
+coor set xdir   20.452          ydir    29.263          zdir   10.463           sele atom LIG 1 C16 end
+coor set xdir   22.244          ydir    27.823          zdir   9.588            sele atom LIG 1 C17 end
+coor set xdir   24.486          ydir    28.173          zdir   9.233            sele atom LIG 1 C18 end
+coor set xdir   22.362          ydir    26.469			zdir   9.096            sele atom LIG 1 C19 end
+coor set xdir   16.096          ydir    24.71          	zdir   10.113           sele atom LIG 1 C2  end
+coor set xdir   23.674          ydir    26.026          zdir   8.653            sele atom LIG 1 C20 end
+coor set xdir   20.318          ydir    26.822          zdir   9.629            sele atom LIG 1 C21 end
+coor set xdir   14.873          ydir    24.282          zdir   9.615            sele atom LIG 1 C3  end
+coor set xdir   16.687          ydir    22.835          zdir   9.176            sele atom LIG 1 C4  end
+coor set xdir   17.641          ydir    21.765          zdir   8.72             sele atom LIG 1 C5  end
+coor set xdir   19.468          ydir    20.333          zdir   8.374            sele atom LIG 1 C6  end
+coor set xdir   20.635          ydir    19.569          zdir   8.189            sele atom LIG 1 C7  end
+coor set xdir   20.541          ydir    18.277          zdir   7.636            sele atom LIG 1 C8  end
+coor set xdir   18.165          ydir    19.737          zdir   7.992            sele atom LIG 1 C9  end
+coor set xdir   13.90646945     ydir    24.76637547     zdir   9.675669258      sele atom LIG 1 H1  end
+coor set xdir   18.63247437     ydir    29.36589555     zdir   8.293430251      sele atom LIG 1 H10 end
+coor set xdir   18.80656974     ydir    31.70115357     zdir   7.771707737      sele atom LIG 1 H11 end
+coor set xdir   20.99203073     ydir    30.15622352     zdir   8.555539317      sele atom LIG 1 H12 end
+coor set xdir   20.41724454     ydir    32.2800095      zdir   9.303512604      sele atom LIG 1 H13 end
+coor set xdir   21.09889794     ydir    29.63018608     zdir   11.27299623      sele atom LIG 1 H14 end
+coor set xdir   25.34895461     ydir    28.83449009     zdir   9.295018761      sele atom LIG 1 H15 end
+coor set xdir   23.12625248     ydir    24.11926535     zdir   8.109399887      sele atom LIG 1 H16 end
+coor set xdir   24.77662565     ydir    24.47584385     zdir   7.870441362      sele atom LIG 1 H17 end
+coor set xdir   19.25313589     ydir    26.68057019     zdir   9.813072153      sele atom LIG 1 H18 end
+coor set xdir   21.59737281     ydir    19.97097204     zdir   8.469436455      sele atom LIG 1 H2  end
+coor set xdir   21.39987716     ydir    16.63746447     zdir   7.215245646      sele atom LIG 1 H3  end
+coor set xdir   17.19118273     ydir    18.01918083     zdir   7.164716721      sele atom LIG 1 H4  end
+coor set xdir   19.27250385     ydir    16.75385005     zdir   6.828851871      sele atom LIG 1 H5  end
+coor set xdir   14.35233227     ydir    26.3879559      zdir   10.47057469      sele atom LIG 1 H6  end
+coor set xdir   16.95496378     ydir    28.23274673     zdir   9.707340714      sele atom LIG 1 H7  end
+coor set xdir   16.13396889     ydir    29.84572972     zdir   9.754626245      sele atom LIG 1 H8  end
+coor set xdir   18.11709832     ydir    30.77359096     zdir   10.98855392      sele atom LIG 1 H9  end
+coor set xdir   17.122          ydir    23.88           zdir   9.859            sele atom LIG 1 N1  end
+coor set xdir   17.161          ydir    20.597          zdir   8.283            sele atom LIG 1 N2  end
+coor set xdir   15.163          ydir    26.714          zdir   10.942           sele atom LIG 1 N3  end
+coor set xdir   20.969          ydir    27.985          zdir   9.896            sele atom LIG 1 N4  end
+coor set xdir   23.306          ydir    28.634          zdir   9.64             sele atom LIG 1 N5  end
+coor set xdir   24.667          ydir    26.929          zdir   8.748            sele atom LIG 1 N6  end
+coor set xdir   23.874          ydir    24.78           zdir   8.175            sele atom LIG 1 N7  end
+coor set xdir   21.154          ydir    25.902          zdir   9.121            sele atom LIG 1 N8  end
+coor set xdir   17.325          ydir    26.177          zdir   11.45            sele atom LIG 1 O1  end
+coor set xdir   21.67           ydir    17.528          zdir   7.451            sele atom LIG 1 O2  end
+coor set xdir   13.983          ydir    28.834          zdir   11.171           sele atom LIG 1 O3  end
+coor set xdir   14.945          ydir    27.889          zdir   13.141           sele atom LIG 1 O4  end
+coor set xdir   16.416          ydir    28.919          zdir   11.602           sele atom LIG 1 O5  end
+coor set xdir   18.218          ydir    31.354          zdir   8.446            sele atom LIG 1 O6  end
+coor set xdir   20.522          ydir    31.6            zdir   9.973            sele atom LIG 1 O7  end
+coor set xdir   19.16           ydir    29              zdir   11               sele atom LIG 1 O8  end
+coor set xdir   15.023          ydir    22.795          zdir   8.826            sele atom LIG 1 S1  end
+coor set xdir   19.32           ydir    21.866          zdir   9.022            sele atom LIG 1 S2  end
+coor set xdir   15.068          ydir    28.075          zdir   11.751           sele atom LIG 1 S3  end
+
+write coor card name protein_wligand.crd
+*CRD
+*
+
+write coor pdb card name protein_wligand.pdb
+*PDB
+*
+write psf card name protein_wligand.psf
+*PSF
+*
+
+stop
+

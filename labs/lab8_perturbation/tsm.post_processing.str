@@ -1,0 +1,91 @@
+* Perturbation lab: Post-processing
+* Prepared by Mitchell Gleed
+* modified by mgleed 29 may 14
+* refer to http://www.charmm.org/documentation/c34b1/pdetail.html
+*
+
+bomlev -2
+
+! SET GENERAL VARS
+	set file @type
+
+! LOOP COUNTERS
+	set firststartunit 50
+	set counter @firststartunit
+	set restartcounter 1
+	set lambdacounter 1
+
+! LOAD TSM OUTPUT FILES	
+	label loadup
+			open unit @counter form read name output/tsm/tsm_@drug2_@file_@{restartcounter}_@lambda@@lambdacounter.tsm
+			incr counter
+			incr restartcounter
+		if @restartcounter .le. @lastrestart goto loadup
+		set restartcounter 1
+		incr lambdacounter
+	if @lambdacounter .le. @numlambdas goto loadup
+
+! CALCULATE MIDPOINTS (FOR 5 LAMBDAS)
+	calc point1 = ( @lambda1 + @lambda2 ) / 2 !(0.05+0.125)/2
+	calc point2 = ( @lambda2 + @lambda3 ) / 2 !(0.125+0.5)/2
+	calc point3 = ( @lambda3 + @lambda4 ) / 2 !(0.5+0.875)/2
+	calc point4 = ( @lambda4 + @lambda5 ) / 2 !(0.875+0.95)/2
+	set start 0.00
+	set finish 1.00
+	
+! PERFORM TSM POST-PROCESSING (FOR 5 LAMBDAS)
+
+	calc nextstartunit1 = @firststartunit + @lastrestart	!should = 2 if only 1 restart
+	calc nextstartunit2 = @nextstartunit1 + @lastrestart	!should = 3 if only 1 restart
+	calc nextstartunit3 = @nextstartunit2 + @lastrestart	!should = 4 if only 1 restart
+	calc nextstartunit4 = @nextstartunit3 + @lastrestart	!should = 5 if only 1 restart
+	
+	set pointsperbin 100
+	
+	TSM POST PSTAck 10 PLOT
+	! use lambda = .05 to extrapolate lambda' = 0
+		PROC FIRST @firststartunit NUNIT @lastrestart LAMB @start TEMP 310.0 DELT 10 BINS @pointsperbin CTEM
+		
+	! use lambda = .05 to extrapolate lambda' = (0.05+0.125)/2	
+		PROC FIRST @firststartunit NUNIT @lastrestart LAMB @point1 TEMP 310.0 DELT 10 BINS @pointsperbin CTEM
+		
+	! use lambda = .125 to extrapolate lambda' = (0.05+0.125)/2
+		PROC FIRST @nextstartunit1 NUNIT @lastrestart LAMB @point1 TEMP 310.0 DELT 10 BINS @pointsperbin CTEM
+		
+	! use lambda = .125 to extrapolate lambda' = (0.125+0.5)/2
+		PROC FIRST @nextstartunit1 NUNIT @lastrestart LAMB @point2 TEMP 310.0 DELT 10 BINS @pointsperbin CTEM
+		
+	! use lambda = .5 to extrapolate lambda' = (0.125+0.5)/2
+		PROC FIRST @nextstartunit2 NUNIT @lastrestart LAMB @point2 TEMP 310.0 DELT 10 BINS @pointsperbin CTEM
+		
+	! use lambda = .5 to extrapolate lambda' = (0.5+0.875)/2
+		PROC FIRST @nextstartunit2 NUNIT @lastrestart LAMB @point3 TEMP 310.0 DELT 10 BINS @pointsperbin CTEM
+		
+	! use lambda = .875 to extrapolate lambda' = (0.5+0.875)/2
+		PROC FIRST @nextstartunit3 NUNIT @lastrestart LAMB @point3 TEMP 310.0 DELT 10 BINS @pointsperbin CTEM
+		
+	! use lambda = .875 to extrapolate lambda' = (0.875+0.95)/2
+		PROC FIRST @nextstartunit3 NUNIT @lastrestart LAMB @point4 TEMP 310.0 DELT 10 BINS @pointsperbin CTEM
+		
+	! use lambda = .95 to extrapolate lambda' = (0.875+0.95)/2
+		PROC FIRST @nextstartunit4 NUNIT @lastrestart LAMB @point4 TEMP 310.0 DELT 10 BINS @pointsperbin CTEM
+		
+	! use lambda = .95 to extrapolate lambda' = 1
+		PROC FIRST @nextstartunit4 NUNIT @lastrestart LAMB @finish TEMP 310.0 DELT 10 BINS @pointsperbin CTEM
+		
+	END
+	
+! CREATE AND ORGANIZE OUTPUT FILE
+	
+	! export environmental variables from CHARMM
+	envi "drug2" @drug2
+	envi "type" @type
+	envi "outfile" @OUTFILE
+
+	!! turn off log file printing for GREP
+	! prnl -1	
+	!! GREP 30 lines after plot files, use lowercase variables
+	! syst "grep -A 30 'plot files' ${outfile,,} > output/postp/${drug2}_${type,,}.txt"	
+	! replaced with shell command after executing charmm, mgleed 4 mar 2015			
+	
+STOP

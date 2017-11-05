@@ -1,0 +1,20 @@
+#!/bin/bash
+
+ulimit -s
+
+#SBATCH -N1 -n16 --mem-per-cpu=2G -t6:00:00
+
+INFILE=minimize_heat.inp
+OUTFILE=minimize_heat.out
+
+cd "$SLURM_SUBMIT_DIR"
+
+module purge
+module load charmm
+
+let "procs = 1 * 16"
+export OMP_NUM_THREADS=$procs
+
+mpirun $(which charmm) rst:1 < $INFILE > $OUTFILE
+
+exit 0

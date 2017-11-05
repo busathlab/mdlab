@@ -1,0 +1,46 @@
+* Solvation script
+*
+
+! TOPPAR
+stream ../toppar.str
+
+! SYSTEM
+open read unit 32 card name ../1_put_ligand_in_protein/protein_wligand.psf
+read psf card unit 32
+open read unit 32 card name ../1_put_ligand_in_protein/protein_wligand.crd
+read coor card unit 32
+
+coor orient sele all end
+
+open read unit 32 card name waterbox.psf
+read psf card append unit 32
+open read unit 32 card name waterbox.crd
+read coor card append unit 32
+
+delete atom sort -
+select .byres. (resn TIP3 .AND. type oh2 .and. -
+((.not. (resn TIP3 .OR. hydrogen)) .around. 2.8)) end
+
+crystal defi cubic 100 100 100 90 90 90
+
+
+join WZ1 WZ2 renum
+join WZ1 WZ3 renum
+join WZ1 WZ4 renum
+join WZ1 WZ5 renum
+join WZ1 WZ6 renum
+
+rename segid WATA sele segid WZ1 end
+
+
+write coor card name system.crd
+*CRD
+*
+write psf card name system.psf
+*PSF
+*
+write coor pdb card name system.pdb
+*PDB
+*
+
+stop

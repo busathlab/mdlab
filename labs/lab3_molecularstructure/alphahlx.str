@@ -1,0 +1,29 @@
+******************ALPHAHLX.STR*********************
+* Copyright 1988 Polygen Corperation
+* This stream file edits the internal coordinate table by defining 
+* the phi and psi angles to be an alpha helix for a rane of residues
+* (CHARMM parameters fstres and lstres)
+*
+!Define fariables for residues i+1 and i-1
+SET RES @FSTRES
+CALC NXTRES = @RES + 1
+CALC PRERES = @RES - 1
+
+LABEL START
+
+!invoke IC EDIT mode, and define hi and psi dihedral angles
+!for and alpha helix
+
+IC EDIT
+DIHE @PRERES C @RES N @RES CA @RES C @PHI
+DIHE @RES N @RES CA @RES C @NXTRES N @PSI
+
+END
+
+!Increment counters and check for last specified residue
+
+INCR PRERES BY 1
+INCR RES BY 1
+INCR NXTRES BY 1
+IF RES LE @LSTRES GOTO START
+

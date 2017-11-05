@@ -1,0 +1,33 @@
+
+RESI PTHR          0.00
+GROUP
+ATOM N    NH1    -0.47  !     |          OC1
+ATOM HN   H       0.31  !  HN-N           |
+ATOM CA   CT1     0.07  !     |     OH1--P04-OC2
+ATOM HA   HB      0.09  !     |    /      |
+GROUP                   !  HA-CA--CB-HB  OC3
+ATOM CB   CT1     0.14  !     |    \
+ATOM HB   HA      0.09  !     |     CG2--HG21
+ATOM OH   OH1    -0.66  !   O=C    / \
+ATOM P04 P04     2.098  !     | HG21 HG22
+ATOM OC1 OC      -0.556
+ATOM OC2 OC      -0.556
+ATOM OC3 OC      -0.556
+GROUP
+ATOM CG2  CT3    -0.27
+ATOM HG21 HA      0.09
+ATOM HG22 HA      0.09
+ATOM HG23 HA      0.09
+GROUP
+ATOM C    C       0.51
+ATOM O    O      -0.51
+BOND CB CA  OG1 CB   CG2 CB    N   HN
+BOND N  CA    C   CA    C   +N    CA  HA
+BOND CB HB  OG1 HG1  CG2 HG21  CG2 HG22  CG2 HG23
+BOND  OG1 P04 P04 OC1 P04 OC2 P04 OC3
+IMPR N -C CA HN  C CA +N O
+DONOR HN N
+DONOR HG1 OG1
+ACCEPTOR OG1
+ACCEPTOR O C
+

@@ -1,0 +1,15 @@
+* created November 9, 2005 by Richard Swenson
+* generates the SNAP25 sequence and names it SNAP
+*
+
+read sequence card
+* SNAP25 sequence
+*
+16
+LEU GLY LYS PHE CYS GLY LEU CYS VAL CYS PRO CYS ASN LYS LEU LYS
+GENERATE SNAP SETUP
+
+IC PARAMETER
+IC SEED 1 CA 1 C 2 N
+IC BUILD
+IC PURGE

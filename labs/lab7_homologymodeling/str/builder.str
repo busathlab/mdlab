@@ -1,0 +1,71 @@
+* Influenza A M2 channel builder
+* Curtis B. Evans 21 Oct 2011
+* Updated by mgleed 29 may 2014,  25 feb 15
+*
+
+!for reference: environment variables from shell, submission script
+!set channeltype @channeltype 
+!set firstres @firstres 
+
+!read in the topology and parameter files
+read rtf card name /panfs/pan.fsl.byu.edu/scr/grp/busathlab/charmmlab/toppar_c27/top_all27_prot_lipid.rtf
+read para card name /panfs/pan.fsl.byu.edu/scr/grp/busathlab/charmmlab/toppar_c27/par_all27_prot_lipid.prm
+
+calc  nres - (@firstres -1)
+
+!perform find & replace shell command to assign titration state to HIS residues
+! sometimes gives errors...not sure why. repetition of submission should resolve
+system "sed -i s/HIS/HSE/ ../segments/${channeltype}_a.pdb"
+system "sed -i s/HIS/HSE/ ../segments/${channeltype}_b.pdb"
+system "sed -i s/HIS/HSE/ ../segments/${channeltype}_c.pdb"
+system "sed -i s/HIS/HSE/ ../segments/${channeltype}_d.pdb"
+
+!read pdb's
+OPEN read unit 20 card name ../segments/@{channeltype}_a.pdb
+READ sequ pdb unit 20
+REWind unit 20
+gener M2A setup warn
+read coor pdb unit 20 offset @nres
+close unit 20
+calc nres ?nres - (@firstres -1)
+
+OPEN read unit 21 card name ../segments/@{channeltype}_b.pdb
+READ sequ pdb  unit 21
+REWind unit 21
+gener M2B setup warn
+read coor pdb unit 21 offset @nres
+close unit 21
+calc nres ?nres - (@firstres -1)
+
+OPEN read unit 22 card name ../segments/@{channeltype}_c.pdb
+READ sequ pdb unit 22
+REWind unit 22
+gener M2C setup warn
+read coor pdb unit 22 offset @nres
+close unit 22
+calc nres ?nres - (@firstres -1)
+
+OPEN read unit 23 card name ../segments/@{channeltype}_d.pdb
+READ sequ pdb unit 23
+REWind unit 23
+gener m2D setup warn
+read coor pdb unit 23 offset @nres
+close unit 23
+
+ic purge
+ic param
+ic build
+hbuild sele type H* end
+
+write psf card name ../channels/@{channeltype}.psf
+* @{channeltype} psf
+*
+write coor card name ../channels/@{channeltype}.crd
+* @{channeltype} crd
+*
+write coor pdb card name ../channels/@{channeltype}.pdb
+* @{channeltype} pdb
+*
+
+STOP
+

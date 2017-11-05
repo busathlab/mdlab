@@ -1,0 +1,45 @@
+* extracts data from the dcd files generated with ww.str
+* created November 15, 2005 by Richard Swenson and revised by Dr. Busath
+*
+
+!read in the topology and parameter files
+read rtf card name /panfs/pan.fsl.byu.edu/scr/grp/busathlab/charmmlab/toppar_c27/top_all27_prot_lipid.rtf
+read para card name /panfs/pan.fsl.byu.edu/scr/grp/busathlab/charmmlab/toppar_c27/par_all27_prot_lipid.prm
+
+open read unit 1 card name water.psf
+read psf unit 1 card
+close unit 1
+
+open read unit 1 card name water.crd
+read coor unit 1 card
+close unit 1
+
+!from 2.2 to 5.0 step is .05
+set first 2.2
+set last 5.0
+set step .05
+calc maxstp = (@last-@first)/@step + 1   !number of umbrellas in system
+calc mxatms = 3 * @maxstp   !total number of atoms in system + 1/pair for codes
+set dist @first    !initial constraint distance
+
+correl Maxtime 500 Maxseries @maxstp maxatom @mxatms	!allocate memory
+
+set count 1                 ! counter to be used for timeseries name
+open read unit 1 file name simul.dcd
+
+label start
+enter d@count distance w@count 1 OH2 w@count 2 OH2     !define timeseries
+incr count
+incr dist by @step
+if dist le @last goto #####
+
+trajectory first 1 nunit 1 begin 0 skip 50 !read file, load all timeseries
+
+!edit d1 veccode @maxstp   !make d1 the first column in an array of maxstp columns
+
+!open write unit 10 card name dist.dat
+!write d1 unit 10 dumb 
+!* title
+!*
+!close unit 10
+stop

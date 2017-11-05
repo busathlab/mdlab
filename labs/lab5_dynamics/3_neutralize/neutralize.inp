@@ -1,0 +1,38 @@
+*Matt Durrant
+*This script combines the protein and the ligand with the ligand in the active site.
+*
+
+stream ../toppar.str
+
+read psf card name ../2_solvate/system.psf
+read coor card name ../2_solvate/system.crd
+
+read sequence POT 108
+generate POT noang nodihe first none last none
+coor set xdir 0 ydir 0 zdir 0 sele segid POT end
+
+read sequence CLA 109
+generate CLA noang nodihe first none last none
+coor set xdir 0 ydir 0 zdir 0 sele segid CLA end
+
+stream watervars.str
+stream ioncoor.str
+stream watercoor.str
+
+join WATA renum
+join POT renum
+join CLA renum
+
+coor orient sele all end
+
+open write unit 22 card name system_neutral.psf
+write psf card unit 22
+close unit 22
+open write unit 22 card name system_neutral.crd
+write coor card unit 22
+close unit 22
+open write unit 22 card name system_neutral.pdb
+write coor pdb unit 22
+close unit 22
+
+stop

@@ -1,0 +1,73 @@
+***********HEATER_DEMO.STR**********
+*
+
+STREAM topparm.str
+
+read sequence card
+* dlpc bilayer
+*
+1
+DMPC
+
+GENERATE LIPID FIRST none LAST none SETUP WARN
+
+IC PARAMETERS
+IC SEED 1 P 1 O12 1 C11
+IC BUILD
+HBUILD
+IC PURGE
+
+MINI SD NSTEP 25
+MINI ABNR NSTEP 500
+
+OPEN WRITE UNIT 11 CARD NAME lipid.pdb
+WRITE COOR PDB UNIT 11 CARD
+CLOSE UNIT 11
+
+!heat
+
+shake bonh param sele all end
+
+open write unit 31 card name heat.rst
+open write unit 32 file name heat.dcd
+
+dynamics vert strt nstep 3000 time 0.001 -
+ihtfrq 50 ieqfrq 0 iprfrq 100 -
+inbfrq -1 ihbfrq 0 ntrfrq 50 cdie -
+iunrea 30 iunwri 31 iuncrd 32 iunvel -1 kunit -1 -
+nprint 100 nsavc 100 nsavv 100 -
+isvfrq 50 -
+firstt 0.0 finalt 300.0 teminc 5 -
+iasors 1 iasvel 1 iscvel 1 
+
+!equilibrate
+
+open read unit 30 card name heat.rst
+open write unit 31 card name equil.rst
+open write unit 32 file name equil.dcd
+
+dynamics cpt rest nstep 1000 time 0.001 -
+ihtfrq 0 ieqfrq 50 iprfrq 100 -
+inbfrq -1 ihbfrq 0 ntrfrq 50 -
+iunrea 30 iunwri 31 iuncrd 32 iunvel -1 -
+kunit -1 nprint 50 -
+nsavc 100 nsavv 100 isvfrq 100 -
+twindl -10.0 twindh 10.0 -
+iasors 0 iasvel 1 ichecw 1 iscvel 1 
+
+!dynamics
+
+open read unit 30 card name equil.rst
+open write unit 31 card name dyna.rst
+open write unit 32 file name dyna.dcd
+
+dynamics cpt rest nstep 10000 time 0.001 -
+ihtfrq 0 ieqfrq 0 iprfrq 50 -
+inbfrq -1 ihbfrq 0 ntrfrq 50 cdie -
+iunrea 30 iunwri 31 iuncrd 32 iunvel -1 -
+kunit -1 nprint 50 -
+nsavc 500 nsavv 50 isvfrq 500 -
+twindl -10.0 twindh 10.0 -
+iasors 0 iasvel 1 ichecw 0
+
+

@@ -1,0 +1,137 @@
+*  Minimizes SOLVATED Luciferase
+*
+
+bomlev -1
+
+STREAM ../TOPPAR.STR
+
+OPEN READ CARD UNIT 11 NAME ../3_neutralize/system_neutral.psf
+READ PSF CARD UNIT 11
+CLOSE UNIT 11
+
+OPEN READ CARD UNIT 11 NAME ../3_neutralize/system_neutral.crd
+READ COOR CARD UNIT 11
+CLOSE UNIT 11
+
+! reconstruct ligand psf based on updated ligand rtf
+
+	dele atom sele all .and. (.not. resn lig) end
+	write coor card name ligtemp.crd
+	*CRD
+	*
+	
+	dele atom sele all end
+	
+	read sequence lig 1
+	generate lig first none last none setup warn
+	read coor card name ligtemp.crd
+	write psf card name ligtemp.psf
+	*psf
+	*
+	dele atom sele all end
+	
+	OPEN READ CARD UNIT 11 NAME ../3_neutralize/system_neutral.psf
+	READ PSF CARD UNIT 11
+	CLOSE UNIT 11
+	
+	OPEN READ CARD UNIT 11 NAME ../3_neutralize/system_neutral.crd
+	READ COOR CARD UNIT 11
+	CLOSE UNIT 11
+	
+	dele atom sele resn lig end
+	OPEN READ CARD UNIT 11 NAME ligtemp.psf
+	READ PSF CARD append UNIT 11
+	CLOSE UNIT 11
+	
+	OPEN READ CARD UNIT 11 NAME ligtemp.crd
+	READ COOR CARD append UNIT 11
+	CLOSE UNIT 11
+
+! CRYSTAL
+	crystal defi cubi 100.0 100.0 100.0 90.0 90.0 90.0
+	crystal build cutoff 14 nope 0
+	image byres xcen 0.0 ycen 0.0 zcen 0.0 sele all end
+	
+! EWALD
+	nbond atom cdie eps 1.0 -
+	ewald pmew kappa 0.34 order 4 -
+	FFTX 128 FFTY 128 FFTZ 128
+	
+! CONSTRAINTS & FIELD
+
+	CONS HMCM FORCE 100.0 WEIG REFX 0 REFY 0 REFZ 0 -
+    SELECT SEGID PROA END
+
+	PULL EFIELD 1E9 XDIR 1.0 SELE ALL END
+
+	CONS HARM force 0.01 mass sele segid PROA end
+
+
+!! MINIMIZATION (ADJUSTED & SHORTENED FOR LAB BELOW, MITCH)
+!!	MINI SD NSTEP 1500 NPRINT 100
+!!	MINI ABNR NSTEP 3000 NPRINT 100
+!!	
+!!	CONS HARM CLEAR
+!!	
+!!	MINI ABNR NSTEP 2000 NPRINT 100
+
+
+! MINIMIZATION
+	MINI SD NSTEP 100 NPRINT 100
+	MINI ABNR NSTEP 100 NPRINT 100
+	CONS HARM CLEAR
+	mini sd nstep 100 nprint 100
+	MINI ABNR NSTEP 100 NPRINT 100
+	mini sd nstep 10 latt
+	mini abnr nstep 10 latt
+		
+	write coor card name system_min.crd
+	*CRD
+	*
+	write psf card name system_min.psf
+	*PSF
+	*
+	write coor pdb card name system_min.pdb
+	*PDB
+	*
+
+	ener
+	shake fast bonh para
+
+! HEAT SYSTEM TO 300
+	open write unit 31 card name -
+	0.rst
+	open write unit 32 file name -
+	0.dcd
+        dynamics cpt leap verl strt nstep 40000 time 0.0015 -
+        iunrea -1 iunwri 31 iuncrd 32 -
+        isvfrq 2000 nsavc 200 nsavv 0 -
+        inbfrq -1 nprint 250 iprfrq 0 ntrfrq 100 -
+        pcon pgam 25 pmass 500 pref 1.0 surface tension 0.0 -
+        ihtfrq 2 teminc 0.06 -
+        imgfrq 50 ixtfrq 1000 cutim 14 -
+        iasors 0 iasvel 1 iscvel 1 iseed 1 -
+        firstt 0.0 finalt 300.0
+
+! OUTPUT
+	open write unit 40 card name 0.xtl
+	write title unit 40
+	* set xtla ?xtla
+	*
+	close unit 40
+	
+	write coor card name 0.crd
+	*CRD
+	*
+	
+	close unit 31
+	close unit 32
+	close unit 40
+
+	!added by mgleed 27 may 14
+	syst "cp 0.crd ../5_simulate/crd/0.crd"
+	syst "cp 0.xtl ../5_simulate/xtl/0.xtl"
+	syst "cp 0.rst ../5_simulate/restart/0.rst"
+	
+STOP
+

@@ -1,0 +1,118 @@
+* Perturbation lab: Heat system--drug in 2kqt
+* Prepared by Mitchell Gleed 29 may 14
+*
+
+bomlev -1
+
+set dyna @rst
+
+set name tsm_@drug2_@type_@dyna_@L
+
+! LOAD TOPPARM
+	set topparloc /panfs/pan.fsl.byu.edu/scr/grp/busathlab/toppar_c36_aug14
+	stream @{topparloc}/load_toppar.str
+	read rtf card append name alm/alm-all.rtf
+	read para card flex append name alm/alm-all.prm
+
+! LOAD SYSTEM
+	read psf card name prep/tsm_@drug2_@type.psf
+	read coor card name prep/tsm_@drug2_@type.crd
+
+! CRYSTAL
+	stream prep/crystal_@type.xtl
+	crystal defi tetr @xtla @xtla @xtlc 90. 90. 90.
+	crystal build cutoff 14 nope 0
+	image byres xcen 0.0 ycen 0.0 zcen 0.0 sele all end
+
+! DEFINE DRUG CAGES
+	stream alm/alm@{drug2}_pc.str
+	set B1 @A1
+	set B2 @A2	
+	set B3 @A3
+	set B4 @A4
+	set B5 @A5
+	set B6 @A6
+	set B7 @A7
+	set B8 @A8
+	set B9 @A9
+	set B10 @A10
+	stream alm/alm@{drug1}_pc.str
+
+	define 1stcage sele type @A1 .or. type @A2 .or. type @A3 .or. type @A4 -
+	.or. type @A5 .or. type @A6 .or. type @A7 .or. type @A8 .or. type @A9 .or. type @A10 end
+	define 2ndcage sele type @B1 .or. type @B2 .or. type @B3 .or. type @B4 -
+	.or. type @B5 .or. type @B6 .or. type @B7 .or. type @B8 .or. type @B9 .or. type @B10 end	
+	
+! MINIMIZATION W/ CONSTRAINTS & FIXED COORDINATES
+	! fix protein, lipids, and drugs (water and ions free)
+	cons fix sele segid M2* .or. resn DMPC .or. segid L@{drug1} .or. segid L@{drug2} end
+		mini sd nstep 1000 nprint 100
+		mini abnr nstep 1000 nprint 100
+	cons fix sele none end
+	! fix protein and drugs
+	cons fix sele segid M2* .or. segid L@{drug1} .or. segid L@{drug2} end
+		mini sd nstep 500 nprint 200
+		mini abnr nstep 2000 nprint 100
+	cons fix sele none end
+	! constrain protein backbone
+	cons harm force 10 mass sele segid M2* .and. ( type C .or. type O .or. type N  .or. type CA )  end
+		mini sd nstep 500 nprint 200
+		mini abnr nstep 2000 nprint 100
+	cons harm clear
+	
+	open write unit 92 card name output/crd/minimized_@name.crd
+	write coor unit 92 card
+	close unit 92
+	open write unit 93 card name output/crd/minimized_@name.pdb
+	write coor pdb unit 93
+	close unit 93			
+
+	! apply constraints to drugs
+	CONS harm force 5.0 sele ( segid L@{drug1} .and. 1stcage ) end
+	CONS harm force 5.0 sele ( segid L@{drug2} .and. 2ndcage ) end			
+
+! TSM
+	open write unit 50 card -
+	name output/tsm/@name.tsm
+	
+	TSM
+		REAC sele segid WTRE .or. segid L@drug1 end
+		PROD sele segid WTPR .or. segid L@drug2 end
+		LAMBDA @L
+		SAVE unit 50
+	END
+	
+	shake bonh para
+	
+! DYNAMIC SIMULATION: HEAT
+
+	open write unit 31 card name output/restart/@name.rst
+	open write unit 32 file name output/dcd/@name.dcd
+		
+	dynamics leap verl nstep 2500 time 0.001 -
+	iunrea -1 iunwri 31 iuncrd 32 -
+	isvfrq 2000 nsavc 200 nsavv 0 -
+	inbfrq -1 nprint 250 iprfrq 0 ntrfrq 100 -
+	pcon pgam 25 pmass 500 pref 1.0 surface tension 0.0 -
+	ihtfrq 2 teminc 0.31 -
+	imgfrq 50 ixtfrq 1000 cutim 14 -
+	iasors 0 iasvel 1 iscvel 1 iseed @iseed -
+	firstt 0.0 finalt 310.0		
+
+! OUTPUT
+	open write unit 40 card name output/xtl/@name.xtl
+	write title unit 40
+	* set xtla ?xtla
+	* set xtlc ?xtlc
+	*
+	
+	close unit 31
+	close unit 32
+	close unit 40
+	
+	write coor card name output/crd/@name.crd
+
+STOP
+
+
+

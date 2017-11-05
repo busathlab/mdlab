@@ -1,0 +1,95 @@
+* Perturbation lab: Restart dynamic simulation
+* Prepared by mgleed 29 May 2014
+*
+
+bomlev -1
+
+set dyna @rst
+calc pdyna = @dyna - 1
+set drug1 035
+set drug2 150
+
+set name tsm_@drug2_@type_@dyna_@L
+set prevname tsm_@drug2_@type_@pdyna_@L
+
+! LOAD TOPPARM
+	set topparloc /panfs/pan.fsl.byu.edu/scr/grp/busathlab/toppar_c36_aug14
+	stream @{topparloc}/load_toppar.str
+	read rtf card append name alm/alm-all.rtf
+	read para card flex append name alm/alm-all.prm
+
+! LOAD SYSTEM
+	read psf card name prep/tsm_@drug2_@type.psf
+	read coor card name output/crd/@prevname.crd
+
+! CRYSTAL
+	stream output/xtl/@prevname.xtl
+    crystal defi tetr @xtla @xtla @xtlc 90.0 90.0 90.0
+    crystal build cutoff 14 nope 0
+    image byres xcen 0.0 ycen 0.0 zcen 0.0 sele all end
+
+! DEFINE DRUG CAGES AND APPLY CONSTRAINTS
+	stream alm/alm@{drug2}_pc.str
+	set B1 @A1
+	set B2 @A2	
+	set B3 @A3
+	set B4 @A4
+	set B5 @A5
+	set B6 @A6
+	set B7 @A7
+	set B8 @A8
+	set B9 @A9
+	set B10 @A10
+	stream alm/alm@{drug1}_pc.str
+
+	define 1stcage sele type @A1 .or. type @A2 .or. type @A3 .or. type @A4 -
+	.or. type @A5 .or. type @A6 .or. type @A7 .or. type @A8 .or. type @A9 .or. type @A10 end
+	define 2ndcage sele type @B1 .or. type @B2 .or. type @B3 .or. type @B4 -
+	.or. type @B5 .or. type @B6 .or. type @B7 .or. type @B8 .or. type @B9 .or. type @B10 end	
+
+	CONS harm force 1.0 sele ( segid L@{drug1} .and. 1stcage ) end
+	CONS harm force 1.0 sele ( segid L@{drug2} .and. 2ndcage ) end	
+	
+! TSM
+	open write unit 50 card name output/tsm/@name.tsm
+	TSM
+		REAC sele segid WTRE .or. segid L@drug1 end
+		PROD sele segid WTPR .or. segid L@drug2 end
+		LAMBDA @L
+		SAVE unit 50
+	END
+
+	SHAKE bonh para	
+	
+! DYNAMIC SIMULATIONS
+
+	set nstep = 100000
+	
+	! estimate Pmass from SYSmass (total system mass)
+	! [there could be problems with extreme values, such as  Pmass << SYSmass or Pmass >> SYSmass
+	scalar mass stat
+	calc Pmass = int ( ?stot  /  50.0 )
+
+	open read unit 30 card name output/restart/@prevname.rst
+	open write unit 31 card name output/restart/@name.rst
+	open write unit 32 file name output/dcd/@name.dcd
+	
+	DYNA CPT leap restart nstep @nstep timestep 0.0015 echeck -1 -
+		nprint 100 iprfrq 5000 ntrfrq 5000 -
+		iunrea 30 iunwri 31 iuncrd 32 iunvel -1 kunit -1 -
+		nsavc 500 nsavv 0 -
+		imgfrq 50 ixtfrq 1000 cutim 14 -
+		PCONS pint pref 1.0 pmass @Pmass pgamma 20.0 - 
+		HOOVER reft 310 tmass 2000.0 tbath 310 firstt 310 -
+		finalt 310
+	
+! OUTPUT	
+	write coor card name output/crd/@name.crd
+	
+	open write unit 40 card name output/xtl/@name.xtl
+	write title unit 40
+	* set xtla ?xtla
+	* set xtlc ?xtlc
+	*
+
+STOP

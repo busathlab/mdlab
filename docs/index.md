@@ -1,5 +1,5 @@
 # Busath Lab Molecular Dynamics
-Welcome to the homepage of Dr. David Busath's Molecular Modeling and Dynamics course. 
+Welcome to the home page of Dr. David Busath's Molecular Modeling and Dynamics course. 
 
 ### Packages / tools covered:
 - CHARMM

@@ -84,4 +84,4 @@ In order to keep system size small while simulating large systems, CHARMM uses s
 
 Submit these three files along with the two files from the first two assignments in the lab to your T.A.
 
-**[Return to home page.](https://busathlab.github.io/mdlab/index.html)**
+**[Return to home page](https://busathlab.github.io/mdlab/index.html)**

@@ -1,0 +1,37 @@
+* Copyright 1988 Polygen Corporation
+*This input file constructs an 3-10 helix for polyalanine
+*
+
+set topparloc /panfs/pan.fsl.byu.edu/scr/grp/busathlab/charmmlab/toppar_c27
+
+OPEN READ UNIT 11 CARD NAME @{topparloc}/top_all27_prot_lipid.rtf
+READ RTF UNIT 11 CARD
+CLOSE UNIT 11
+
+OPEN READ UNIT 11 CARD NAME @{topparloc}/par_all27_prot_lipid.prm
+READ PARA UNIT 11 CARD
+CLOSE UNIT 11
+
+READ SEQUENCE CARD
+*Polyalanine
+*
+14
+ALA ALA ALA ALA ALA ALA ALA ALA ALA ALA ALA ALA ALA ALA
+GENERATE HELX SETUP
+IC PARAMETERS
+
+SET FSTRES 2	!First residue to be modified.
+SET LSTRES 13	!Last residue to be modified.
+
+SET PHI -49.0
+SET PSI -26.0
+
+OPEN READ UNIT 18 CARD NAME "ALPHAHLX.STR"
+STREAM UNIT 18
+
+IC SEED 1 N 1 CA 1 C
+IC BUILD
+OPEN WRITE UNIT 40 CARD NAME "3-10.PDB"
+WRITE COOR PDB CARD UNIT 40
+
+STOP

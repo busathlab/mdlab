@@ -1,0 +1,11 @@
+* loads the topology and parameter files
+*
+BOMLEV -1
+
+open read unit 1 card name top_all27_prot_lipid.rtf
+read rtf unit 1 card
+close unit 1
+
+open read unit 1 card name par_all27_prot_lipid.prm
+read param unit 1 card
+close unit 1

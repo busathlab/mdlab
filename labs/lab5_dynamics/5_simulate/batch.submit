@@ -1,0 +1,22 @@
+#!/bin/bash
+
+ulimit -s
+
+#SBATCH -N1 -n16 --mem-per-cpu=2G -t100:00:00 -C 'm7'
+
+rst=1
+
+INFILE=equilibrate.inp
+OUTFILE=output/equilibrate_${rst}.out
+
+cd "$SLURM_SUBMIT_DIR"
+
+module purge
+module load charmm
+
+export OMP_NUM_THREADS=$SLURM_CPUS_ON_NODE
+
+mpirun $(which charmm) rst:$rst < $INFILE > $OUTFILE
+
+exit 0
+

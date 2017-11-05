@@ -1,0 +1,74 @@
+*  EQUILIBRATRES LUCIFERASE
+*
+ 
+bomlev -1
+  
+calc prevrst = @rst - 1
+ 
+STREAM ../TOPPAR.STR
+
+OPEN READ CARD UNIT 11 NAME ../4_minimize_heat/system_min.psf
+READ PSF CARD UNIT 11
+CLOSE UNIT 11
+
+OPEN READ CARD UNIT 11 NAME crd/@{prevrst}.crd
+READ COOR CARD UNIT 11
+CLOSE UNIT 11
+
+! CRYSTAL
+stream xtl/@{prevrst}.xtl
+
+crystal defi cubi @xtla @xtla @xtla 90.0 90.0 90.0
+crystal build cutoff 14 nope 0
+image byres xcen 0.0 ycen 0.0 zcen 0.0 sele all end
+
+! EWALD
+nbond atom cdie eps 1.0 -
+ewald pmew kappa 0.34 order 4 -
+FFTX 128 FFTY 128 FFTZ 128
+
+! CONSTRAINTS
+CONS HMCM FORCE 100.0 WEIG REFX 0 REFY 0 REFZ 0 -
+SELECT SEGID PROA END
+
+PULL EFIELD 1E9 XDIR 1.0 SELE ALL END
+
+ener
+
+shake fast bonh
+  
+!DYNAMIC SIMULATION: HOLD VOLUME CONSTANT
+!100 picoseconds, 1 frame = 1 nanosecond
+
+open read unit 30 card name restart/@{prevrst}.rst
+open write unit 31 card name restart/@{rst}.rst
+
+open write unit 32 file name dcd/@{rst}.dcd
+
+dynamics cpt leap verl restart nstep 800000 time 0.00125 -
+iunrea 30 iunwri 31 iuncrd 32 -
+isvfrq 2000 nsavc 800 -
+inbfrq -1 nprint 2000 iprfrq 2000 ntrfrq 100 -
+PCONst pmass 500.0 pgamma 0.0 tbath 300.0 tcoup 5.0  tref 300 PREFerence 1.0 -
+hoov tmass 1000 -
+imgfrq 50 ixtfrq 1000 cutim 14 -
+ichecw 0 iscvel 1 -
+finalt 300.0
+
+!pcon pgam 25 pmass 500 pref 1.0 surface tension 0.0 -
+
+write coor card name crd/@{rst}.crd
+write coor pdb card name @rst.pdb
+
+open write unit 40 card name xtl/@{rst}.xtl
+write title unit 40
+* set xtla ?xtla
+* set xtlc ?xtlc
+*
+!close unit 30
+!close unit 31
+!close unit 32
+close unit 40
+
+STOP
+

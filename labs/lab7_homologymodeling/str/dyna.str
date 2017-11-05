@@ -1,0 +1,79 @@
+* Heating and equilibration in preparation for free simulations
+* Curtis B. Evans 16 Aug 2012
+* modified by mgleed 29 may 14, 25 feb 15
+*
+
+bomlev -1
+
+!for reference: environment variables from shell, submission script
+!set file @channeltype
+
+! LOAD FILES
+	!read in the topology and parameter files
+	read rtf card name /panfs/pan.fsl.byu.edu/scr/grp/busathlab/charmmlab/toppar_c27/top_all27_prot_lipid.rtf
+	read para card name /panfs/pan.fsl.byu.edu/scr/grp/busathlab/charmmlab/toppar_c27/par_all27_prot_lipid.prm
+	!read in structure
+    read psf card name ../channels/@{channeltype}.psf
+	read coor card name ../channels/@{channeltype}.crd
+
+! APPLY CONSTRAINT TO AVERAGE BACKBONE COORDINATES OF PDB MODELS (PRE-MADE)
+	!read in average structure, pre-made
+	read coor card comp name ../channels/@{channeltype}_avg.crd
+	!define a selection for backbone atoms
+	define backbone sele ( type C .or. type O .or. type N  .or. type CA ) end
+	!mass-weighted constraint to backbone atoms
+	!mutant channel might have warnings...but OK
+	cons harm mass force 0.01 sele backbone .and. (.not. resname ASN) end comp
+	
+! MINIMIZE
+	mini sd nstep 100 nprint 100
+	!write a minimization trajectory
+	open unit 26 file write name ../dynafiles/@{channeltype}_0min.dcd
+	mini abnr nstep 1000 nprint 100 iuncrd 26 nsavc 10
+	close unit 26
+	write coor card name ../dynafiles/@{channeltype}_0min.crd
+
+!DYNAMIC SIMULATION: HEAT TO 310
+	ener !pre-heat energy
+	shake bonh
+	open write unit 31 card name ../dynafiles/@{channeltype}_1heat.rst
+	open write unit 32 file name ../dynafiles/@{channeltype}_1heat.dcd
+	
+	dynamics cpt leap verl strt nstep 2000 time 0.0015 -
+		iunrea -1 iunwri 31 iuncrd 32 -
+		isvfrq 2000 nsavc 100 nsavv 0 -
+		inbfrq -1 nprint 250 iprfrq 0 ntrfrq 100 -
+		ihtfrq 2 teminc 0.31 -
+		iasors 0 iasvel 1 iscvel 1 iseed 444 -
+		firstt 0.0 finalt 310.0
+	
+	close unit 31
+	close unit 32
+
+	write coor card name ../dynafiles/@{channeltype}_1heat.crd
+
+!DYNAMIC SIMULATION: HOLD VOLUME CONSTANT
+	open read unit 30 card name ../dynafiles/@{channeltype}_1heat.rst
+	open write unit 31 card name ../dynafiles/@{channeltype}_2eq.rst
+	open write unit 32 file name ../dynafiles/@{channeltype}_2eq.dcd
+
+	dynamics cpt leap verl rest nstep 10000 time 0.0015 -
+		iunrea 30 iunwri 31 iuncrd 32 -
+		isvfrq 2000 nsavc 100 -
+		inbfrq -1 nprint 2000 iprfrq 2000 ntrfrq 100 -
+		tcon  hoov tmass 1000 tbath 310 tcoup 5.0  tref 310 -
+		ichecw 0 iscvel 1 -
+		finalt 310.0
+
+!WRAP UP		
+	ener !post-dynamics energy
+	
+	write coor card name ../dynafiles/@{channeltype}_2eq.crd
+	* @{channeltype} crd
+	*
+	write coor pdb name ../dynafiles/@{channeltype}_2eq.pdb
+	* @{channeltype} pdb
+	*	
+
+STOP
+
