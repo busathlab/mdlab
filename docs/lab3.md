@@ -26,7 +26,7 @@ Imagine having a structure consisting of several segments, but wanting to apply 
 
 Selections are passed as arguments to various commands within CHARMM. A selection argument of all atoms of a segment called SEG1 for example, would be as follows:
 
-```
+```fortran
 SELECT ATOM SEG1 * * END
 ```
 
@@ -35,7 +35,7 @@ SELECT ATOM SEG1 * * END
 #### Variables
 There will be occasions when you will need to use a **variable** in a CHARMM script. The `SET` command assigns a value to a variable. For instance, `SET dist 15.3` gives the variable named "dist" a value of 15.3. When you wish to use the value of a variable where CHARMM is expecting a number, you use the variable with a `@` sign in front of it. CHARMM then reads the command containing the variable, as though it contained the value of that variable. An example of this is demonstrated in the following sequence of commands:
 
-```
+```fortran
 SET unlucky 13
 OPEN READ UNIT 10 CARD NAME "SPIFFY@unlucky.CRD"
 ```
@@ -53,7 +53,7 @@ Variables can also be SET to the values of other internal CHARMM variables. For 
 
 You can manipulate the values stored in variables using `INCR` and `DECR`. The syntax for both of them is the command, the variable name, and the amount to add or subtract. The following command will add 10 to the value stored in number so that the final value of "number" is 10:
 
-```
+```fortran
 SET number 0
 INCR number 10
 ```
@@ -61,7 +61,7 @@ INCR number 10
 #### Variable Arrays
 Charmm also supports referencing variables in an array-like fashion. For example, if you set a variable with a constant prefix and integer suffix, you can access various variable values later using an `@` in front of the variable name prefix followed by `@@` and the array index you wish to access. Here is an example:
 
-```
+```fortran
 SET segName1 M2A
 SET segName2 M2B
 SET segName3 M2C
@@ -82,14 +82,14 @@ In the above example, four sequential variables with the prefix "segName" are se
 The `DEFINE` command can be used to save a selection for use throughout a script. For example:
 
 ```
-DEFINE WATEROXYGENS SELE TYPE OH2 .and. SEGNAME TIP3 END 
+DEFINE WATEROXYGENS SELE TYPE OH2 END 
 ```
 
-This defines a selection named "WATEROXYGENS" to be all of oxygens with the atom type OH2 and belonging to the segment named TIP3. This definition can then be used later, such as in this example (interpreted):
+This defines a selection named "WATEROXYGENS" to be all of oxygens with the atom type OH2. This definition can then be used later, such as in this example (interpreted):
 
 ```diff
 - COOR STAT SELE WATEROXYGENS END 
-+ COOR STAT SELE TYPE OH2 .and. SEGNAME TIP3 END 
++ COOR STAT SELE TYPE OH2 END 
 ```
 
 #### Conditional Statements and Boolean Logic
@@ -97,19 +97,29 @@ Often conditional statements and loops are handy in CHARMM scripts ([miscom.doc]
 
 Sometimes you only want to run a command if a certain condition is true. Let’s say you minimize your structure for 200 steps of ABNR, and then you want to minimize it again if the total energy is greater than a given value (say, -100 kcal/mol). In this case you could use an if statement. Here’s how you could do it:
 
-```
+```fortran
 MINIMIZE ABNR NSTEP 200
 SET MYENERGY ?ENER
 IF MYENERGY GT -100 MINIMIZE ABNR NSTEP 200
 ```
-
-The condition in this example is given by the (`GT`) operator. If the value stored in `MYENERGY` is greater than -100, then CHARMM will execute 200 more steps of minimization. If the value stored in MYENERGY is not greater than -100, then CHARMM will skip over the additional minimization. Besides "greater than", `GT`, we could use the conditionals `EQ` ("equal to"), `NE ("not equal to"), `GE` ("greater than or equal to"), `LT` ("less than"), or `LE` ("less than or equal to"). 
 
 `IF` is always followed by 
 1. A variable (not preceded by a "@")
 2. A conditional
 3. A reference (either a value or another variable proceeded by a "@")
 4. A CHARMM command
+
+The condition in this example is given by the (`GT`) operator. If the value stored in `MYENERGY` is greater than -100, then CHARMM will execute 200 more steps of minimization. If the value stored in MYENERGY is not greater than -100, then CHARMM will skip over the additional minimization. Besides "greater than", `GT`, we could use the conditionals `EQ` ("equal to"), `NE ("not equal to"), `GE` ("greater than or equal to"), `LT` ("less than"), or `LE` ("less than or equal to"). To add conditions, you can use the `.and.` operator or `.or` operator depending on what is desired. 
+
+> See [this guide](https://www.tutorialspoint.com/fortran/fortran_operators.htm) for more information on boolean operators.  
+
+Here is a more complex example of boolean operators that demonstrates one way to define selections for the protein backbone and sidechains:
+
+```fortran
+define PROT sele ( segid PROA .or. segid PROB .or. segid PROC .or. segid PROD ) end
+define BACKBONE sele ( type C   .or. type O   .or. type N   .or. type CA ) .and. PROT end
+define SIDECHAINS sele .not. BACKBONE .and. .not. hydrogen .and. ( PROT ) end
+```
 
 #### Loops
 A loop is a piece of a program designed to repeat itself many times ([miscom.doc](https://www.charmm.org/charmm/documentation/by-version/c37b1/params/doc/miscom/)). Loops can be created using the `GOTO` and `LABEL` commands. 
