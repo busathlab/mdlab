@@ -132,9 +132,9 @@ Next on the comparison is how CHARMM and NAMD set up periodic conditions.
 ```tcl
 # Periodic Boundary conditions
 cellBasisVector1	*REPLACE*	0.0			0.0;
-cellBasisVector2	0.0			*REPLACE*	0.0;
-cellBasisVector3	0.0			0.0			*REPLACE*;
-cellOrigin			0.0			0.0			0.0;
+cellBasisVector2	0.0		*REPLACE*	0.0;
+cellBasisVector3	0.0		0.0			*REPLACE*;
+cellOrigin		0.0			0.0		0.0;
 
 wrapWater           on;
 wrapAll             on;
