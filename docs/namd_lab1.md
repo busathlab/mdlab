@@ -416,9 +416,9 @@ Open "namd.production.inp" and examine the contents. Notice there are a lot more
 
 For this portion of the lab, you will also need to open and adjust "namdrestraints/namd.restraintsetup_production.col" to create a center-of-mass restraint between the protein backbone and the coordinate origin with a force constant of 1.0 and width of 0.   
 
-Finally, adjust the final command in "bash.production_namd.sh". Use the submission script for the equilibration phase for reference. When you are satisfied, execute `sbatch bash.production_namd.sh`. 
+Finally, adjust the final command in "bash.production_namd.sh". Use the submission script for the equilibration phase for reference. Keep the SBATCH paramters the same as the CHARMM production script. When you are satisfied, execute `sbatch bash.production_namd.sh`. 
 
-Examine the log files from :
+Check on the status of the jobs with `watch squeue -u [username]`. Once they have completed, answer the following questions:
 
 > **Question 3**: How much faster did the simulation run with NAMD? Refer to the logs from both the NAMD production run and CHARMM production run.
 
