@@ -61,7 +61,7 @@ The lab directory you will be working with (labeled "perturbation") can be found
 
 This lab utilizes a multi-purpose submission script tailored for the lab. As you perform research, there will be many occassions where you will need to submit up to thousands of analogous simulations with similar, but varying parameters. Invoking a Linux shell script can help to submit these scripts in bulk. Open the file "submit.sh" and look over the contents. You don’t need to know what every Linux command means, but acquaint yourself with the variables, for you will need to adjust them later. When `export` is used, a variable is passed for use by another script--in this case to a procedurally generated file via a Linux [here document](https://bash.cyberciti.biz/guide/Here_documents), which submits commands and parameters to a compute node on the supercomputer. The loops and if tests that follow cause the submission to be performed multiple times depending on the values set in the variables section. The here-doc section contains a line `#SBATCH`, without which the file could not be submitted to the scheduler (not to be mistaken for a Linux comment). It loads the required environments using `module load charmm` and finally invokes CHARMM following the general pattern below:
 
-```bash
+```shell
 mpirun $(which charmm) [variables to pass] < [input] > [output]
 ```
 
