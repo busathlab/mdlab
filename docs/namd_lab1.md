@@ -131,10 +131,10 @@ Next on the comparison is how CHARMM and NAMD set up periodic conditions.
 
 ```tcl
 # Periodic Boundary conditions
-cellBasisVector1	*REPLACE*	0.0			0.0;
+cellBasisVector1	*REPLACE*	0.0		0.0;
 cellBasisVector2	0.0		*REPLACE*	0.0;
-cellBasisVector3	0.0		0.0			*REPLACE*;
-cellOrigin		0.0			0.0		0.0;
+cellBasisVector3	0.0		0.0		*REPLACE*;
+cellOrigin		0.0		0.0		0.0;
 
 wrapWater           on;
 wrapAll             on;
@@ -336,7 +336,7 @@ For the equilibration portion of this lab, that file is `namdrestraints/namd.res
 
 At the start of the file, `Colvarstrajfrequency` determines how often time series data is output for all of the collective variables. `Colvarsrestartfrequency` is the frequency with which restart information is written. 
 
-###### Collective variable definition 
+##### Collective variable definition 
 
 A collective variable is defined by `colvar` with a name and a type, the type of which has nested brackets. There are more many more options that can be included here, but for simplicity, these are all that will be discussed here. 
 
@@ -378,7 +378,7 @@ The `refPositionsFile` and the two parameters beneath it work in a similar fashi
 
 The VMD command line is the easiest way to create PDB reference files for use by the Collective Variables Module, and that will be demonstrated in a future lab. Otherwise, using a text editor that supports vertical editing, such as Notepad++ (column mode), can make manual edits feasible. 
 
-###### Applying a harmonic restraint to a collective variable 
+##### Applying a harmonic restraint to a collective variable 
 
 Next in the file is a block labeled `harmonic`. Here, a harmonic force with a constant of `forceConstant` centered at `centers` is applied to the colvar `colvars`; i.e., a 1.0 force constant is applied to bb_rmsd with a center of 0 (to keep the RMSD near 0).
 
