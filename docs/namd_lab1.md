@@ -74,7 +74,7 @@ read para card unit 20 append flex
 stream @topparloc/toppar_water_ions.str
 ```
 
-##### NAMD:
+###### NAMD:
 
 ```tcl
 # Force-Field Parameters
@@ -390,11 +390,42 @@ Now that the basic usage of NAMD and the collective variables module have been e
 
 The CHARMM equilibration file is set and ready to go, so we will get that simulation started and running and then work on finishing the NAMD configuration file. Open "bash.eq_charmm.sh" and ensure the SBATCH parameters are as desired, save and quit, and then run `sbatch bash.eq_charmm.sh`. Ensure the job starts and runs using the command `watch squeue -u [username]`, replacing [username] with your username (to exit this view, press Control+C).
 
-Now that the CHARMM job is running, open "namd.eq.inp" and fill in any remaining `*REPLACE*` instances. Use the "charmm.eq.str" file for reference, if needed. Take another run through the script to get an idea of how the configuration file works, now that you've learned about it. When you are confident the file is ready, open "bash.eq_namd.sh", ensure the SBATCH parameters are as desired, save and quit, and then run `sbatch bash.eq_namd.sh`.
+Now that the CHARMM job is running, open "namd.eq.inp" and fill in any remaining `*REPLACE*` instances. Use the "charmm.eq.str" file for reference, if needed. Take another run through the script to get an idea of how the configuration file works, now that you've learned about it. 
 
-Check on the status of the jobs with `watch squeue -u [username]` again. If they are still running, go ahead and move on to the next section and come back later to answer the following question: 
+When you are confident the file is ready, open "bash.eq_namd.sh". In this file you will see the variable `namddir`, which shows where the NAMD executable resides. The next line shows how to launch NAMD. The basic pattern is `namd2 [inputFile] > [outputFile]`, but the command shown here is optimized for this particular build of NAMD has has been benchmarked on FSL to be the best NAMD build for single-node jobs. (Therefore this would not work if ``--nodes`` were set to greater than 1). Running NAMD on multiple nodes or on GPU nodes will be covered in future labs.
 
-> **Question 1**: Are you satisfied with the amount of equilibration performed? Hint: Check the file `output/namd/leptin_eq.colvars.traj`. 
+Once you have familiarized yourself with how to launch NAMD, ensure the SBATCH parameters are as desired, save and quit, and then run `sbatch bash.eq_namd.sh`.
+
+Check on the status of the jobs with `watch squeue -u [username]` again. If they are still running, go ahead and move on to the next section and come back later to answer the following questions: 
+
+> **Question 1**: Are you satisfied with the amount of equilibration performed? Plot the data in the file `output/namd/leptin_eq.colvars.traj` and include a snapshot of your diagram in your submission to the TA. 
+
+> **Question 2**: After addressing the previous question, provide an explanation for the drastic change in the pattern of Y. (Hint: Carefully examine the timestep it occurs near.)
 
 ### 4. Dynamics 
+
+If the CHARMM run has completed, go ahead and open "bash.production_charmm.sh", ensure the SBATCH parameters are as desired, save and exit, and run `sbatch bash.production_charmm.sh`. Otherwise, return to this after editing the NAMD production files.
+
+Open "namd.production.inp" and examine the contents. Notice there are a lot more `*REPLACE* areas to be filled. Use whatever scripts necessary to fill these in. Also notice the difference between equilibration and production:
+
+```diff
+- # Constant Temperature Control ONLY DURING EQUILB
+- reassignFreq        500;
+- reassignTemp        $temp;
+```
+
+For this portion of the lab, you will also need to open and adjust "namdrestraints/namd.restraintsetup_production.col" to create a center-of-mass restraint between the protein backbone and the coordinate origin with a force constant of 1.0 and width of 0.   
+
+Finally, adjust the final command in "bash.production_namd.sh". Use the submission script for the equilibration phase for reference. When you are satisfied, execute `sbatch bash.production_namd.sh`. 
+
+Examine the log files from :
+
+> **Question 3**: How much faster did the simulation run with NAMD? Refer to the logs from both the NAMD production run and CHARMM production run.
+
+> **Question 4**: Plot the bb_rmsd colvar from the production run and include a snapshot of the diagram in your submission to the TA.
+
+**[NAMD Lab 2](https://busathlab.github.io/mdlab/namd_lab2.html)**
+
+**[Return to home page](https://busathlab.github.io/mdlab/index.html)**
+
 
