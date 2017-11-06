@@ -67,7 +67,7 @@ mpirun $(which charmm) [variables to pass] < [input] > [output]
 
 - `mpirun` invokes the default Message Passing Interface (MPI) parallel environment
 - `$(which charmm)` is a variable stored that points to the CHARMM executable in the supercomputer apps directory, set when loading the CHARMM module. When MPI is not invoked with mpirun, CHARMM will run in serial.
-- `[variables to pass]` is an optional list of variables to send to CHARMM in the format variable:value.
+- `[variables to pass]` is an optional list of variables to send to CHARMM in the format variableName:value.
 - `[input]` is the name of the file to send to CHARMM, usually a .str or .inp file.
 - `[output]` is the name of the file to write CHARMM output to, usually called a log file.
 
