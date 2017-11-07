@@ -404,7 +404,7 @@ Check on the status of the jobs with `watch squeue -u [username]` again. If they
 
 ### 4. Dynamics 
 
-If the CHARMM run has completed, go ahead and open "bash.production_charmm.sh", ensure the SBATCH parameters are as desired, save and exit, and run `sbatch bash.production_charmm.sh`. Otherwise, return to this after editing the NAMD production files.
+If the CHARMM run has completed, go ahead and either create a new "bash.production_charmm.sh" file or modify the "bash.eq_charmm.sh" file to perform the production dynamics. Ensure the SBATCH parameters are as desired, save and exit, and run `sbatch` on the file you modified or created. Otherwise, return to this after editing the NAMD production files.
 
 Open "namd.production.inp" and examine the contents. Notice there are a lot more `*REPLACE* areas to be filled. Use whatever scripts necessary to fill these in. Also notice the difference between equilibration and production:
 
@@ -416,7 +416,7 @@ Open "namd.production.inp" and examine the contents. Notice there are a lot more
 
 For this portion of the lab, you will also need to open and adjust "namdrestraints/namd.restraintsetup_production.col" to create a center-of-mass restraint between the protein backbone and the coordinate origin with a force constant of 1.0 and width of 0.   
 
-Finally, adjust the final command in "bash.production_namd.sh". Use the submission script for the equilibration phase for reference. Keep the SBATCH paramters the same as the CHARMM production script. When you are satisfied, execute `sbatch bash.production_namd.sh`. 
+Finally, as you did for the CHARMM submission script, either create a new "bash.production_namd.sh" file or adjust the "bash.eq_namd.sh" file to perform the production dynamics. Keep the SBATCH paramters the same as the CHARMM production script. When you are satisfied, execute `sbatch` on the file you modified or created. 
 
 Check on the status of the jobs with `watch squeue -u [username]`. Once they have completed, answer the following questions:
 
