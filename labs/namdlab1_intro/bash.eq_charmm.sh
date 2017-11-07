@@ -5,6 +5,11 @@
 #SBATCH --nodes=1   # number of nodes
 #SBATCH --mem-per-cpu=2G   # memory per CPU core
 
+# Github sometimes doesn't store empty directories, create if they don't exist
+mkdir -p output
+mkdir -p output/charmm 
+mkdir -p output/namd
+
 # Launch CHARMM 
 module purge
 module load charmm
