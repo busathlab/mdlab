@@ -6,7 +6,7 @@
 
 #### Repository Tree
 
-- `docs/` contains the files used to render the web CHARMM/NAMD tutorials, edit these to edit the labs
+- `docs/` contains the files used to render the web CHARMM/NAMD tutorials; here is where you can edit or create new labs in markdown
 - `images/` contains the image files used in the labs
 - `labs/` contains the lab files for students to download or to host on Marylou
 - `tutorials_old` contains the word doc and Indesign versions of the lab
