@@ -1,0 +1,23 @@
+#
+# protein backbone CoM restraint
+#
+
+Colvarstrajfrequency    100
+Colvarsrestartfrequency 100
+
+colvar { 
+  name bb_com 
+  width 1
+  distance { 
+    group1 { 
+      dummyAtom (0, 0, 0)
+    } 
+    group2 { 
+		*REPLACE LINE*
+		*REPLACE LINE*
+		*REPLACE LINE*
+    } 
+  } 
+} 
+
+*REPLACE SECTION*
