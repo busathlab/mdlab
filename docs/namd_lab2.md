@@ -109,14 +109,13 @@ You may close CHARMM-GUI now.
 
 Each step lasts 50 - 100 ps.
 
-       | Step 1 | Step 2 | Step 3 | Step 4 | Step 5 | Step 6 |
--------|--------|--------|--------|--------|--------|--------|
-BB     |  10.0  | 5.0    | 2.5    | 1.0    | 0.5    | 0.1    |
-SC     |   5.0  | 2.5    | 1.0    | 0.5    | 0.1    | 0.0    |
-tforce |   2.5  | 1.0    | 0.5    | 0.0    | 0.0    | 0.0    |
-mforce |   2.5  | 0.0    | 0.0    | 0.0    | 0.0    | 0.0    |
-ion    |  10.0  | 0.0    | 0.0    | 0.0    | 0.0    | 0.0    |
-----------------|--------|--------|--------|--------|--------|
+|        | Step 1 | Step 2 | Step 3 | Step 4 | Step 5 | Step 6 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| BB     |  10.0  | 5.0    | 2.5    | 1.0    | 0.5    | 0.1    |
+| SC     |   5.0  | 2.5    | 1.0    | 0.5    | 0.1    | 0.0    |
+| tforce |   2.5  | 1.0    | 0.5    | 0.0    | 0.0    | 0.0    |
+| mforce |   2.5  | 0.0    | 0.0    | 0.0    | 0.0    | 0.0    |
+| ion    |  10.0  | 0.0    | 0.0    | 0.0    | 0.0    | 0.0    |
 
 - BB = force constant to keep RMSD of protein backbone atoms to original structure 
 - BB = force constant to keep RMSD of protein sidechain atoms to original structure 
