@@ -43,8 +43,8 @@ Once you have entered the PDBID of your choice, ensure `Download Source` is set 
 
 #### Manipulate PDB 
 All of the boxes here should be unchecked except for the following: 
-- Terminal group patching. The four M2 segments should be patched at the N and C termini by default when checked. 
-- Mutation. Here is where you can mutate certain residues, e.g. Ser 31 -> Asn 31. Ensure you mutate all four segments (PROA, PROB, PROC, PROD). **You also use this to set His protonation, see discussion below.** Click on `Add Mutation` to add more mutations.
+- **Terminal group patching**. The four M2 segments should be patched at the N and C termini by default when checked. 
+- **Mutation**. Here is where you can mutate certain residues, e.g. Ser 31 -> Asn 31. Ensure you mutate all four segments (PROA, PROB, PROC, PROD). **You also use this to set Histidine protonation, see discussion below.** Click on `Add Mutation` to add more mutations.
 
 The protonation box is limited, and we prefer to use the mutation feature to set His protonation states. You must set His protonation for all occurences in the peptide. For example, the 2KQT structure has one His residue on each M2 segment, for a total of four; 2L0J, on the other hand, has two on each segment, for a total of eight. We have used the HSE epsilon protonation state for His37 in our lab publications, so we suggest you use that here.
 
@@ -56,6 +56,8 @@ For 2KQT, it should look like the following:
 | PROB  | 37    | HIS | HSE |
 | PROC  | 37    | HIS | HSE |
 | PROD  | 37    | HIS | HSE |
+
+Amino acid mutations such as S31N would be performed similar to the above table. 
 
 #### Generate PDB and Orient Molecule
 - If using an OPM orientation of the PDB (set in the first step when you entered the PDB ID), select `Use PDB Orientation`, otherwise select `Align the First Principal Axis Along Z`
@@ -103,23 +105,24 @@ Click the red box labeled `download .tgz`, located near the top right corner of 
 
 You may close CHARMM-GUI now.
 
-###### CHARMM:
+### 2. Running pre-made equilibration input files in NAMD 
 
+Each step lasts 50 - 100 ps.
 
-Setup Restraints for Protein and Lipids (see @liptype_restraint.str)
+       | Step 1 | Step 2 | Step 3 | Step 4 | Step 5 | Step 6 |
+-------|--------|--------|--------|--------|--------|--------|
+BB     |  10.0  | 5.0    | 2.5    | 1.0    | 0.5    | 0.1    |
+SC     |   5.0  | 2.5    | 1.0    | 0.5    | 0.1    | 0.0    |
+tforce |   2.5  | 1.0    | 0.5    | 0.0    | 0.0    | 0.0    |
+mforce |   2.5  | 0.0    | 0.0    | 0.0    | 0.0    | 0.0    |
+ion    |  10.0  | 0.0    | 0.0    | 0.0    | 0.0    | 0.0    |
+----------------|--------|--------|--------|--------|--------|
 
-Suggested Equilibration Scheme [Reducing Force Constants]
-(5 Cycles, 1 cycle = 50 - 100 ps )
------------------------------------------------------------------------
-       1 cycle    2 cycle    3 cycle    4 cycle    5 cycle    6 cycle
------------------------------------------------------------------------
-BB       10.0        5.0        2.5        1.0        0.5        0.1  
-SC        5.0        2.5        1.0        0.5        0.1        0.0  
-tforce    2.5        1.0        0.5        0.0        0.0        0.0  
-mforce    2.5        0.0        0.0        0.0        0.0        0.0
-ion      10.0        0.0        0.0        0.0        0.0        0.0
------------------------------------------------------------------------
-
+- BB = force constant to keep RMSD of protein backbone atoms to original structure 
+- BB = force constant to keep RMSD of protein sidechain atoms to original structure 
+- tforce = force constant to keep the lipid tail below +/- %
+- mforce = force constant to keep the lipid head groups close to target values
+- ion = force constant to keep ions near original positions
   
 Equilibration
 -----------------------------------------------------------------------
