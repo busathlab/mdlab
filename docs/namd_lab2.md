@@ -9,6 +9,8 @@
 
 ---
 
+> The first portion of this lab using CHARMM-GUI is something you can do at home, so if you would like more lab time for coding and simulation, we would recommend you complete section 1 of the lab beforehand.
+
 In this lab we will be working with the same protein that we simulated in CHARMM labs 7 and 8, the Influenza A M2 protein. We construct the protein-bilayer system using CHARMM-GUI, a CHARMM web interface developed by Lehigh University. We will then use NAMD to equilibrate, CHARMM to insert a drug of choice, VMD to create comparison sets for NAMD restraints, and then perform production dynamics in NAMD. 
 
 This lab is a preparation lab for the Umbrella Sampling lab, which will use trajectories you simulate in this lab and rely heavily on code you create as well. To this end, there are actually a few points of flexibility in the lab, so depending on if you are doing this lab with other students in a class setting, you might each pick slightly different, but related, options so that you can compare results in the end (like a small research study!). Take a moment with your class and decide what each class member will do differently and what variables should remain the same. Here are just a few of many examples of components where you will have flexibility:
@@ -19,6 +21,8 @@ This lab is a preparation lab for the Umbrella Sampling lab, which will use traj
 - **M2 blocker properties**. Ex: Compare free-energy profiles of deprotonated vs. protonated or L- vs. R-chiral M2 blockers with the same M2 structure.
 - **Restraints**. Ex: Investigate the impact of varying strengths of peptide backbone restraints on a specific drug's free-energy profile with the same M2 structure.
 - **Membrane composition**. Ex: Investigate the impact of varying lipid membrane composition on the free-energy profile of a specific M2 blocker with the same M2 structure.
+- **Reaction coordinate**. Ex: Investigate the difference between a coordinate bias and distance bias; e.g., sampling in Z-axial cartesian space -30 to 30 Ang vs. sampling in relative Z-axial distance from a central residue, e.g. His37, -30 to 30 Ang.
+
 
 ### 1. CHARMM-GUI 
 
@@ -55,21 +59,49 @@ For 2KQT, it should look like the following:
 
 #### Generate PDB and Orient Molecule
 - If using an OPM orientation of the PDB (set in the first step when you entered the PDB ID), select `Use PDB Orientation`, otherwise select `Align the First Principal Axis Along Z`
-- Check `Generate Por Water and Measure Pore Size`
+- Check `Generate Pore Water and Measure Pore Size`
 
 #### Calculate Cross-Sectional Area
 In this portion, you will decide which type of lipids to use and what type and size of system you want. 
 
-- Under `1. Box Type`, select `Hexagonal`. You can elect to use `Rectangular`, but for the purposes of this lab we will add the ability to manage a hexagonal simulation crystal to your repetoire, should you choose to use one or find a need to use one in your simulations. Hexagonal boxes reduce the size of a protein-bilayer system without compromising results, as it gets rid of water and lipids most distant from the central protein. For most purposes, however, probably including in publications, we recommend using a rectagonal box, as this is the standard.
+- Under `1. Box Type`, select `Hexagonal`. You can elect to use `Rectangular`, but for the purposes of this lab we will add the ability to manage a hexagonal simulation crystal to your repetoire, should you choose to use one or find a need to use one in your simulations. Hexagonal boxes reduce the size of a protein-bilayer system without compromising results, as it eliminates the unneeded water and lipids most distant from the central protein in the corners of a rectangular box. For most purposes, however, (probably including in publications) we recommend using a rectagonal box, as this is the standard.
 - Leave `2. Length of Z based on` and `3. Length of XY based on` default, but take a look at what these are adjusting. 
 - Enter `60` in the box after `Length of X and Y`
 - Click the arrowhead next to `PC (phosphatidylcholine ) Lipids` and enter `1` in the boxes under the headings `Upperleaflet Ratio (Integer)` and `Lowerleaflet Ratio (Integer)` for the lipid `DMPC`.
 - Click the button `Show the system info`. A table on the right side of the page now appears and provides some data regarding the membrane to be constructed.
 
-As far as the membrane lipid composition goes, you will generally want to choose a lipid according to the lipid used in the study connected to the PDB. If you want to use this as a comparison in the umbrella sampling study, you could use homogenous membranes with varying lipids or varying mixtures of lipids, cholesterol, etc. by changing the lipid ratios in the upper and lower membrane leaflets. 
+> As far as the membrane lipid composition goes, you will generally want to choose a lipid according to the lipid used in the study connected to the PDB. If you want to use this as a comparison in the umbrella sampling study, you could use homogenous membranes with varying lipids or varying mixtures of lipids, cholesterol, etc. by changing the lipid ratios in the upper and lower membrane leaflets. 
 
 #### Determine the System Size 
+- Ensure `Replacement method` is checked, as well as `Check lipid ring (and protein surface) penetration`
+- Check `Include Ions` and set to `0.15 M NaCl` (as this is physiologically taking place within the endosome, in which sodium is the dominant cation), and then click the box `Calculate number of ions`
+- Ensure `Ion Placing Method` is set to `Monte-Carlo`
 
+> If you have time and want to publish using this CHARMM-GUI structure, consider following the extra instructions under `Pore Water Options`. Otherwise move on to the next step.
+
+> This step typically takes the longest for CHARMM-GUI to process, and you may even get a blank white screen for a while. You might consider copying the link that shows just below the yellow CHARMM box in case of a time out.
+
+#### Build Components
+Nothing needs to be adjusted here. 
+
+#### Assemble Components 
+Nothing needs to be adjusted here.
+
+#### Assemble Generated Components 
+You can now view the ultimate system size. 
+
+> If you are publishing using this structure, you might want to copy down some of these statistics for reference. 
+
+- Force Field options should be set to CHARMM36m if your CHARMM version is at least c42. As we will be using NAMD primarily in this lab, you can use CHARMM36m regardless of CHARMM version available to you.
+- Check `NAMD` under `Input Generation Options` 
+- Ensure `Generate grid information for PME FFT automatically` is enabled
+- Ensure `NPT ensemble` is checked 
+- Set the temperature to `310` K.
+
+#### Generate Equilibration and Dynamics Inputs 
+Click the red box labeled `download .tgz`, located near the top right corner of the Membrane Builder interface. This will download a file named `charmm-gui.tgz` to your system. Upload this file to your personal NAMD lab 2 directory on the supercomputer.
+
+You may close CHARMM-GUI now.
 
 ###### CHARMM:
 
