@@ -255,7 +255,7 @@ Open the file "bash.pt2_adddrug.sh" and fill in the values for the environment v
 
 > See the "alm" directory for the 45 drugs you can choose from. Amantadine is alm034 (+) and alm035 (neutral) and Rimantadine is alm149 (+) and alm150 (neutral). 
 
-Once you are done, check to ensure the CHARMM-GUI job from earlier is complete, and then execute `./bash.pt2_adddrug.sh` to run the CHARMM job on the internode (rather than scheduling using `sbatch`).
+Once you are done, check to ensure the CHARMM-GUI job from earlier is complete, and then execute `./bash.pt2_adddrug.sh` to run the CHARMM job on the internode (rather than scheduling using `sbatch`). If the job from earlier isn't done yet, you can move on to the next section and come back to execute the script.
 
 ### 4. Preparing reference files for colvars using VMD 
 
@@ -299,6 +299,7 @@ The `repprotein` variable contains a selection of all the protein atoms in molec
 
 `$repprotein set {x y z} [$newprotein get {x y z}]` therefore is interpreted by VMD as `atomselect 0 "protein" set {x y z} [atomselect 1 "protein" get {x y z}]`. This causes the protein atoms in the first structure to have their coordinates replaced by the coordinates of the atoms in the second structure (the average PDB structure). 
 
+#### Create comparison sets and write PDB's
 Now we can start creating comparison files for restraint references. Append the following code: 
 ```tcl 
 # create comparison file sets
@@ -315,14 +316,30 @@ Now we can start creating comparison files for restraint references. Append the 
 - `$slxn set beta 1` sets the beta column of the previously defined atom selection to 1, indicating it will be used in a restraint or reference.
 - `$all writepdb output/colvar_drugcage.pdb` calls the function `writepdb` to create a new PDB file containing all the selected atoms contained by the variable `$all`.
 
-> To use environment variables in VMD, use `export <variableName> = <variableValue>` in your submission script and use `$::env(<variableName>)` to use the passed variable in VMD. (Substitute "<variableName>" and "<variableValue>")
+> To use environment variables in VMD, use `export variableName = variableValue` in your submission script and use `$::env(variableName)` to use the passed variable in VMD.
 
-**Create another restraint reference file to restrain the protein backbone atoms.** Use `writepdb` to create a file named "output/colvar_bb.pdb" in which the only atoms with beta 1 are protein backbone atoms. Hints: You will need to set all the atoms to beta 0 first, also, VMD allows you to use "backbone" as a selector term.
+**Create another restraint reference file to restrain the protein backbone atoms.** Set the beta property of all the atom back to zero, use the atom selector "backbone" to set the beta property of all the backbone atoms to 1, and mame your output file "output/colvar_bb.pdb"
 
+#### Run VMD 
 
+Create a new file named "bash.pt3_compsets.sh". Add the following code at the start:
+```bash 
+#!/bin/bash
+module purge
+module load vmd/1.9.1
+```
+This will provide us with the environment required by VMD, and provide the executable, which can be called with `$(which vmd)`. 
 
+To launch VMD, add the following code to the submission script:
+```bash 
+$(which vmd) < vmd.compsets.inp > output/vmd.compsets.inp.log
+```
 
-
+Before we submit the script, we need to do one last thing--export the drug carbon variables for use by the VMD script. The export commands were created by the "charmm.adddrug.str" script already, we just need to stream the file. Add the following code between after the `module load ...` line and before the line to launch VMD:
+```bash 
+sed -i "s/ EXPORT CC/export cc/" output/alm034_cc.sh # gotta convert the file to lowercase, charmm output is uppercase by default
+source output/alm034_cc.sh # file created by CHARMM containing export commands
+```
 
 
 **[NAMD Lab 3](https://busathlab.github.io/mdlab/namd_lab3.html)**
