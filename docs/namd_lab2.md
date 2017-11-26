@@ -251,9 +251,11 @@ This block demonstrates how to delete atoms near atoms of interest. This particu
 
 Notice the variables `pdbid`, `drugfilename`, `drugsegid`, and `topparloc` aren't set anywhere in the script, but are used multiple times. These are variables that are passed to CHARMM by the submission script. Recall from previous labs the use of environment variables set in Linux and passed to CHARMM or other programs. 
 
-Open the file "bash.pt2_adddrug.sh" and fill in the values for the environment variables that are empty. If you don't know the proper value for `drugsegid`, use a text editor or `vi` to open the PDB file associated with the drug you want to simulate and check the far right column. For example, for protonated Amt, you would use `alm034` for `drugname` and `L034` for `drugsegid`. 
+Open the file "bash.pt2_adddrug.sh" and fill in the values for the environment variables that are empty. If you don't know the proper value for `drugsegid`, use a text editor or `vi` to open the PDB file associated with the drug you want to simulate and check the far right column. For example, for protonated Amt, you would use `alm034` for `drugname` and `L034` for `drugsegid` (and `alm035` and `L035` if deprotonated). 
 
-Once you are done, check to ensure the CHARMM-GUI job from earlier is complete, and then execute `./bash.pt2_adddrug.sh` to run CHARMM on the internode. 
+> See the "alm" directory for the 45 drugs you can choose from. Amantadine is alm034 (+) and alm035 (neutral) and Rimantadine is alm149 (+) and alm150 (neutral). 
+
+Once you are done, check to ensure the CHARMM-GUI job from earlier is complete, and then execute `./bash.pt2_adddrug.sh` to run the CHARMM job on the internode (rather than scheduling using `sbatch`).
 
 **[NAMD Lab 2](https://busathlab.github.io/mdlab/namd_lab2.html)**
 
