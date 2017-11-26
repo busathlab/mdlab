@@ -11,7 +11,7 @@
 
 > The first portion of this lab using CHARMM-GUI is something you can do at home, so if you would like more lab time for coding and simulation, we would recommend you complete section 1 of the lab beforehand.
 
-In this lab we will be working with the same protein that we simulated in CHARMM labs 7 and 8, the Influenza A M2 protein. We construct the protein-bilayer system using CHARMM-GUI, a CHARMM web interface developed by Lehigh University. We will then use NAMD to equilibrate, CHARMM to insert a drug of choice, VMD to create comparison sets for NAMD restraints, and then perform production dynamics in NAMD. 
+In this lab we will be working with the same protein that we simulated in CHARMM labs 7 and 8, the Influenza A M2 protein. We construct the protein-bilayer system using CHARMM-GUI, a CHARMM web interface developed at Lehigh University. We will then use NAMD to equilibrate, CHARMM to insert a drug of choice, VMD to create comparison sets for NAMD restraints, and then perform production dynamics in NAMD. 
 
 This lab is a preparation lab for the Umbrella Sampling lab, which will use trajectories you simulate in this lab and rely heavily on code you create as well. To this end, there are actually a few points of flexibility in the lab, so depending on if you are doing this lab with other students in a class setting, you might each pick slightly different, but related, options so that you can compare results in the end (like a small research study!). Take a moment with your class and decide what each class member will do differently and what variables should remain the same. Here are just a few of many examples of components where you will have flexibility:
 - **M2 PDB**. Ex: Compare free-energy profiles of a particular M2 blocker between different M2 structures on the protein data bank.
@@ -125,6 +125,11 @@ The equilibration protocol involves progressive relaxation of restraints. Each s
 
 Other restraints implemented include a barrier restraint to keep water molecules away from the hydrophobic lipid regions, dihedral restraints on lipids, etc.
 
+#### Extracting CHARMM-GUI output 
+Now that "charmm-gui.tgz" is in your NAMD lab 2 directory, execute the following command: `tar -xvf charmm-gui.tgz`. This will extract the contents of the compressed file (analagous to unzipping a .zip file in Windows).
+
+This will create a directory called "charmm-gui" that contains all of the files used by CHARMM-GUI and the automatically generated input files for NAMD.
+
 #### Submitting NAMD GPU jobs
 
 NAMD performs very well on standard Linux clusters, but is particularly fast when used on nodes with GPU's. A sample submission script titled "bash.pt1_equilibrate.sh" is provided for you, let's go ahead and start digging into it. Open the file and examine its contents.
@@ -163,14 +168,16 @@ $dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices "0,1,2,3" step6.1_equilibr
 ```
 The `cd` command moves to the folder containing the NAMD input files. Using `cd` in a submission script will help prevent creating output files in a location you don't want. The next line is where NAMD is invoked. 
 - `$dir/namd2` calls the NAMD executable
-- `p${SLURM_CPUS_ON_NODE}` uses the number of CPU's on the node, which should be 24 if you use a whole m8g GPU node
+- `+p${SLURM_CPUS_ON_NODE}` uses the number of CPU's on the node, which should be 24 if you use a whole m8g GPU node
 - `+idlepoll` is a command used for optimizing jobs using GPU's
-- `+devices "0,1,2,3"` asks for the GPU devices numbered 0 to 3 (4 GPU's)
+- `+devices "0,1,2,3"` requests the devices numbered 0 to 3, which are the 4 GPU's
 - The next two parameters are the input and output files respectively, separated by a `>`
 
 > There are simpler ways to run GPU jobs, but this is the fastest we've discovered for the m8g cluster based on a variety of benchmark results.
 
-This submission script is nearly complete, but while we have the GPU node scheduled, let's go ahead and run all of the steps of equilibration, not just 6.1. *Create new lines for step 6.2 through 6.6, based on the last line, and append them to the end of the script.*
+This submission script is nearly complete, but while we have the GPU node scheduled, let's go ahead and run all of the steps of equilibration, not just 6.1. **Create new lines for step 6.2 through 6.6, based on the last line, and append them to the end of the script.** 
+
+> Rather than use the "step7.1_production.inp" file, we will perform our own custom production script.
 
 If you don't want to use GPU's for your simulation (such as when the GPU nodes have 100% utilization, [check the site](http://marylou.byu.edu)), remove the line containing `--gres`, reduce the number of processors, RAM, etc., and use the following pattern to launch jobs:
 ```bash 
@@ -181,6 +188,24 @@ module load namd/2.12_openmpi-1.8.5_gnu-5.2.0
 # Run NAMD 
 mpirun $(which namd2) step6.1_equilibration.inp > step6.1_equilibration.inp.log
 ```
+
+Now, submit this script to the scheduler using the `sbatch` command. Watch the progress of the job using `watch squeue -u [username]` and type `Control+C` to exit watching.
+
+If you have followed the default lab suggestions, this portion will take roughly 45 minutes to complete after the GPU node is scheduled. However, don't wait for the job to finish before moving on to the next portion of the lab!
+
+### 3. Adding a drug to the protein-bilayer system using CHARMM 
+
+We will now add a drug to the protein-bilayer system using CHARMM. There are several important steps that must be accomplished to be successful: 
+- Load drug topology/parameters
+- Merge protein-bilayer system PSF file with the drug PSF file 
+- Orient the protein-bilayer system so the protein once again is in its original position (by fitting to the average protein backbone atom coordinates of the PDB models)
+- Place the drug in the desired location 
+- Delete water molecules that are excessively close to the drug (overlapping)
+- Check the total system charge and neutralize by adding a chloride ion (e.g. if the drug is positively charged)
+- Save the current system coordinates to be used for restraints 
+- Revert the orientation of the protein-bilayer system to its original position, so the drug is now appropriately aligned with respect to the channel position and axis
+- Write output files for use in simulation 
+
 
 > To learn more, see also [MaryLou compute resources](https://marylou.byu.edu/documentation/resources) to get an idea of what resources you can request and the [Job Script Generator](https://marylou.byu.edu/documentation/slurm/script-generator) to get the scheduler commands you need.
 
