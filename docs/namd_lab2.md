@@ -292,8 +292,35 @@ Both molecules are now in VMD, so we can start replacing protein coordinates, et
 	set repprotein [atomselect 0 "protein"]
 	set newprotein [atomselect 1 "protein"]
 	$repprotein set {x y z} [$newprotein get {x y z}]
-	set all [atomselect 0 "all"] 
 ```
+`set` is used to assign a value to a variable. For example, `set x 3` would set the variable x to equal 3. Here, we use set to set variables to atom selections. 
+
+The `repprotein` variable contains a selection of all the protein atoms in molecule 0, the first structure we loaded. `newprotein` contains a selection of all the protein atoms in molecule 1, the second structure we loaded. 
+
+`$repprotein set {x y z} [$newprotein get {x y z}]` therefore is expanded to `atomselect 0 "protein" set {x y z} [atomselect 1 "protein" get {x y z}`. This causes the protein atoms in the first structure to have their coordinates replaced by the coordinates of the atoms in the second structure (the average PDB structure). 
+
+Now we can start creating comparison files for restraint references. Append the following code: 
+```tcl 
+# create comparison file sets
+	set all [atomselect 0 "all"]
+	
+	# drug cage
+	$all set beta 0
+	set slxn [atomselect 0 "segname $::env(drugsegid) and (name $::env(cc1) $::env(cc2) $::env(cc3) $::env(cc4) $::env(cc5) $::env(cc6) $::env(cc7) $::env(cc8) $::env(cc9) $::env(cc10))"]
+	$slxn set beta 1
+	$all writepdb output/colvar_drugcage.pdb
+```
+- `$all set beta 0` sets the beta column of all the atoms in molecule to zero. The beta column should be 1 for all atoms you want to restrain or use in a reference.
+- `set slxn [atomselect 0 "segname ...]` is used to define an atom selection of drug cage carbons, and the carbon atom names are given by environment variables. 
+- `$slxn set beta 1` sets the beta column of the previously defined atom selection to 1, indicating it will be used in a restraint or reference.
+- `$all writepdb output/colvar_drugcage.pdb` calls the function `writepdb` to create a new PDB file containing all the selected atoms contained by the variable `$all`.
+
+> To use environment variables in VMD, use `export <variableName> = <variableValue>` in your submission script and `$::env(<variableName>)` in VMD. (Substitute "<variableName>" and "<variableValue>")
+
+
+
+
+dont forget to discuss env in VMD after the script is ready 
 
 
 
@@ -301,9 +328,7 @@ Both molecules are now in VMD, so we can start replacing protein coordinates, et
 
 
 
-
-
-**[NAMD Lab 2](https://busathlab.github.io/mdlab/namd_lab2.html)**
+**[NAMD Lab 3](https://busathlab.github.io/mdlab/namd_lab3.html)**
 
 **[Return to home page](https://busathlab.github.io/mdlab/index.html)**
 
