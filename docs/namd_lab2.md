@@ -211,7 +211,9 @@ We will now add a drug to the protein-bilayer system using CHARMM. There are sev
 - Revert the orientation of the protein-bilayer system to its post-equilibration position, so the drug is now appropriately aligned with respect to the channel position and axis
 - Write output files for use in next simulation 
 
-This is a surprisingly daunting task to perform properly. Rather than spend our time and energy and making you make this file on our own, we will continue our NAMD focus in this lab and hit the highlights in the next script, "charmm.adddrug.str".
+This is a surprisingly daunting task to perform properly. Rather than spend our time and energy making you create this file on our own, we will provide the file for you and continue our NAMD focus in this lab and hit the highlights of our the next script, "charmm.adddrug.str".
+
+#### Insert drug 
 
 ```fortran
 ! load topology
@@ -243,8 +245,15 @@ The section that starts with `! find alpha carbons of residue S31 and place Amt 
 	delete atom sele .byres. ((resn TIP3 .and. type OH2) .and. (fulldrug .around. 2.2)) end
 ```
 
-This block demonstrates how to delete atoms near atoms of interest. It will delete entire residues (`.byres.`) attached to any water molecule (`resn TIP3`) oxygen (`type OH2`) if within 2.2 angstroms (`.around. 2.2`) of the drug (`fulldrug` definined earlier in script).
+This block demonstrates how to delete atoms near atoms of interest. This particular command will delete entire residues (`.byres.`) containing any water molecule (`resn TIP3`) oxygen (`type OH2`) if the oxygen lies within 2.2 angstroms (`.around. 2.2`) of the drug (`fulldrug` definined earlier in script).
 
+#### Submit CHARMM script 
+
+Notice the variables `pdbid`, `drugfilename`, `drugsegid`, and `topparloc` aren't set anywhere in the script, but are used multiple times. These are variables that are passed to CHARMM by the submission script. Recall from previous labs the use of environment variables set in Linux and passed to CHARMM or other programs. 
+
+Open the file "bash.pt2_adddrug.sh" and fill in the values for the environment variables that are empty. If you don't know the proper value for `drugsegid`, use a text editor or `vi` to open the PDB file associated with the drug you want to simulate and check the far right column. For example, for protonated Amt, you would use `alm034` for `drugname` and `L034` for `drugsegid`. 
+
+Once you are done, check to ensure the CHARMM-GUI job from earlier is complete, and then execute `./bash.pt2_adddrug.sh` to run CHARMM on the internode. 
 
 **[NAMD Lab 2](https://busathlab.github.io/mdlab/namd_lab2.html)**
 
