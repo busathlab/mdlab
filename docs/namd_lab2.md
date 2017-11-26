@@ -166,7 +166,7 @@ The `cd` command moves to the folder containing the NAMD input files. Using `cd`
 
 This submission script is nearly complete, but while we have the GPU node scheduled, let's go ahead and run all of the steps of equilibration, not just 6.1. *Create new lines for step 6.2 through 6.6, based on the last line, and append them to the end of the script.*
 
-If you don't want to use GPU's for your simulation (such as when the GPU nodes have 100% utilization, [check the site](http://marylou.byu.edu)), remove the `--gres` line, and use the following pattern to launch jobs:
+If you don't want to use GPU's for your simulation (such as when the GPU nodes have 100% utilization, [check the site](http://marylou.byu.edu)), remove the line containing `--gres`, reduce the number of processors, RAM, etc., and use the following pattern to launch jobs:
 ```bash 
 # NAMD variables 
 module purge 
@@ -176,6 +176,7 @@ module load namd/2.12_openmpi-1.8.5_gnu-5.2.0
 mpirun $(which namd2) step6.1_equilibration.inp > step6.1_equilibration.inp.log
 ```
 
+> To learn more, see also [MaryLou compute resources](https://marylou.byu.edu/documentation/resources) to get an idea of what resources you can request and the [Job Script Generator](https://marylou.byu.edu/documentation/slurm/script-generator) to get the scheduler commands you need.
 
 
 
