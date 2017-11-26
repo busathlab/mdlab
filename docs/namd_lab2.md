@@ -192,6 +192,8 @@ module load namd/2.12_openmpi-1.8.5_gnu-5.2.0
 mpirun $(which namd2) step6.1_equilibration.inp > step6.1_equilibration.inp.log
 ```
 
+> To learn more, see also [MaryLou compute resources](https://marylou.byu.edu/documentation/resources) to get an idea of what resources you can request and the [Job Script Generator](https://marylou.byu.edu/documentation/slurm/script-generator) to get the scheduler commands you need.
+
 Now, submit this script to the scheduler using the `sbatch` command. Watch the progress of the job using `watch squeue -u [username]` and type `Control+C` to exit watching.
 
 If you have followed the default lab suggestions, this portion will take roughly 45 minutes to complete after the GPU node is scheduled. However, don't wait for the job to finish before moving on to the next portion of the lab!
@@ -204,14 +206,44 @@ We will now add a drug to the protein-bilayer system using CHARMM. There are sev
 - Orient the protein-bilayer system so the protein once again is in its original position (by fitting to the average protein backbone atom coordinates of the PDB models)
 - Place the drug in the desired location 
 - Delete water molecules that are excessively close to the drug (overlapping)
-- Check the total system charge and neutralize by adding a chloride ion (e.g. if the drug is positively charged)
+- Check the total system charge and, if necessary, neutralize by adding a chloride ion (e.g. if the drug is positively charged)
 - Save the current system coordinates to be used for restraints 
-- Revert the orientation of the protein-bilayer system to its original position, so the drug is now appropriately aligned with respect to the channel position and axis
-- Write output files for use in simulation 
+- Revert the orientation of the protein-bilayer system to its post-equilibration position, so the drug is now appropriately aligned with respect to the channel position and axis
+- Write output files for use in next simulation 
 
+This is a surprisingly daunting task to perform properly. Rather than spend our time and energy and making you make this file on our own, we will continue our NAMD focus in this lab and hit the highlights in the next script, "charmm.adddrug.str".
 
-> To learn more, see also [MaryLou compute resources](https://marylou.byu.edu/documentation/resources) to get an idea of what resources you can request and the [Job Script Generator](https://marylou.byu.edu/documentation/slurm/script-generator) to get the scheduler commands you need.
+```fortran
+! load topology
+	stream @topparloc/load_toppar.str
+	read rtf card append name alm/45drugs.rtf
+	read para card flex append name alm/45drugs.prm
+```
 
+This code block demonstrates how to append topology and parameters to already loaded topology and parameters. Using `append` after `read rtf` causes the `alm/45drugs.rtf` topology to appended; `flex append` performs the same function for the parameter file. The `45drugs` files contain topology and parameters for 45 adamantyl-derived drugs studied in the Busath lab, some of which vary only by protonation state or chirality.
+
+```fortran 
+! loads coordinates from charmm-gui NAMD restart file
+	read namd file "charmm-gui/namd/step6.6_equilibration.coor"
+```
+
+This code block demonstrates how to load NAMD binary coordinate files into CHARMM. This feature is very rudimentary, and formatting is strict. The file name *must* be encircled by double quotes (`"`) and the coordinates can only be read into the main coordinate set (not the comparison set, though you can get around this limitation by using `coor copy comp` or `coor swap`).
+
+```fortran 
+! reorient entire system to "fit" the simulated protein backbone to the average protein backbone, will be reversed later 
+	coor orie rms sele backbone end 
+```
+
+This code block causes the main coordinate set, the protein-bilayer system, to be RMS oriented to the backbone atoms of the comparison set, which is the average PDB structure. 
+
+The section that starts with `! find alpha carbons of residue S31 and place Amt cage here with N facing inferiorly to roughly match configuration 1 from the 2015 paper` is where the drug placement happens. The drug is first moved in the X/Y plane to be centered on the channel, then the drug is placed near the Ser31 residue using a combination of `coor stat` and `calc`.
+
+```fortran 
+! delete any water overlapping the drug 	
+	delete atom sele .byres. ((resn TIP3 .and. type OH2) .and. (fulldrug .around. 2.2)) end
+```
+
+This block demonstrates how to delete atoms near atoms of interest. It will delete entire residues (`.byres.`) attached to any water molecule (`resn TIP3`) oxygen (`type OH2`) if within 2.2 angstroms (`.around. 2.2`) of the drug (`fulldrug` definined earlier in script).
 
 
 **[NAMD Lab 2](https://busathlab.github.io/mdlab/namd_lab2.html)**
