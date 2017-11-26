@@ -125,8 +125,11 @@ The equilibration protocol involves progressive relaxation of restraints. Each s
 
 Other restraints implemented include a barrier restraint to keep water molecules away from the hydrophobic lipid regions, dihedral restraints on lipids, etc.
 
-Let's go ahead and start digging into code. Open "bash.pt1_equilibrate.sh" and examine the contents.
+#### Submitting NAMD GPU jobs
 
+NAMD performs very well on standard Linux clusters, but is particularly fast when used on nodes with GPU's. A sample submission script titled "bash.pt1_equilibrate.sh" is provided for you, let's go ahead and start digging into it. Open the file and examine its contents.
+
+You will see some familiar lines near the start that tell the scheduler what resources to ask for:
 ```bash 
 #!/bin/bash
 
@@ -135,46 +138,43 @@ Let's go ahead and start digging into code. Open "bash.pt1_equilibrate.sh" and e
 #SBATCH --nodes=1   # number of nodes
 #SBATCH --gres=gpu:4
 #SBATCH --mem=64G   # memory per CPU core
+```
+This script is tailored to the architecture of the m8g cluster, which is comprised of nodes each with 24 processing cores, 4 GPU's, and 64 GB of RAM. The option `--gres=gpu:4` requests 4 GPU's.
 
-# Add a channel backbone tilt restraint to the equilibration scheme
-if [ -f charmm-gui/namd/membrane_lipid_restraint.namd.col_backup ]; then
-	cp charmm-gui/namd/membrane_lipid_restraint.namd.col_backup charmm-gui/namd/membrane_lipid_restraint.namd.col
-else 
-	cp charmm-gui/namd/membrane_lipid_restraint.namd.col charmm-gui/namd/membrane_lipid_restraint.namd.col_backup
-fi
-cat <<EOT >> charmm-gui/namd/membrane_lipid_restraint.namd.col
-colvar { 
-	name bb_tilt
-	tilt { 
-		atoms {
-			atomsFile          restraints/bb_rmsd.ref
-			atomsCol           B 
-			atomsColValue      1.0 
-		}
-		refPositionsFile      restraints/bb_rmsd.ref
-		refPositionsCol       B
-		refPositionsColValue  1.0    
-		axis (0.0, 0.0, 1.0) 
-	} 
-} 
+We will use this script to modify the restraint protocol provided by CHARMM-GUI. To save time for the meat of the lab, we won't delve into the syntax of the section labeled `# Add a channel backbone tilt restraint...`, but it is appending an extra restraint to the NAMD equilibration protocol given by CHARMM-GUI to keep the channel axis lightly restrained to the Z axis using the `tilt` collective variable. 
 
-harmonic {
-	colvars bb_tilt
-	centers 0
-	forceConstant 1
-}
-EOT
-	
-# NAMD variables
+To allow NAMD to use the GPU's, we need to give Linux an environment ready for GPU simulations. 
+
+Append the following code beneath the line `# NAMD variables`:
+```bash
 module purge
 module load compiler_gnu/6.4
 module load cuda/8.0
 export dir=/fslhome/mgleed/software/namd/exec/NAMD_Git-2017-11-04_Linux-x86_64-multicore-CUDA
-
-# Run NAMD
 ```
+This will reset the environment with `module purge`, and give the libraries needed for GPU simulations with `compiler_gnu/6.4` and `cuda/8.0`. Finally, the directory containing the NAMD GPU-ready executable is given by the variable `dir`. 
 
+Now we need to launch NAMD and load the input files. Append the following code beneath the line `# Run NAMD`:
+```bash 
+# Run NAMD 
+cd $SLURM_SUBMIT_DIR/charmm-gui/namd
+$dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices "0,1,2,3" step6.1_equilibration.inp > step6.1_equilibration.inp.log
+```
+The `cd` command moves to the folder containing the NAMD input files. Using `cd` in a submission script will help prevent creating output files in a location you don't want. The next line is where NAMD is invoked. `$dir/namd2` calls the NAMD executable; `p${SLURM_CPUS_ON_NODE}` uses the number of CPU's on the node, which should be 24 if you use a whole m8g GPU node; `+idlepoll` is a command used for optimizing jobs using GPU's, `+devices "0,1,2,3"` asks for the GPU devices numbered 0 to 3 (4 GPU's), and the next two are the input and output files respectively.
 
+> There are simpler ways to run GPU jobs, but this is the fastest we've discovered for the m8g cluster based on a variety of benchmark results.
+
+This submission script is nearly complete, but while we have the GPU node scheduled, let's go ahead and run all of the steps of equilibration, not just 6.1. *Create new lines for step 6.2 through 6.6, based on the last line, and append them to the end of the script.*
+
+If you don't want to use GPU's for your simulation (such as when the GPU nodes have 100% utilization, [check the site](http://marylou.byu.edu)), remove the `--gres` line, and use the following pattern to launch jobs:
+```bash 
+# NAMD variables 
+module purge 
+module load namd/2.12_openmpi-1.8.5_gnu-5.2.0
+
+# Run NAMD 
+mpirun $(which namd2) step6.1_equilibration.inp > step6.1_equilibration.inp.log
+```
 
 
 
