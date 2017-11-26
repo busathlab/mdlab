@@ -257,6 +257,52 @@ Open the file "bash.pt2_adddrug.sh" and fill in the values for the environment v
 
 Once you are done, check to ensure the CHARMM-GUI job from earlier is complete, and then execute `./bash.pt2_adddrug.sh` to run the CHARMM job on the internode (rather than scheduling using `sbatch`).
 
+### 4. Preparing reference files for colvars using VMD 
+
+VMD, like CHARMM, can be used from the command line without any user interface. Scripting is based on the programming language Tcl. 
+
+> A great way to learn to use VMD scripting is by using VMD on your personal computer. At the start of a session, go to `File` > `Log Tcl Commands to File...` and then load molecules, play with representations, atom selections, etc. When your session is complete, load the file you saved at the start of the session in a text editor, and it will give you the Tcl commands used to run your session behind the scenes.
+
+One advantage of VMD is that it supports many plugins and is useful for system building, trajectory analysis, and more. In this lab, we use VMD to construct reference coordinate files for use by the collective variables module in NAMD, as VMD has the ability to easily manipulate alpha and beta columns (to tag atoms of interest) in PDB files.
+
+Create a new file named `vmd.compsets.inp`. The general idea for this script will be as follows:
+- Load the protein-bilayer-drug system 
+- Load the average PDB structure 
+- Replace the system's protein coordinates with the average PDB structure protein coordinates
+- Create a restraint reference file of the drug 
+- Create a restraint reference file of the protein 
+
+#### Load input files into VMD 
+
+Let's start with the following code:
+```tcl
+# load in structure produced by charmm.adddrug.str
+	mol new output/2l0j_alm034_oriented.pdb type {pdb} first 0 last -1 step 1 waitfor all
+```
+
+To load a file into VMD, you load it as a new molecule, just as you would in the GUI version you are used to. You start with the keyword `mol` to utilize the molecule facility, say `new` to specify you are creating a new molecule, insert a filename to load as the new molecule, use `type {pdb}` to tell the input reader to expect PDB formatting. The rest are used primarily for trajectories: `first 0` means to start with frame 0, `last -1` would mean to finish on frame -1, but -1 really means there is no last frame as in this case, `step 1` loads every 1 frame of the trajectory, and `waitfor all` causes VMD to completely load the file before moving on to the next command.
+
+Now that we have loaded our file into VMD, let's load in average protein structure from the PDB models, which we will use in backbone restraints and to align the simulating protein to the cartesian Z axis as needed. **Following the pattern from the previous code block, make a new line that loads the average protein structure as a new molecule.**
+
+#### Using `set` and `atomselect` to replace protein coordinates
+
+Both molecules are now in VMD, so we can start replacing protein coordinates, etc. Consider the next code block, which you will add to your script:
+```tcl
+# replace original backbone coordinates with avg. backbone coordinates
+	set repprotein [atomselect 0 "protein"]
+	set newprotein [atomselect 1 "protein"]
+	$repprotein set {x y z} [$newprotein get {x y z}]
+	set all [atomselect 0 "all"] 
+```
+
+
+
+
+
+
+
+
+
 **[NAMD Lab 2](https://busathlab.github.io/mdlab/namd_lab2.html)**
 
 **[Return to home page](https://busathlab.github.io/mdlab/index.html)**
