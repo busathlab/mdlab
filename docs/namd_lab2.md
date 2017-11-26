@@ -84,17 +84,15 @@ In this portion, you will decide which type of lipids to use and what type and s
 > This step typically takes the longest for CHARMM-GUI to process, and you may even get a blank white screen for a while. You might consider copying the link that shows just below the yellow CHARMM box in case of a time out.
 
 #### Build Components
-Nothing needs to be adjusted here. 
+Click to continue
 
-#### Assemble Components 
-Nothing needs to be adjusted here.
+#### Assemble Components (1 of 2)
+Click to continue
 
-#### Assemble Generated Components 
-You can now view the ultimate system size. 
+#### Assemble Components (2 of 2) 
+> You can now view the ultimate system size. If you are hoping to publish using this structure, you might want to document some of these statistics. 
 
-> If you are publishing using this structure, you might want to copy down some of these statistics for reference. 
-
-- Force Field options should be set to CHARMM36m if your CHARMM version is at least c42. As we will be using NAMD primarily in this lab, you can use CHARMM36m regardless of CHARMM version available to you.
+- `Force Field options` should be set to CHARMM36m if your CHARMM version is at least c42. As we will be using NAMD primarily in this lab, you can use CHARMM36m regardless of CHARMM version available to you.
 - Check `NAMD` under `Input Generation Options` 
 - Ensure `Generate grid information for PME FFT automatically` is enabled
 - Ensure `NPT ensemble` is checked 
@@ -105,9 +103,11 @@ Click the red box labeled `download .tgz`, located near the top right corner of 
 
 You may close CHARMM-GUI now.
 
-### 2. Running pre-made equilibration input files in NAMD 
+### 2. Running generated equilibration input files in NAMD 
 
-Each step lasts 50 - 100 ps.
+CHARMM-GUI provides output in multiple MD suite formats to automatically begin equilibrating the systems, and for this lab we will use the generated NAMD input files. The simulation parameters and restraints vary slightly between MD packages, but the simulations follow essentially the same pattern. 
+
+The equilibration protocol involves progressive relaxation of restraints. Each step lasts 50 - 100 ps. The relaxation is performed as follows (per the CHARMM-GUI site):
 
 |        | Step 1 | Step 2 | Step 3 | Step 4 | Step 5 | Step 6 |
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
@@ -117,21 +117,67 @@ Each step lasts 50 - 100 ps.
 | mforce |   2.5  | 0.0    | 0.0    | 0.0    | 0.0    | 0.0    |
 | ion    |  10.0  | 0.0    | 0.0    | 0.0    | 0.0    | 0.0    |
 
-- BB = force constant to keep RMSD of protein backbone atoms to original structure 
-- BB = force constant to keep RMSD of protein sidechain atoms to original structure 
-- tforce = force constant to keep the lipid tail below +/- %
-- mforce = force constant to keep the lipid head groups close to target values
-- ion = force constant to keep ions near original positions
-  
-Equilibration
------------------------------------------------------------------------
-To reduce the possible problem with the numerical integration with
-the uncorrelated system, 1 fs time-step is used only for the first-step of 
-equilibration. 
-It is still possible that you may need to use 1 fs for the next equilibration
-steps if your system is initially very very unstable (rare cases).
+- `BB`: force constant to keep RMSD of protein backbone atoms to original structure 
+- `SC`: force constant to keep RMSD of protein sidechain atoms to original structure 
+- `tforce`: force constant to keep the lipid tail below +/- %
+- `mforce`: force constant to keep the lipid head groups close to target values
+- `ion`: force constant to keep ions near original positions
 
-** Note: change "nstep" to reduce the number of dynamics steps
+Other restraints implemented include a barrier restraint to keep water molecules away from the hydrophobic lipid regions, dihedral restraints on lipids, etc.
+
+Let's go ahead and start digging into code. Open "bash.pt1_equilibrate.sh" and examine the contents.
+
+```bash 
+#!/bin/bash
+
+#SBATCH --time=18:00:00   # walltime
+#SBATCH --ntasks=24   # number of processor cores (i.e. tasks)
+#SBATCH --nodes=1   # number of nodes
+#SBATCH --gres=gpu:4
+#SBATCH --mem=64G   # memory per CPU core
+
+# Add a channel backbone tilt restraint to the equilibration scheme
+if [ -f charmm-gui/namd/membrane_lipid_restraint.namd.col_backup ]; then
+	cp charmm-gui/namd/membrane_lipid_restraint.namd.col_backup charmm-gui/namd/membrane_lipid_restraint.namd.col
+else 
+	cp charmm-gui/namd/membrane_lipid_restraint.namd.col charmm-gui/namd/membrane_lipid_restraint.namd.col_backup
+fi
+cat <<EOT >> charmm-gui/namd/membrane_lipid_restraint.namd.col
+colvar { 
+	name bb_tilt
+	tilt { 
+		atoms {
+			atomsFile          restraints/bb_rmsd.ref
+			atomsCol           B 
+			atomsColValue      1.0 
+		}
+		refPositionsFile      restraints/bb_rmsd.ref
+		refPositionsCol       B
+		refPositionsColValue  1.0    
+		axis (0.0, 0.0, 1.0) 
+	} 
+} 
+
+harmonic {
+	colvars bb_tilt
+	centers 0
+	forceConstant 1
+}
+EOT
+	
+# NAMD variables
+module purge
+module load compiler_gnu/6.4
+module load cuda/8.0
+export dir=/fslhome/mgleed/software/namd/exec/NAMD_Git-2017-11-04_Linux-x86_64-multicore-CUDA
+
+# Run NAMD
+```
+
+
+
+
+
 
 **[NAMD Lab 2](https://busathlab.github.io/mdlab/namd_lab2.html)**
 
