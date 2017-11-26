@@ -147,6 +147,7 @@ To allow NAMD to use the GPU's, we need to give Linux an environment ready for G
 
 Append the following code beneath the line `# NAMD variables`:
 ```bash
+# NAMD variables 
 module purge
 module load compiler_gnu/6.4
 module load cuda/8.0
@@ -160,7 +161,12 @@ Now we need to launch NAMD and load the input files. Append the following code b
 cd $SLURM_SUBMIT_DIR/charmm-gui/namd
 $dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices "0,1,2,3" step6.1_equilibration.inp > step6.1_equilibration.inp.log
 ```
-The `cd` command moves to the folder containing the NAMD input files. Using `cd` in a submission script will help prevent creating output files in a location you don't want. The next line is where NAMD is invoked. `$dir/namd2` calls the NAMD executable; `p${SLURM_CPUS_ON_NODE}` uses the number of CPU's on the node, which should be 24 if you use a whole m8g GPU node; `+idlepoll` is a command used for optimizing jobs using GPU's, `+devices "0,1,2,3"` asks for the GPU devices numbered 0 to 3 (4 GPU's), and the next two are the input and output files respectively.
+The `cd` command moves to the folder containing the NAMD input files. Using `cd` in a submission script will help prevent creating output files in a location you don't want. The next line is where NAMD is invoked. 
+- `$dir/namd2` calls the NAMD executable
+- `p${SLURM_CPUS_ON_NODE}` uses the number of CPU's on the node, which should be 24 if you use a whole m8g GPU node
+- `+idlepoll` is a command used for optimizing jobs using GPU's
+- `+devices "0,1,2,3"` asks for the GPU devices numbered 0 to 3 (4 GPU's)
+- The next two parameters are the input and output files respectively, separated by a `>`
 
 > There are simpler ways to run GPU jobs, but this is the fastest we've discovered for the m8g cluster based on a variety of benchmark results.
 
