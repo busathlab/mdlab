@@ -341,6 +341,10 @@ sed -i "s/ EXPORT CC/export cc/" output/alm034_cc.sh # gotta convert the file to
 source output/alm034_cc.sh # file created by CHARMM containing export commands
 ```
 
+Now, ensure the NAMD simulations and drug insertion in CHARMM from the previous steps worked successfully, and then run the VMD script on the internode with `./bash.pt3_compsets.sh`. If the other scripts haven't finished yet, continue to the next section and revisit these later. 
+
+### 5. Perform dynamics simulations on the protein-bilayer system in NAMD 
+
 
 **[NAMD Lab 3](https://busathlab.github.io/mdlab/namd_lab3.html)**
 
