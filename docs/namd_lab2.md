@@ -335,15 +335,18 @@ To launch VMD, add the following code to the submission script:
 $(which vmd) < vmd.compsets.inp > output/vmd.compsets.inp.log
 ```
 
-Before we submit the script, we need to do one last thing--export the drug carbon variables for use by the VMD script. The export commands were created by the "charmm.adddrug.str" script already, we just need to stream the file. Add the following code between after the `module load ...` line and before the line to launch VMD:
+Now, before we submit, we need to export the drug carbon variables for use by the VMD script. The export commands were created by the "charmm.adddrug.str" script already, we just need to stream the file. Add the following code between after the `module load ...` line and before the line to launch VMD:
 ```bash 
 sed -i "s/ EXPORT CC/export cc/" output/alm034_cc.sh # gotta convert the file to lowercase, charmm output is uppercase by default
 source output/alm034_cc.sh # file created by CHARMM containing export commands
 ```
 
+Finally, there are a few places in the VMD script where you should be using environment variables, as the code provided here assumes you are using 2L0J and amantadine. Replace these hard-coded values and substitute environment variables--be sure you add the corresponding export lines to the "bash.pt3_compsets.sh" file as well, as you did in your CHARMM submission script from earlier.
+
 Now, ensure the NAMD simulations and drug insertion in CHARMM from the previous steps worked successfully, and then run the VMD script on the internode with `./bash.pt3_compsets.sh`. If the other scripts haven't finished yet, continue to the next section and revisit these later. 
 
 ### 5. Perform dynamics simulations on the protein-bilayer system in NAMD 
+
 
 
 **[NAMD Lab 3](https://busathlab.github.io/mdlab/namd_lab3.html)**
