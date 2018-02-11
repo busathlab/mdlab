@@ -49,7 +49,7 @@ All of the boxes here should be unchecked except for the following:
 - **Terminal group patching**. The four M2 segments should be patched at the N and C termini by default when checked. 
 - **Mutation**. Here is where you can mutate certain residues, e.g. Ser 31 -> Asn 31. Ensure you mutate all four segments (PROA, PROB, PROC, PROD). **You also use this to set Histidine protonation, see discussion below.** Click on `Add Mutation` to add more mutations.
 
-The protonation box is limited, and we prefer to use the mutation feature to set His protonation states. You must set His protonation for all occurences in the peptide. For example, the 2KQT structure has one His residue on each M2 segment, for a total of four; 2L0J, on the other hand, has two on each segment, for a total of eight. We have used the HSE epsilon protonation state for His37 in our lab publications, so we suggest you use that here.
+The protonation feature is limited, instead we prefer to use the mutation feature to set His protonation states. You must set His protonation for all occurences in the peptide. For example, the 2KQT structure has one His residue on each M2 segment, for a total of four; 2L0J, on the other hand, has two on each segment, for a total of eight. We have used the HSE epsilon protonation state for His37 in our lab publications, so we suggest you use that here.
 
 For 2KQT, it should look like the following: 
 
@@ -60,7 +60,7 @@ For 2KQT, it should look like the following:
 | PROC  | 37    | HIS | HSE |
 | PROD  | 37    | HIS | HSE |
 
-Amino acid mutations such as S31N would be performed similar to the above table. 
+Amino acid mutations such as S31N would be performed in a similar fashion. 
 
 #### Generate PDB and Orient Molecule
 - If using an OPM orientation of the PDB (set in the first step when you entered the PDB ID), select `Use PDB Orientation`, otherwise select `Align the First Principal Axis Along Z`
@@ -69,7 +69,7 @@ Amino acid mutations such as S31N would be performed similar to the above table.
 #### Calculate Cross-Sectional Area
 In this portion, you will decide which type of lipids to use and what type and size of system you want. 
 
-- Under `1. Box Type`, select `Hexagonal`. You can elect to use `Rectangular`, but for the purposes of this lab we will add the ability to manage a hexagonal simulation crystal to your repetoire, should you choose to use one or find a need to use one in your simulations. Hexagonal boxes reduce the size of a protein-bilayer system without compromising results, as it eliminates the unneeded water and lipids most distant from the central protein in the corners of a rectangular box. For most purposes, however, (probably including in publications) we recommend using a rectagonal box, as this is the standard.
+- Under `1. Box Type`, select `Rectangular`. You can elect to use `Hexagonal`, if you choose; however, crystal structure management becomes more complicated, especially when working between different simulation and visualization programs. Hexagonal boxes reduce the size of a protein-bilayer system without compromising results, as it eliminates the unneeded water and lipids most distant from the central protein in the corners of a rectangular box. Especially for protocols with intentions to publish, we recommend using a rectagonal box, as this is the standard.
 - Leave `2. Length of Z based on` and `3. Length of XY based on` default, but take a look at what these are adjusting. 
 - Enter `60` in the box after `Length of X and Y`
 - Click the arrowhead next to `PC (phosphatidylcholine ) Lipids` and enter `1` in the boxes under the headings `Upperleaflet Ratio (Integer)` and `Lowerleaflet Ratio (Integer)` for the lipid `DMPC`.
