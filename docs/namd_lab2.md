@@ -372,7 +372,20 @@ Next modify `outputName`, which will give the pattern of all of NAMD's output. F
 + outputName         output/2l0j_alm034_production;
 ```
 
+#### Changing from a "restart" script to an initial script 
 
+Make the following changes:
+```diff 
+- set inputname      step6.6_equilibration;
+- binCoordinates     $inputname.coor;    # coordinates from last run (binary)
+- binVelocities      $inputname.vel;     # velocities from last run (binary)
+- extendedSystem     $inputname.xsc;     # cell dimensions from last run (binary)
++ firsttimestep      0;
+```
+```diff 
+- dcdfreq           1000;
++ dcdfreq           5000;
+```
 
 
 add these lines to use the NVT ensemble instead of NPT ensemble:
