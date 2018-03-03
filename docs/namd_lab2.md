@@ -328,14 +328,15 @@ Create a new file named "bash.pt3_compsets.sh". Add the following code at the st
 module purge
 module load vmd/1.9.1
 ```
-This will provide us with the environment required by VMD, and provide the executable, which can be called with `$(which vmd)`. 
+This will provide us with the environment required by VMD, and provide a link to the executable binary file, which can be called with `$(which vmd)`. 
 
 To launch VMD, add the following code to the submission script:
 ```bash 
 $(which vmd) < vmd.compsets.inp > output/vmd.compsets.inp.log
 ```
 
-Now, before we submit, we need to export the drug carbon variables for use by the VMD script. The export commands were created by the "charmm.adddrug.str" script already, we just need to stream the file. Add the following code between after the `module load ...` line and before the line to launch VMD:
+Now, before we submit, we need to export the adamantane cage carbon variables for use by the VMD script. The export commands were created by the "charmm.adddrug.str" script already, we just need to stream the file. Add the following code between the `module load ...` line and the `$(which vmd) ...` line:
+
 ```bash 
 sed -i "s/ EXPORT CC/export cc/" output/alm034_cc.sh # gotta convert the file to lowercase, charmm output is uppercase by default
 source output/alm034_cc.sh # file created by CHARMM containing export commands
