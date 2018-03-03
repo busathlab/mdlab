@@ -386,7 +386,10 @@ Make the following changes:
 - dcdfreq           1000;
 + dcdfreq           5000;
 ```
-
+```diff 
+- source step5_assembly.namd.str
++ parameters alm/45drugs.prm 
+```
 
 add these lines to use the NVT ensemble instead of NPT ensemble:
 # Constant Temperature Control ONLY DURING EQUILB
