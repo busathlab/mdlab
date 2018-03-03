@@ -33,6 +33,8 @@ One large distinction is that CHARMM scripts are very order-dependent--commands 
 
 Another advantage of NAMD is that the configuration files are written in TCL, so you can use as much TCL code as you like in the configuration file (for calculations, etc.). VMD command line is also based on TCL, making integration of the two seamless.
 
+> If you are using Notepad++ or another IDE, you can set the language of NAMD and VMD scripts to TCL to have some syntax highlighting. 
+
 #### Topology and Parameters 
 Typically among the very first things in any CHARMM script is loading topology and parameter files, and it won't take you long to find the analogous location in the NAMD configuration file.
 
