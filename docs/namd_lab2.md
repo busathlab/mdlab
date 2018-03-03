@@ -506,14 +506,14 @@ $dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES namd
 
 > If you have variables you wish to export for use in NAMD, enter them before the `# Run NAMD` section. For example, you could put `export pdbid=2l0j` or `export drugname=alm034` if you want to use variable substitution in your NAMD script for amantadine in 2L0J. (As a reminder, use `$::env(VARIABLENAME)` in your NAMD script to reference an exported variable.) Such an approach will be beneficial to your workflow in later labs.
 
-Run your production script with `sbatch`. (Following this lab with the m8 GPU architecture ran roughly 40 minutes per 500,000 steps of simulation)
+Run your production script with `sbatch`. (Following this lab with the m8 GPU architecture, completed 500,000 steps in roughly 40 minutes 3/2018)
 
 ### Analysis
 
 Once your simulation is complete, open the file named `2l0j_alm034_production.colvars.traj` in the `output/` directory. Using the data from this file, plot the backbone RMSD and the drug position over time. You might have a few rows where the header labels are duplicated throughout the output file; if you do, just manually delete these lines in your spreadsheet or data analysis software.
 
 Here is a sample graph of Amt in 2L0J with 3,000,000 steps, following this lab protocol.
-![alt text](https://github.com/busathlab/mdlab/raw/master/images/namd02_f01.png "Figure 1")
+![alt text](https://github.com/busathlab/mdlab/raw/master/images/namd02_f01.PNG "Figure 1")
 
 > **Assignment:** Summarize the meaning of these results in a couple of sentences. If your classmates varied the lab in any way (different channel, drug, etc.), how do your results compare? Submit your plot to your TA.
 
