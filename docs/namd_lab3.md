@@ -138,7 +138,7 @@ export umbrellaWindow=`perl -E 'say ($ENV{reactionCoordinateStart}+$ENV{reaction
 export umbrellaWindow=`echo "( $reactionCoordinateStart + $reactionCoordinateIncrement )" | bc`
 ```
 
-`perl` is better for more advanced calculations and the `echo ... | bc` method is a bit easier for very basic calcluations.
+`perl` is better for more advanced calculations and the `echo ... | bc` method is a bit easier for very basic calculations.
 
 Here's another example of using `perl` to compute the arccosine of the exported bash variable `cos`, converting to degrees, and assigning it to the bash variable `umbrellaTiltDegrees`:
 
@@ -146,11 +146,22 @@ Here's another example of using `perl` to compute the arccosine of the exported 
 export umbrellaTiltDegrees=`perl -E 'use Math::Trig; say acos($ENV{cos})*180/pi'`
 ```
 
-#### Integer to decimal conversion
+#### Decimal handling
+
+For analysis purposes and automation, managing your decimal places and floating zeros is critical. For ease in the analysis stage, it may be helpful to you to be consistent with number length decimal places.
 
 `printf` is a common cross-platform utility for formatting a variety of data types. [Here is a helpful resource for learning more](https://www.computerhope.com/unix/uprintf.htm).
 
-You can convert
+To redefine the variable `umbrellaWindow` with a current value of 2.5 to a new value of 002.500:
+
+```shell
+umbrellaWindow=`printf "%07.3f" $umbrellaWindow`
+```
+
+Breaking down the formatting argument, `%07.3f`:
+- the `7` means to format the output with a minimum of 7 characters (if the output is less than 7, it will add empty space to the right to equal 7 characters, by default)
+- the `0` before the 7 means to use leading zeros to make the minimum of 7 characters instead of blank spaces to the right.
+- the `3f` means to use the float data type (6 decimal precision) and to limit the decimal places to 3.
 
 #### While loops 
 There are multiple types of loops and multiple ways of performing each loop in bash. The 
