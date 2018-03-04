@@ -35,20 +35,86 @@ Let's go over the general approach of how we will accomplish umbrella sampling i
 
 There are hundreds of different ways that the umbrella sampling protocol can be performed. If you are experienced and more comfortable with Python, C++, etc., you could technically do most of the template replacement, submission, and data aggregation presented here. For the purposes of the lab we will use `bash` for our code, the default Linux interpreter. You do not have to follow the methods described here if you are comfortable with coding and prefer other methods.
 
-Here is a chart demonstrating the general workflow:
+Here is a chart demonstrating the suggested general workflow:
 ![alt text](https://github.com/busathlab/mdlab/raw/master/images/namd03_f01.PNG "Figure 1")
 
-One approach to accomplishing this is using a master submission script. The master submission script contains all of the variables of interest and defines the reaction coordiante of interest. Its function is to loop over all of the simulation configuration files (CHARMM, VMD, NAMD, etc.; the files in the middle column of *Figure 1*) providing environment variables specific for each window along the reaction coordinate. The submission script carefully manages filenames so the output data can be intelligently extracted for analysis in WHAM.
+One approach to performing umbrella sampling with this workflow is using a "master" submission script. The submission script contains all of the variables of interest and defines the reaction coordiante of interest. Its function is to loop over all of the simulation configuration files (CHARMM, VMD, NAMD, etc.; the files in the middle column of *Figure 1*) providing environment variables specific for each window along the reaction coordinate. The submission script carefully manages filenames so the output data can be intelligently extracted for analysis in WHAM.
 
-An analysis script can be run after the simulations complete that extracts the meaningful output data and prepares files for WHAM. 
+An analysis script can be run after the simulations complete that extracts the meaningful output data and execute WHAM.
 
-One recommended method to prepare the simulation scripts is to modify them to use environment variables wherever possible. Some scripts, like colvars, do not use environment variables, so other methods such as find and replace (using the `sed` command in `bash`) can be utilized to accomplish the same goal.
+### 3. Design the protocol 
 
-### 3. 
+That's pretty much it! We have provided a couple skeleton scripts containing some suggested pseudocode to help guide you, but now that you've made it this far in the course you should be able to perform most of this on your own, even if you were to do it all manually without special scripts. 
+
+The two scripts we have provided you are listed below, and they each contain some basic comments and pseudocode to help get you started:
+- `bash.umbrellasubmit.sh` - master submission script 
+- `bash.analyzeumbrellas.sh` - post-simulation analysis script that runs WHAM, discussed later 
+
+Copy the following from the previous lab into the current lab directory. You may rename any of them as you prefer:
+- `amt/`
+- `alm/`
+- `charmm-gui/`
+- `charmm.adddrug.str`
+- `colvars.production.inp`
+- `namd.production.inp` 
+- `vmd.compsets.inp` 
+- `bash.pt2_adddrug.sh`
+- `bash.pt3_compsets.sh`
+- `bash.pt4_simulation.sh`
+
+To save some time, here's some code you can execute within this lab's directory to grab these files from the previous lab, if you keep each of the lab directories within a directory together. Otherwise just modify the code to suit your directory structure. :
+```bash 
+cp ../namdlab2_m2amt/charmm.adddrug.str .
+cp ../namdlab2_m2amt/colvars.production.inp .
+cp ../namdlab2_m2amt/namd.production.inp . 
+cp ../namdlab2_m2amt/vmd.compsets.inp . 
+cp ../namdlab2_m2amt/bash.pt2_adddrug.sh .
+cp ../namdlab2_m2amt/bash.pt3_compsets.sh .
+cp ../namdlab2_m2amt/bash.pt4_simulation.sh .
+cp -r ../namdlab2_m2amt/alm .
+cp -r ../namdlab2_m2amt/avg .
+cp -r ../namdlab2_m2amt/charmm-gui .
+```
+
+One tip to start, make sure to use environment variables anywhere you have filenames within your configuration files. You do not want to perform your whole umbrella sampling protocol to find out all of the output files have the same name and overwrite each other! For good-practice's sake, you might also choose to use environment variables for any paramater that may potentially be of interest as some point, such as temperature, number of simulation steps, etc. If you were already using environment variables in the last lab, you will be a step ahead.
+
+Also, the scheduler submission script, `bash.pt4_simulation`, from last lab is written to utilize full GPU nodes. While you may keep this in your workflow as-is, the number of GPU nodes is very limited and it may be easier to either request portions of GPU nodes or full non-GPU nodes instead. Adjust the requested time as you see fit. 
+
+**Example full GPU node request** (as in lab 2, based on `m8g` architecture)
+```bash 
+#SBATCH --time=24:00:00   # walltime
+#SBATCH --ntasks=24   # number of processor cores (i.e. tasks)
+#SBATCH --nodes=1   # number of nodes
+#SBATCH --gres=gpu:4
+#SBATCH --mem=64G   # memory per CPU core
+```
+
+**Example 1 GPU per GPU node request** (more likely to get through a high volume of jobs quickly, based on `m8g` architecture)
+```bash 
+#SBATCH --time=24:00:00   # walltime
+#SBATCH --ntasks=6   # number of processor cores (i.e. tasks)
+#SBATCH --nodes=1   # number of nodes
+#SBATCH --gres=gpu:1
+#SBATCH --mem=16G   # memory per CPU core
+```
+
+**Example non-GPU node request** (if the GPU nodes [are being hogged](https://marylou.byu.edu/utilization/), this is the most likely scheme to get through the highest volume of jobs quickly) `m7` has 16 cores per node, `m8` and `m9` have 24 cores per node. (3/2018)
+```bash 
+#SBATCH --time=24:00:00   # walltime
+#SBATCH --ntasks=16   # number of processor cores (i.e. tasks)
+#SBATCH --nodes=1   # number of nodes
+#SBATCH --mem-per-cpu=2G   # memory per CPU core
+```
+
+Refer to the next section of the lab for helpful `bash` tips and guidance.
+
+### 4. `bash` review and other helpful hints
 
 
+### 5. Submitting 
 
 
+### 6. Analysis with WHAM 
 
 
 
