@@ -1,0 +1,16 @@
+* Defines Carbons for alm185_pc
+* Mitchell Gleed 21 Nov 13
+*
+! set carbons according to cage_diagram.png
+set A1 C4
+set A2 C5
+set A3 C6
+set A4 C12
+set A5 C11
+set A6 C13
+set A7 C9
+set A8 C8
+set A9 C10
+set A10 C7
+! set R1 to 1 if largest R group is on carbon 1
+set R1 1

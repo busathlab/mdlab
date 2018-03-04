@@ -1,0 +1,132 @@
+* add amantadine to M2
+*
+bomlev -1
+ioformat exte
+
+! load topology
+	stream @topparloc/load_toppar.str
+	read rtf card append name alm/45drugs.rtf
+	read para card flex append name alm/45drugs.prm
+	
+! load channel psf
+	read psf xplor card name charmm-gui/step5_assembly.xplor_ext.psf
+
+! loads coordinates from charmm-gui NAMD restart file
+	read namd file "charmm-gui/namd/step6.6_equilibration.coor"
+	set m2seg PRO
+	set nres ?nres
+	write coor card name output/orient.crd ! write coordinates into charmm format for use later 
+	
+! load average structure M2 for comparison coordinate set 
+	coor copy comp ! copy entire system to comparison coordinate set 
+	read coor card comp name avg/@{pdbid}_avg.crd ! overwrites protein coordinates in comparison set
+	defi backbone sele segid @{m2seg}* .and. (TYPE N .OR. TYPE CA .OR. TYPE C .OR. TYPE O) END
+	
+! reorient entire system to "fit" the simulated protein backbone to the average protein backbone, will be reversed later 
+	coor orie rms sele backbone end 
+	
+! load drug crd/psf
+	read psf card append name alm/@{drugname}_oriented.psf
+	read coor card offset @nres name alm/@{drugname}_oriented.crd
+	! load drug information, variables for orientation
+	stream alm/@{drugname}_pc.str
+	define fulldrug sele segid @{drugsegid} end
+	define cage sele type @A1 .or. type @A2 .or. type @A3 .or. type @A4 .or. type @A5 .or. type @A6 .or. type @A7 .or. type @A8 .or. type @A9 .or. type @A10 end
+	defi backbone sele segid @{m2seg}* .and. (TYPE N .OR. TYPE CA .OR. TYPE C .OR. TYPE O) END ! repeat definition because there was a PSF change 
+
+! find alpha carbons of residue S31 and place Amt cage here with N facing inferiorly to roughly match configuration 1 from the 2015 paper
+	coor stat sele type CA .and. backbone .and. resi 31 end 
+		set resxave ?XAVE 
+		set resyave ?YAVE 
+		set reszave ?ZAVE 
+				
+	! align drug in X and Y 
+	coor stat sele fulldrug end 
+		set drugxave ?XAVE 
+		set drugyave ?YAVE 
+		set drugzave ?ZAVE
+
+	calc xdist = @resxave - @drugxave
+	calc ydist = @resyave - @drugyave
+	coor trans xdir @xdist ydir @ydist sele fulldrug end ! move drug in X and Y dir
+
+	! align drug in Z 
+	coor stat sele fulldrug .and. cage end
+		set cagexave ?XAVE
+		set cageyave ?YAVE
+		set cagezave ?ZAVE
+		
+	coor stat sele fulldrug end 
+		set drugxave ?XAVE 
+		set drugyave ?YAVE 
+		set drugzave ?ZAVE	
+	
+	calc drugcagedist = @cagezave - @drugzave ! difference between geometric center of entire drug and drug cage 
+	
+	calc desiredzpos = @reszave + 1 ! place cage about 1 angstrom above Ser31
+	
+	calc zdist = @desiredzpos - @drugzave
+	calc zdist = @zdist - @drugcagedist ! we want to move the whole drug, but need the cage to be at desired position 
+		
+	coor trans zdir @zdist sele fulldrug end ! move drug in Z dir 
+	
+! delete any water overlapping the drug 	
+	delete atom sele .byres. ((resn TIP3 .and. type OH2) .and. (fulldrug .around. 2.2)) end
+	
+! check total system charge and overwrite a random water molecule with a chloride ion until total system charge is zero (e.g. to neutralize Amt)
+	if ?CGTOT .eq. 0 goto skip 
+
+	label addcl
+		
+		coor stat sele segid TIP3 end ! select non-pore waters 
+		calc watrescount = ?nsel / 3 ! calculate number of waters 
+		IRAND SERIES 1 SETU BEGI 1 ENDI @watrescount SEED 918417 ! create a random number between 1 and @watrescount 
+		IRAND SERIES 1
+		set randomwatres ?iran 
+		
+		! find and delete random water molecule
+		coor stat sele segid TIP3 .and. resid @randomwatres .and. type OH2 end
+		set repx ?XAVE
+		set repy ?YAVE 
+		set repz ?ZAVE 
+		dele atom sele segid TIP3 .and. resid @randomwatres end
+		
+		! put a new chloride at the water molecule's position
+		read sequence CLA 1
+		generate ANIC first none last none setup noangle nodihe
+		coor set xdir @repx ydir @repy zdir @repz sele type CLA .and. segi ANIC end
+	
+	if ?CGTOT .ge. 1 goto addcl
+	
+	label skip
+	
+! write oriented protein and drug coordinates to PDB for NAMD restraints 
+	write coor pdb name output/@{pdbid}_@{drugname}_oriented.pdb
+
+! reorient system 
+	read coor card comp name output/orient.crd ! overwrite the comparison set with original system coordinates, ignore warnings
+	defi backbone sele segid @{m2seg}* .and. (TYPE N .OR. TYPE CA .OR. TYPE C .OR. TYPE O) END
+	coor orie rms sele backbone end ! reorient to the original coordinates 	
+	
+! write new psf / crd 
+	write psf xplor card name output/@{pdbid}_@{drugname}_xplor.psf 
+	write psf card name output/@{pdbid}_@{drugname}.psf 
+	write coor card name output/@{pdbid}_@{drugname}.crd 
+	write coor pdb name output/@{pdbid}_@{drugname}.pdb
+	
+! write out drug cage carbons file for use in VMD later
+	open write unit 40 card name output/@{drugname}_cc.sh
+	write title unit 40
+	* export cc1=@A1
+	* export cc2=@A2
+	* export cc3=@A3
+	* export cc4=@A4
+	* export cc5=@A5
+	* export cc6=@A6
+	* export cc7=@A7
+	* export cc8=@A8
+	* export cc9=@A9
+	* export cc10=@A10
+	*			
+	
+stop

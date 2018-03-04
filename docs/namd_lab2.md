@@ -129,13 +129,13 @@ The equilibration protocol involves progressive relaxation of restraints. Each s
 Other restraints implemented include a barrier restraint to keep water molecules away from the hydrophobic lipid regions, dihedral restraints on lipids, etc.
 
 #### Extracting CHARMM-GUI output 
-Now that "charmm-gui.tgz" is in your NAMD lab 2 directory, execute the following command: `tar -xvf charmm-gui.tgz`. This will extract the contents of the compressed file (analagous to unzipping a .zip file in Windows).
+Now that `charmm-gui.tgz` is in your NAMD lab 2 directory, execute the following command: `tar -xvf charmm-gui.tgz`. This will extract the contents of the compressed file (analagous to unzipping a .zip file in Windows).
 
 This will create a directory called "charmm-gui" that contains all of the files used by CHARMM-GUI and the automatically generated input files for NAMD.
 
 #### Submitting NAMD GPU jobs
 
-NAMD performs very well on standard Linux clusters, but is particularly fast when used on nodes with GPU's. A sample submission script titled "bash.pt1_equilibrate.sh" is provided for you, let's go ahead and start digging into it. Open the file and examine its contents.
+NAMD performs very well on standard Linux clusters, but is particularly fast when used on nodes with GPU's. A sample submission script titled `bash.pt1_equilibrate.sh` is provided for you, let's go ahead and start digging into it. Open the file and examine its contents.
 
 You will see some familiar lines near the start that tell the scheduler what resources to ask for:
 ```bash 
@@ -180,8 +180,6 @@ The `cd` command moves to the folder containing the NAMD input files. Using `cd`
 
 This submission script is nearly complete, but while we have the GPU node scheduled, let's go ahead and run all of the steps of equilibration, not just 6.1. **Create new lines for step 6.2 through 6.6, based on the last line, and append them to the end of the script.** 
 
-> Rather than use the "step7.1_production.inp" file, we will perform our own custom production script.
-
 If you don't want to use GPU's for your simulation (such as when the GPU nodes have 100% utilization, [check the site](http://marylou.byu.edu)), remove the line containing `--gres`, reduce the number of processors, RAM, etc., and use the following pattern to launch jobs:
 ```bash 
 # NAMD variables 
@@ -196,7 +194,7 @@ mpirun $(which namd2) step6.1_equilibration.inp > step6.1_equilibration.inp.log
 
 Now, submit this script to the scheduler using the `sbatch` command. Watch the progress of the job using `watch squeue -u [username]` and type `Control+C` to exit watching.
 
-If you have followed the default lab suggestions, this portion will take roughly 45 minutes to complete after the GPU node is scheduled. However, don't wait for the job to finish before moving on to the next portion of the lab!
+If you have followed the default lab suggestions, this portion will take roughly 45 minutes to complete after the GPU node is scheduled. However, you can continue through the lab while waiting for the job to finish!
 
 ### 3. Adding a drug to the protein-bilayer system using CHARMM 
 
@@ -211,9 +209,11 @@ We will now add a drug to the protein-bilayer system using CHARMM. There are sev
 - Revert the orientation of the protein-bilayer system to its post-equilibration position, so the drug is now appropriately aligned with respect to the channel position and axis
 - Write output files for use in next simulation 
 
-This is a surprisingly daunting task to perform properly. Rather than spend our time and energy making you create this file on our own, we will provide the file for you and continue our NAMD focus in this lab and hit the highlights of our the next script, "charmm.adddrug.str".
+This is a surprisingly daunting task to perform properly. Rather than spend our time and energy making you create this file on our own, we will provide the file for you. In this way we will continue our NAMD focus in this lab. 
 
 #### Insert drug 
+
+Let's hit the highlights of our the next script, `charmm.adddrug.str`.
 
 ```fortran
 ! load topology
@@ -229,7 +229,7 @@ This code block demonstrates how to append topology and parameters to already lo
 	read namd file "charmm-gui/namd/step6.6_equilibration.coor"
 ```
 
-This code block demonstrates how to load NAMD binary coordinate files into CHARMM. This feature is very rudimentary, and formatting is strict. The file name *must* be encircled by double quotes (`"`) and the coordinates can only be read into the main coordinate set (not the comparison set, though you can get around this limitation by using `coor copy comp` or `coor swap`).
+This code block demonstrates how to load NAMD binary coordinate files into CHARMM. The NAMD import feature is very rudimentary, and formatting is strict. The file name *must* be encircled by double quotes (`"`) and the coordinates can only be read into the main coordinate set (you can get around this limitation by using `coor copy comp` and then `coor swap`).
 
 ```fortran 
 ! reorient entire system to "fit" the simulated protein backbone to the average protein backbone, will be reversed later 
@@ -240,20 +240,22 @@ This code block causes the main coordinate set, the protein-bilayer system, to b
 
 The section that starts with `! find alpha carbons of residue S31 and place Amt cage here with N facing inferiorly to roughly match configuration 1 from the 2015 paper` is where the drug placement happens. The drug is first moved in the X/Y plane to be centered on the channel, then the drug is placed near the Ser31 residue using a combination of `coor stat` and `calc`.
 
+The next block demonstrates how to delete atoms near atoms of interest. 
+
 ```fortran 
 ! delete any water overlapping the drug 	
 	delete atom sele .byres. ((resn TIP3 .and. type OH2) .and. (fulldrug .around. 2.2)) end
 ```
 
-This block demonstrates how to delete atoms near atoms of interest. This particular command will delete entire residues (`.byres.`) containing any water molecule (`resn TIP3`) oxygen (`type OH2`) if the oxygen lies within 2.2 angstroms (`.around. 2.2`) of the drug (`fulldrug` definined earlier in script).
+This particular command will delete entire residues (`.byres.`) containing any water molecule (`resn TIP3`) oxygen (`type OH2`) if the oxygen lies within 2.2 angstroms (`.around. 2.2`) of the drug (`fulldrug` definined earlier in script).
 
 #### Submit CHARMM script 
 
-Notice the variables `pdbid`, `drugfilename`, `drugsegid`, and `topparloc` aren't set anywhere in the script, but are used multiple times. These are variables that are passed to CHARMM by the submission script. Recall from previous labs the use of environment variables set in Linux and passed to CHARMM or other programs. 
+Notice the variables `pdbid`, `drugfilename`, `drugsegid`, and `topparloc` aren't defined anywhere in the script, but are used multiple times. These are variables that are passed to CHARMM by the submission script. Recall from previous labs the use of environment variables set in Linux and passed to CHARMM or other programs. 
 
-Open the file "bash.pt2_adddrug.sh" and fill in the values for the environment variables that are empty. If you don't know the proper value for `drugsegid`, use a text editor or `vi` to open the PDB file associated with the drug you want to simulate and check the far right column. For example, for protonated Amt, you would use `alm034` for `drugname` and `L034` for `drugsegid` (and `alm035` and `L035` if deprotonated). 
+Open the file `bash.pt2_adddrug.sh` and fill in the values for the environment variables that are empty. If you don't know the proper value for `drugsegid`, use a text editor or `vi` to open the PDB file associated with the drug you want to simulate and check the far right column. For example, for protonated Amt, you would use `alm034` for `drugname` and `L034` for `drugsegid` (and `alm035` and `L035` if deprotonated). 
 
-> See the "alm" directory for the 45 drugs you can choose from. Amantadine is alm034 (+) and alm035 (neutral) and Rimantadine is alm149 (+) and alm150 (neutral). 
+> See the `alm/` directory for the 45 drugs you can choose from. Amantadine is alm034 (+) and alm035 (neutral) and Rimantadine is alm149 (+) and alm150 (neutral). 
 
 Once you are done, check to ensure the CHARMM-GUI job from earlier is complete, and then execute `./bash.pt2_adddrug.sh` to run the CHARMM job on the internode (rather than scheduling using `sbatch`). If the job from earlier isn't done yet, you can move on to the next section and come back to execute the script.
 
@@ -282,7 +284,7 @@ Let's start with the following code:
 
 To load a file into VMD, you load it as a new molecule, just as you would in the GUI version you are used to. You start with the keyword `mol` to utilize the molecule facility, say `new` to specify you are creating a new molecule, insert a filename to load as the new molecule, use `type {pdb}` to tell the input reader to expect PDB formatting. The rest are used primarily for trajectories: `first 0` means to start with frame 0, `last -1` would mean to finish on frame -1, but -1 really means there is no last frame as in this case, `step 1` loads every 1 frame of the trajectory, and `waitfor all` causes VMD to completely load the file before moving on to the next command.
 
-Now that we have loaded our file into VMD, let's load in average protein structure from the PDB models, which we will use in backbone restraints and to align the simulating protein to the cartesian Z axis as needed. **Following the pattern from the previous code block, make a new line that loads the average protein structure as a new molecule.**
+Now that we have loaded our file into VMD, let's load in average protein structure from the PDB models, which we will use in backbone restraints and to align the simulating protein to the cartesian Z axis as needed. **Following the pattern from the previous code block, make a new line that loads the average protein structure as a new molecule.** You can find the average structures for several PDB structures in the `avg/` directory.
 
 #### Using `set` and `atomselect` to replace protein coordinates
 
@@ -293,7 +295,7 @@ Both molecules are now in VMD, so we can start replacing protein coordinates, et
 	set newprotein [atomselect 1 "protein"]
 	$repprotein set {x y z} [$newprotein get {x y z}]
 ```
-`set` is used to assign a value to a variable. For example, `set x 3` would set the variable x to equal 3. Here, we use set to set variables to atom selections. 
+`set` is used to define a variable. For example, `set x 3` would set the variable x to the integer 3. In this case, we use `set` to define variables as atom selections. 
 
 The `repprotein` variable contains a selection of all the protein atoms in molecule 0, the first structure we loaded. `newprotein` contains a selection of all the protein atoms in molecule 1, the second structure we loaded. 
 
@@ -318,11 +320,11 @@ Now we can start creating comparison files for restraint references. Append the 
 
 > To use environment variables in VMD, use `export variableName = variableValue` in your submission script and use `$::env(variableName)` to use the passed variable in VMD.
 
-**Create another restraint reference file to restrain the protein backbone atoms.** Set the beta property of all the atom back to zero, use the atom selector "backbone" to set the beta property of all the backbone atoms to 1, and mame your output file "output/colvar_bb.pdb"
+The above code will create a restraint file in which the drug cage carbons are marked for restraint. Following this pattern, continue the script and **create another restraint reference file to restrain the protein backbone atoms.** Set the beta property of all the atoms back to zero, use the atom selector "backbone" to set the beta property of all the backbone atoms to 1, and name your output file `output/colvar_bb.pdb`.
 
 #### Run VMD 
 
-Create a new file named "bash.pt3_compsets.sh". Add the following code at the start:
+Create a new file named `bash.pt3_compsets.sh`. Add the following code at the start:
 ```bash 
 #!/bin/bash
 module purge
@@ -335,14 +337,14 @@ To launch VMD, add the following code to the submission script:
 $(which vmd) < vmd.compsets.inp > output/vmd.compsets.inp.log
 ```
 
-Now, before we submit, we need to export the adamantane cage carbon variables for use by the VMD script. The export commands were created by the "charmm.adddrug.str" script already, we just need to stream the file. Add the following code between the `module load ...` line and the `$(which vmd) ...` line:
+Now, before we submit, we need to export the adamantane cage carbon variables for use by the VMD script. The export commands were created by the `charmm.adddrug.str` script already, we just need to stream the file. Add the following code between the `module load ...` line and the `$(which vmd) ...` line:
 
 ```bash 
 sed -i "s/ EXPORT CC/export cc/" output/alm034_cc.sh # gotta convert the file to lowercase, charmm output is uppercase by default
 source output/alm034_cc.sh # file created by CHARMM containing export commands
 ```
 
-Finally, there are a few places in the VMD script where you should be using environment variables, as the code provided here assumes you are using 2L0J and amantadine. Replace these hard-coded values and substitute environment variables--be sure you add the corresponding `export` lines to the "bash.pt3_compsets.sh" file as well, as you did in your CHARMM submission script from earlier.
+Finally, there are a few places in the VMD script where you should be using environment variables, as the code provided here assumes you are using 2L0J and amantadine. Replace these hard-coded values and substitute environment variables--be sure you add the corresponding `export` lines to the `bash.pt3_compsets.sh` file as well, as you did in your CHARMM submission script from earlier.
 
 Now, ensure the NAMD simulations and drug insertion in CHARMM from the previous steps worked successfully, and then run the VMD script on the internode with `./bash.pt3_compsets.sh`. If the other scripts haven't finished yet, continue to the next section and revisit these later. 
 
@@ -356,7 +358,7 @@ This script needs some important adjustments:
 - We need to adjust filenames 
 - It assumes there are "restart" velocities, coordinates, cell dimensions, etc., but we cannot use these now that the PSF has changed to include a drug 
 - We need to add the drug parameters to the parameter set 
-- This script creates a Particle-mesh Ewald grid with a python script, but this process is automatically handled in newer versions of NAMD if you don't need specific Fast Fourier Transformation parameters.
+- This script creates a Particle-mesh Ewald grid calculated with a python script, but this process is automatically handled in newer versions of NAMD if you don't need specific grid dimensions.
 - The dynamics settings need adjustment, as we will implement constant temperature and pressure control for this phase of simulation.
 - We need to minimize the system, at least a small amount, now that there is a drug in the protein channel 
 
@@ -415,7 +417,7 @@ Simplify the following statement, as we are using a rectangular box for the lab:
 + wrapNearest         off;
 ```
 
-Make the following changes to let NAMD automatically handle Fast Fourier Transformation parameter calculation.
+Make the following changes to let NAMD automatically calculate PME grid dimensions:
 ```diff 
 - source checkfft.str
 ```
@@ -481,6 +483,112 @@ run 			500000;
 
 This will turn on the collective variables module, use the configurations set in the `colvars.production.inp` file, minimize for 5000 steps, and perform 500,000 steps of simulation (that is 1 nanosecond, given 2 fs/step).
 
+#### Create colvars configuration file 
+
+Before we submit the script, we actually need a `colvars.production.inp` file for the NAMD to read. Here we will set up three collective variables:
+- Protein backbone tilt with respect to the cartesian Z axis 
+- Protein backbone RSMD with respect to the protein backbone average structure atoms aligned to best-fit 
+- Adamantane cage drug position with respect to the channel axis 
+
+Create a file in the lab directory called `colvars.production.inp` and begin with the following code:
+```javascript 
+colvarsTrajFrequency    500
+```
+This command controls how frequently the collective variable information is reported to the colvars trajectory file (time series) in simulation timesteps. For example, in this case, every 500 steps the protein tilt in cosine units, RMSD in angstroms, and adamantane cage position in angstroms will be written to the text file. 
+
+Let's create our first collective variable using the `tilt` colvar component. Copy the following code to your file: 
+```javascript 
+colvar { 
+  name bb_tilt
+  outputvalue off
+  tilt { 
+	atoms {
+		atomsFile          output/colvar_bb.pdb
+		atomsCol           B 
+		atomsColValue      1.0 
+	}
+	refPositionsFile      output/colvar_bb.pdb
+	refPositionsCol       B
+	refPositionsColValue  1.0    
+	axis (0.0, 0.0, 1.0) 
+  } 
+} 
+```
+We have named the collective variable `bb_tilt`, turned off output data using `outputvalue off` (because the protein tilt with respect to the cartesian Z axis will be restrained and is not of particular interest), provide a file containing the atoms of interest `atomsFile`, provide another file containing the positions of the atoms of interest `refPositionsFile`, and set the tilt with respect to a vector equal to the cartesian Z axis `axis (0.0, 0.0, 1.0)`.
+
+Next we will create the protein backbone RMSD collective variable. COpy the following code to your file:
+```javascript
+colvar {
+   name bb_rmsd
+   rmsd {
+       atoms {
+          atomsFile          output/colvar_bb.pdb
+          atomsCol           B 
+          atomsColValue      1.00
+	      centerReference
+	      rotateReference		  
+          fittingGroup {
+             atomsFile      output/colvar_bb.pdb
+             atomsCol       B
+             atomsColValue  1.00
+          }
+		  refPositionsFile  output/colvar_bb.pdb   	  
+       }
+       refPositionsFile      output/colvar_bb.pdb
+       refPositionsCol       B
+       refPositionsColValue  1.00
+   }
+}
+```
+This collective variable is setup in a similar fashion to the last, with a couple major exceptions. At every step, the collective variable is computed with respect to the `fittingGroup` atoms. Since we are using the same files to fit, and using `centerReference` and `rotateReference`, the RMSD collective variable will track internal distortion of the protein backbone atoms. The reference structure is best-fit aligned at every step, so the RMSD of the simulating structure will always be computed with respect to the average structure "centered" and "rotated" onto itself. Were this relative reference not performed, the RMSD would measure the deviation of the protein in translation and rotation, so drifting even slightly in the membrane would result in very high RMSD values.
+
+Let's now create the collective variable defining the drug adamantane cage position with respect to the channel axis. This is done using the `distanceZ` colvars component, which computes the distance of a group of atoms from another group of atoms along a single axis. Copy the following code to your file: 
+```javascript 
+colvar { 
+  name drugpos 
+  distanceZ { 
+    ref { 
+      dummyAtom (0, 0, 0)
+    } 
+    main { 
+      atomsFile      output/colvar_drugcage.pdb
+      atomsCol       B
+      atomsColValue  1.00
+	  centerReference
+	  rotateReference
+      fittingGroup {
+         atomsFile      output/colvar_bb.pdb
+         atomsCol       B
+         atomsColValue  1.00
+      }
+	  refPositionsFile  output/colvar_bb.pdb   
+	} 
+	axis (0.0, 0.0, 1.0) 
+  } 
+} 
+```
+Since we only care about the drug adamantane cage position with respect to the channel axis, we create a `dummyAtom` group at the cartesian origin to give us a context for positive and negative values. In this collective variable, we use the file `colvar_drugcage.pdb` to define the atoms of interest. Also, like the last collective variable we discussed, `rmsd`, we will implement a `fittingGroup` to keep the drug position data with respect to the channel axis, rather than the cartesian axis. This allows for the distance to be calculated always  relative to the `colvar_bb.pdb` file--if the channel protein were to translate along the x-y plane, tilt away from the cartesian Z axis, or translate along the Z-axis; the distance from the drug carbon atoms to the cartesian origin would be "centered" and "rotated" to be with respect to the average protein backbone atoms created in VMD. 
+
+This concept of a moving frame of reference is more likely to be understood with visual context than in a brief explanation in a lab, so feel free to ask your TA's or professor if you would like to learn more. You can also learn more in the [colvars documentation](http://www.ks.uiuc.edu/Research/namd/2.12/ug/node56.html).
+
+> Perhaps a superior approach would be to make the `ref` group Histidine 37 backbone atoms instead of `dummyAtom`. If the `main` group were above the His atoms it would result in a positive number, and if it were below the His atoms, a negative number would be recorded. Since you can't do normal atom selections in colvars, you would need to create a PDB file of the system in which the beta column was flagged exclusively for all His 37 backbone atoms.
+
+Finally we implement a harmonic constraint on the ``bb_tilt` collective variable. Copy the following code to your file:
+```javascript 
+harmonic {
+	colvars bb_tilt
+	centers 0
+	forceConstant 1
+}
+```
+This will create a harmonic restraint with a force constant of 1 on the collective variable defined by `bb_tilt`. In this lab we lightly restrain the protein's tilt to align with the cartesian Z axis. 
+
+> It could be argued this restraint and collective variable are unnecessary for the simulation, particularly when the other collective variables of interest are all with respect to a best-fit average protein structure, so deviations in protein tilt shouldn't matter. It was implemented here to prevent excessive tilting while this lab was being designed. Abandoning this restraint was considered, but we concluded it would be a good introduction to the syntax of the important `tilt` collective variables component.
+
+Save the file and return to the lab directory.
+
+#### Submit to scheduler 
+
 Create a submission script titled `bash.pt4_simulation.sh` in the lab directory. 
 
 Insert the following code into the file and adjust any of the `#SBATCH` parameters as you deem necessary (currently set to use a full FSL m8 GPU node, 3/2018):
@@ -512,10 +620,10 @@ Run your production script with `sbatch`. (Following this lab with the m8 GPU ar
 
 Once your simulation is complete, open the file named `2l0j_alm034_production.colvars.traj` in the `output/` directory. Using the data from this file, plot the backbone RMSD and the drug position over time. You might have a few rows where the header labels are duplicated throughout the output file; if you do, just manually delete these lines in your spreadsheet or data analysis software.
 
-Here is a sample graph of Amt in 2L0J with 3,000,000 steps, following this lab protocol.
+Here is a sample graph of Amt in 2L0J with 3,000,000 steps, following the lab protocol.
 ![alt text](https://github.com/busathlab/mdlab/raw/master/images/namd02_f01.PNG "Figure 1")
 
-> **Assignment:** Summarize the meaning of these results in a couple of sentences. If your classmates varied the lab in any way (different channel, drug, etc.), how do your results compare? Submit your plot to your TA.
+> **Assignment:** Summarize the meaning of your results in a couple of sentences. If your classmates varied the lab in any way (different channel, drug, etc.), how do your results compare? Submit your plot(s) to your TA.
 
 **[NAMD Lab 3](https://busathlab.github.io/mdlab/namd_lab3.html)**
 

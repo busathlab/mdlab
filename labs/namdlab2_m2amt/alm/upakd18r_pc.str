@@ -1,0 +1,16 @@
+* Defines Carbons for upakd18s_pc
+* Mitchell Gleed 21 Nov 13
+*
+! set carbons according to cage_diagram.png
+set A1 C7
+set A2 C8
+set A3 C1
+set A4 C2
+set A5 C3
+set A6 C9
+set A7 C6
+set A8 C5
+set A9 C4
+set A10 C10
+! set R1 to 1 if largest R group is on carbon 1
+set R1 0
