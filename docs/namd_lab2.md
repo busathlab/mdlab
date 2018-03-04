@@ -1,8 +1,7 @@
 ## NAMD LAB 2: BUILDING AND SIMULATING A PROTEIN-BILAYER SYSTEM
 ###### by [Mitch Gleed](https://www.linkedin.com/in/mitchell-gleed-65a8b03b/)
 
-## WORK IN PROGRESS
-
+## BETA
 
 ---
 
