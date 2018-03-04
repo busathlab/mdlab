@@ -63,7 +63,7 @@ Copy the following from the previous lab into the current lab directory. You may
 - `bash.pt4_simulation.sh`
 
 To save some time, here's some code you can execute within this lab's directory to grab these files from the previous lab, if you keep each of the lab directories within a directory together. Otherwise just modify the code to suit your directory structure. :
-```bash 
+```shell 
 cp ../namdlab2_m2amt/charmm.adddrug.str .
 cp ../namdlab2_m2amt/colvars.production.inp .
 cp ../namdlab2_m2amt/namd.production.inp . 
@@ -81,7 +81,7 @@ One tip to start, make sure to use environment variables anywhere you have filen
 Also, the scheduler submission script, `bash.pt4_simulation`, from last lab is written to utilize full GPU nodes. While you may keep this in your workflow as-is, the number of GPU nodes is very limited and it may be easier to either request portions of GPU nodes or full non-GPU nodes instead. Adjust the requested time as you see fit. 
 
 **Example full GPU node request** (as in lab 2, based on `m8g` architecture)
-```bash 
+```shell 
 #SBATCH --time=24:00:00   # walltime
 #SBATCH --ntasks=24   # number of processor cores (i.e. tasks)
 #SBATCH --nodes=1   # number of nodes
@@ -90,7 +90,7 @@ Also, the scheduler submission script, `bash.pt4_simulation`, from last lab is w
 ```
 
 **Example 1 GPU per GPU node request** (more likely to get through a high volume of jobs quickly, based on `m8g` architecture)
-```bash 
+```shell 
 #SBATCH --time=24:00:00   # walltime
 #SBATCH --ntasks=6   # number of processor cores (i.e. tasks)
 #SBATCH --nodes=1   # number of nodes
@@ -99,7 +99,7 @@ Also, the scheduler submission script, `bash.pt4_simulation`, from last lab is w
 ```
 
 **Example non-GPU node request** (if the GPU nodes [are being hogged](https://marylou.byu.edu/utilization/), this is the most likely scheme to get through the highest volume of jobs quickly) `m7` has 16 cores per node, `m8` and `m9` have 24 cores per node. (3/2018)
-```bash 
+```shell 
 #SBATCH --time=24:00:00   # walltime
 #SBATCH --ntasks=16   # number of processor cores (i.e. tasks)
 #SBATCH --nodes=1   # number of nodes
