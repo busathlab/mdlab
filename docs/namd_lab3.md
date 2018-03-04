@@ -82,12 +82,26 @@ Refer to the next section of the lab for helpful `bash` tips and guidance.
 
 ### 4. `bash` review and other helpful hints
 
+#### Environment variables 
+
+In bash, variables stay within the environment of the bash script being run unless the `export` function is used. Let's review how to use environment variables in each program.
+
+**CHARMM**
+1. Use `export variableName=variableValue` in the bash script.
+2. Add `variableName:$variableName` to the CHARMM run command. (see the end of `bash.pt2_adddrug.sh`). Alternatively you can skip `1.` and do `variableName:variableValue`, but other programs will not have access to this variable.
+3. In the CHARMM script being run, you can simply refer to the variable with `@variableName`.
+
+**NAMD/VMD**
+1. Use `export variableName=variableValue` in the bash script.
+2. In the NAMD/VMD script being run, use $::env(variableName) to refer to the environment variable.
+
+
 
 ### 5. Submitting 
 
-The scheduler submission script from last lab, `bash.pt4_simulation`, is written to utilize full GPU nodes. While you may keep this in your workflow as-is, the number of GPU nodes is very limited and it may be easier to either request portions of GPU nodes or full non-GPU nodes instead. Adjust the requested time as you see fit. 
+The scheduler submission script from last lab, `bash.pt4_simulation`, is written to utilize full GPU nodes. While you may keep this in your workflow as-is, the number of GPU nodes is very limited and it may be easier to either request portions of GPU nodes or full non-GPU nodes instead. Adjust the requested time and resources as you see fit [according to available resources](https://marylou.byu.edu/documentation/resources). 
 
-**Example full GPU node request** This is what is used in lab 2. If GPU node [utilization is low](https://marylou.byu.edu/utilization/) and you have a *low volume* of jobs and need them done as quickly as possible, this is a good scheme. Based on `m8g` architecture.
+**Example full GPU node request**. This is what is used in lab 2. If GPU node [utilization is low](https://marylou.byu.edu/utilization/) and you have a *low volume* of jobs and need them done as quickly as possible, this is a good scheme. Based on `m8g` architecture.
 ```shell 
 #SBATCH --time=24:00:00   # walltime
 #SBATCH --ntasks=24   # number of processor cores (i.e. tasks)
@@ -103,7 +117,7 @@ export dir=/fslhome/mgleed/software/namd/exec/NAMD_Git-2017-11-04_Linux-x86_64-m
 $dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES $inputFile > $outputFile
 ```
 
-**Example 1 GPU per GPU node request** This requests 1/4th of the GPU node. If GPU node [utilization is low](https://marylou.byu.edu/utilization/) and you have a *medium-to-high volume* of jobs, this is a good scheme. Based on `m8g` architecture.
+**Example 1 GPU per GPU node request**. This requests 1/4th of the GPU node. If GPU node [utilization is low](https://marylou.byu.edu/utilization/) and you have a *medium-to-high volume* of jobs, this is a good scheme. Based on `m8g` architecture.
 ```shell 
 #SBATCH --time=24:00:00   # walltime
 #SBATCH --ntasks=6   # number of processor cores (i.e. tasks)
@@ -133,7 +147,7 @@ module load namd/2.12_openmpi-1.8.5_gnu-5.2.0
 mpirun $(which namd2) $inputFile > $outputFile
 ```
 
-**Example single non-GPU node request** If the GPU nodes [are being hogged](https://marylou.byu.edu/utilization/), and you have a *high volume* of jobs to get through, this is a good scheme. `m7` has 16 cores per node, `m8` and `m9` have 24 cores per node. (3/2018)
+**Example single non-GPU node request**. If the GPU nodes [are being hogged](https://marylou.byu.edu/utilization/), and you have a *high volume* of jobs to get through, this is a good scheme. `m7` has 16 cores per node, `m8` and `m9` have 24 cores per node. (3/2018)
 ```shell 
 #SBATCH --time=24:00:00   # walltime
 #SBATCH --ntasks=16   # number of processor cores (i.e. tasks)
