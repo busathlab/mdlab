@@ -117,7 +117,7 @@ The following command will replace all occurences of `YES` in `foo.txt` with `NO
 
 The following command will replace all occurences of `DRUGPOSITION` with the value of the variable `drugposition` with the filename pattern `output/colvars.${outputPattern}.inp` and save changes to the same file: `sed -i "s,DRUGPOSITION,${drugposition}," output/colvars.${outputPattern}.inp`.
 
-Advanced substitutions involving punctuation, special characters, ignoring case, etc. are possible but a bit more difficult. See the documentation [here](https://www.gnu.org/software/sed/manual/sed.html) for more information. 
+Advanced substitutions involving punctuation, special characters, ignoring case, etc. are possible but a bit more difficult. See the [`sed` documentation](https://www.gnu.org/software/sed/manual/sed.html) for more information. 
 
 
 
