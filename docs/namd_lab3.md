@@ -87,7 +87,7 @@ Refer to the next section of the lab for helpful `bash` tips and guidance.
 
 The scheduler submission script from last lab, `bash.pt4_simulation`, is written to utilize full GPU nodes. While you may keep this in your workflow as-is, the number of GPU nodes is very limited and it may be easier to either request portions of GPU nodes or full non-GPU nodes instead. Adjust the requested time as you see fit. 
 
-**Example full GPU node request** (as in lab 2, based on `m8g` architecture)
+**Example full GPU node request** This is what is used in lab 2. If GPU node [utilization is low](https://marylou.byu.edu/utilization/) and you have a *low volume* of jobs and need them done as quickly as possible, this is a good scheme. Based on `m8g` architecture.
 ```shell 
 #SBATCH --time=24:00:00   # walltime
 #SBATCH --ntasks=24   # number of processor cores (i.e. tasks)
@@ -103,7 +103,7 @@ export dir=/fslhome/mgleed/software/namd/exec/NAMD_Git-2017-11-04_Linux-x86_64-m
 $dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES $inputFile > $outputFile
 ```
 
-**Example 1 GPU per GPU node request** (more likely to get through a high volume of jobs quickly, based on `m8g` architecture)
+**Example 1 GPU per GPU node request** This requests 1/4th of the GPU node. If GPU node [utilization is low](https://marylou.byu.edu/utilization/) and you have a *medium-to-high volume* of jobs, this is a good scheme. Based on `m8g` architecture.
 ```shell 
 #SBATCH --time=24:00:00   # walltime
 #SBATCH --ntasks=6   # number of processor cores (i.e. tasks)
@@ -119,7 +119,21 @@ export dir=/fslhome/mgleed/software/namd/exec/NAMD_Git-2017-11-04_Linux-x86_64-m
 $dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES $inputFile > $outputFile
 ```
 
-**Example non-GPU node request** (if the GPU nodes [are being hogged](https://marylou.byu.edu/utilization/), this is the most likely scheme to get through the highest volume of jobs quickly) `m7` has 16 cores per node, `m8` and `m9` have 24 cores per node. (3/2018)
+**Example multiple non-GPU node request with `mpi` and infiniband**. If the GPU nodes [are being hogged](https://marylou.byu.edu/utilization/), utilization of the non-GPU nodes is low, and you have a *low volume* of jobs, this is a good scheme. Jobs will run across multiple nodes. `m7` has 16 cores per node, `m8` and `m9` have 24 cores per node. (3/2018)
+```shell 
+#SBATCH --time=24:00:00   # walltime
+#SBATCH --ntasks=64   # number of processor cores (i.e. tasks)
+#SBATCH --nodes=4   # number of nodes
+#SBATCH --mem-per-cpu=2G   # memory per CPU core
+#SBATCH -C 'ib'
+...
+# Run NAMD 
+module purge 
+module load namd/2.12_openmpi-1.8.5_gnu-5.2.0
+mpirun $(which namd2) $inputFile > $outputFile
+```
+
+**Example single non-GPU node request** If the GPU nodes [are being hogged](https://marylou.byu.edu/utilization/), and you have a *high volume* of jobs to get through, this is a good scheme. `m7` has 16 cores per node, `m8` and `m9` have 24 cores per node. (3/2018)
 ```shell 
 #SBATCH --time=24:00:00   # walltime
 #SBATCH --ntasks=16   # number of processor cores (i.e. tasks)
@@ -127,10 +141,12 @@ $dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES $inp
 #SBATCH --mem-per-cpu=2G   # memory per CPU core
 ...
 # Run NAMD 
-module purge 
-module load namd/2.12_openmpi-1.8.5_gnu-5.2.0
-mpirun $(which namd2) $inputFile > $outputFile
+export dir=/fslhome/mgleed/software/namd/exec/NAMD_Git-2017-11-04_Linux-x86_64-multicore
+$dir/namd2 +setcpuaffinity `numactl --show | awk '/^physcpubind/ {printf "+p%d +pemap %d",(NF-1),$2; for(i=3;i<=NF;++i){printf ",%d",$i}}'` $inputFile > $outputFile
 ```
+
+
+
 
 ### 6. Analysis with WHAM 
 
