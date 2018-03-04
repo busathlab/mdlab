@@ -105,22 +105,49 @@ In bash, variables stay within the environment of the bash script being run unle
 
 **NAMD/VMD**
 1. Use `export variableName=variableValue` in the bash script.
-2. In the NAMD/VMD script being run, use $::env(variableName) to refer to the environment variable.
+2. In the NAMD/VMD script being run, use `$::env(variableName)` to refer to the environment variable.
 
-**Colvars** does *not* use environment variables. You will need to somehow tell colvars to use these variables, though. One option is to use a colvars "template" file, put unique words in the place of the values you would like to substitute, copy the template within the submission loop with `cp`, and then use do a find/replace with `sed` as described below.
-
+**Colvars does not use environment variables**. You will need to somehow tell colvars to use these variables, though. One option is to use a colvars "template" file, put unique words in the place of the values you would like to substitute, copy the template within the submission loop with `cp`, and then perform a find/replace with `sed` as described below.
 
 #### Find / Replace with `sed`
-There are multiple ways to do Find / Replace in Linux, and one utility is `sed`. 
+There are multiple ways to do Find / Replace in Linux. One utility capable of find/replace is `sed`. 
 
 The following command will replace all occurences of `YES` in `foo.txt` with `NO` in a new file called `bar.txt`: `sed "s,YES,NO," foo.txt > bar.txt`.
 
-The following command will replace all occurences of `DRUGPOSITION` with the value of the variable `drugposition` with the filename pattern `output/colvars.${outputPattern}.inp` and save changes to the same file: `sed -i "s,DRUGPOSITION,${drugposition}," output/colvars.${outputPattern}.inp`.
+The following command will replace all occurences of `DRUGPOSITION` with the value of the variable `drugposition` and save changes to the same file: `sed -i "s,DRUGPOSITION,${drugposition}," output/colvars.${outputPattern}.inp`.
 
-Advanced substitutions involving punctuation, special characters, ignoring case, etc. are possible but a bit more difficult. See the [`sed` documentation](https://www.gnu.org/software/sed/manual/sed.html) for more information. 
+Advanced substitutions involving punctuation, special characters, ignoring case, etc. are possible but a bit more complex. See the [`sed` documentation](https://www.gnu.org/software/sed/manual/sed.html) for more information. 
 
+#### Math
 
+Math is a huge limitation of bash, so occassionally other utilities are used to perform math. 
 
+Here are two different ways to assign the sum of the exported variables `reactionCoordinateStart` and `reactionCoordinateIncrement` to the variable `umbrellaWindow`:
+```shell
+export umbrellaWindow=`perl -E 'say ($ENV{reactionCoordinateStart}+$ENV{reactionCoordinateIncrement})'`
+```
+```shell 
+export umbrellaWindow=`echo "( $reactionCoordinateStart + $reactionCoordinateIncrement )" | bc`
+```
+
+`perl` is better for more advanced calculations and the ` ... | bc ` method is a bit easier for very basic calcluations.
+
+Here's another example of using `perl` to compute the arccosine of the exported bash variable `cos`, converting to degrees, and assigning it to the bash variable `umbrellaTiltDegrees`.
+```shell
+export umbrellaTiltDegrees=`perl -E 'use Math::Trig; say acos($ENV{cos})*180/pi'`
+```
+
+#### Integer to decimal conversion
+
+`printf` is a common cross-platform utility for formatting a variety of data types. [Here is a helpful resource for learning more](https://www.computerhope.com/unix/uprintf.htm).
+
+You can convert
+
+#### While loops 
+There are multiple types of loops and multiple ways of performing each loop in bash. The 
+
+### Good practice and troubleshooting
+When creating a script or troubleshooting a script that isn't working properly, one good practice is to check the values of variables as the script is executed. 
 
 
 
