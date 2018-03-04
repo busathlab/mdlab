@@ -575,7 +575,7 @@ Also, like the last collective variable we discussed, `rmsd`, we will implement 
 
 > This concept of a moving frame of reference is more likely to be understood with visual context than in a brief explanation in a lab, so feel free to ask your TA's or professor if you would like to learn more. You can also learn more in the [colvars documentation](http://www.ks.uiuc.edu/Research/namd/2.12/ug/node56.html).
 
-> Perhaps a superior approach would be to make the `ref` group Histidine 37 backbone atoms instead of `dummyAtom`. If the `main` group were above the His atoms it would result in a positive number, and if it were below the His atoms, a negative number would be recorded. Since you can't do normal atom selections in colvars, you would need to create a PDB file of the system in which the beta column was flagged exclusively for all His 37 backbone atoms.
+> An alternative approach would be to make the `ref` group Histidine 37 backbone atoms instead of `dummyAtom`. If the `main` group were above the His backbone atoms it would result in a positive number, and if it were below the His atoms, a negative number would be recorded. Since you can't do normal atom selections in colvars, you would need to create a PDB file of the system in which the beta column was flagged exclusively for all His 37 backbone atoms. Careful consideration may need to be given with this method, though, as fluctuations in channel length may distort results.
 
 Finally we implement a harmonic constraint on the ``bb_tilt` collective variable. Copy the following code to your file:
 ```javascript 
