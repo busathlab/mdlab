@@ -84,9 +84,9 @@ Refer to the next section of the lab for helpful bash tips and guidance.
 
 #### Variables
 
-To set a variable in bash, just use the `=` sign. To create a variable named `channel` equal to `2l0j`, just do `channel=2l0j`.
+To set a variable in bash, just use the `=` sign. To create a variable named `channel` equal to `2l0j`, just do `channel=2l0j`. To refer to that variable in the script, add a `$` in front of the variable name. 
 
-One time- and headache-saving tip is to use variables when defining other variables. Here's an example of using multiple variables to define a pattern.
+One headache-saving tip is to use variables when defining other variables. Here's an example of using multiple variables to define a pattern.
 ```shell 
 export pdbid=2l0j
 export runCount=1
@@ -146,32 +146,103 @@ Here's another example of using `perl` to compute the arccosine of the exported 
 export umbrellaTiltDegrees=`perl -E 'use Math::Trig; say acos($ENV{cos})*180/pi'`
 ```
 
-#### Decimal handling
+#### Number formatting
 
-For analysis purposes and automation, managing your decimal places and floating zeros is critical. For ease in the analysis stage, it may be helpful to you to be consistent with number length decimal places.
+For analysis purposes and automation, managing your decimal places and floating zeros is important. For ease in the analysis stage, it may be helpful to you to be consistent with number length and decimal places.
 
-`printf` is a common cross-platform utility for formatting a variety of data types. [Here is a helpful resource for learning more](https://www.computerhope.com/unix/uprintf.htm).
-
-To redefine the variable `umbrellaWindow` with a current value of 2.5 to a new value of 002.500:
+`printf` is a common cross-platform utility for formatting a variety of data types. To redefine the variable `umbrellaWindow` with a current value of 2.5 to a new value of 002.500:
 
 ```shell
 umbrellaWindow=`printf "%07.3f" $umbrellaWindow`
 ```
 
 Breaking down the formatting argument, `%07.3f`:
-- the `7` means to format the output with a minimum of 7 characters (if the output is less than 7, it will add empty space to the right to equal 7 characters, by default)
+- the `7` means to format the output with a minimum of 7 characters (if the output is less than 7, it will add blank spaces to the right to equal 7 characters, by default)
 - the `0` before the 7 means to use leading zeros to make the minimum of 7 characters instead of blank spaces to the right.
 - the `3f` means to use the float data type (6 decimal precision) and to limit the decimal places to 3.
 
-#### While loops 
-There are multiple types of loops and multiple ways of performing each loop in bash. The 
+[Here is a helpful resource for learning more about formatting with printf](https://www.computerhope.com/unix/uprintf.htm).
 
-### Good practice and troubleshooting
-When creating a script or troubleshooting a script that isn't working properly, one good practice is to check the values of variables as the script is executed. 
+#### Echo
 
+The `echo` command writes its arguments to the standard output. It is an essential tool for a variety of reasons. Here are a few:
+- Determining that calculations are performed properly.
+- Passing output to other commands. The second arithmetic approach described earlier is an example of this.
+- Outputting data to a file
+- Troubleshooting loops 
 
+Here is an example of using echo to write the value of a variable `umbrellaWindow` to a new file `window.txt`:
+```shell 
+echo $umbrellaWindow > window.txt 
+```
+If the file `window.txt` already exists, it will be overwritten. If you desire to append to the file instead, use two angular quote brackets `>>`:
+```shell 
+echo $umbrellaWindow >> window.txt 
+```
 
+Find more information [here](https://www.computerhope.com/unix/uecho.htm).
 
+#### Loops 
+There are multiple types of loops and multiple ways of performing each loop in bash. 
+
+**For Loop**. A "for loop" is used to execute a list of commands and iterates through a series.
+
+Let's use an example of iterating through umbrella windows with a for loop.
+```shell 
+export reactionCoordinateStart=3
+export reactionCoordinateIncrement=0.5
+export reactionCoordinateStop=6
+# calculate number of umbrella windows 
+totalWindows=`perl -E 'say 1+($ENV{reactionCoordinateStop}-$ENV{reactionCoordinateStart})/$ENV{reactionCoordinateIncrement}'`
+
+for (( windowCount=0; windowCount<$totalWindows; ++windowCount )); do 
+	export windowCount=$windowCount
+	umbrellaWindow=`perl -E 'say ($ENV{windowCount}*$ENV{reactionCoordinateIncrement}+$ENV{reactionCoordinateStart})'`
+	echo $umbrellaWindow # check the calculation and the loop counter 
+done	
+```
+
+The output of above snippet is:
+```shell 
+3
+3.5
+4
+4.5
+5
+5.5
+6
+```
+
+[Here is a helpful resource for learning more about loops](http://tldp.org/LDP/abs/html/loops1.html).
+
+#### Arrays 
+
+An array is a variable that contains multiple values. 
+
+When setting up a reaction coordinate, for example, you could set variables named `reactionCoordinateStart`, `reactionCoordinateIncrement`, and `reactionCoordinateStop` and use arithmetic to pass the umbrella window position to the simulation program. An alternative would be to use a variable array, with umbrella window positions manually entered in.
+
+```shell 
+reactionCoordinate=( "-5" "-4" "-3" "-2" )
+```
+
+To get the value of the 3rd value in the array, `-3`, use `${reactionCoordinate[2]}`. You use `2` in the brackets because in the Linux shell, the first array position is defined at position zero, so the third value in the array would be at position two.
+
+To loop through all the elements of the `reactionCoordinate` array:
+```shell 
+for (( count=0; count<${#reactionCoordinate[@]}; count++ )); do 
+	echo ${reactionCoordinate[$count]}
+done
+```
+
+The output of the above snippet is:
+```shell 
+-5
+-4
+-3
+-2
+```
+
+#### Functions
 
 
 
