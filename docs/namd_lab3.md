@@ -100,7 +100,7 @@ module purge
 module load compiler_gnu/6.4
 module load cuda/8.0
 export dir=/fslhome/mgleed/software/namd/exec/NAMD_Git-2017-11-04_Linux-x86_64-multicore-CUDA
-$dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES namd.production.inp > output/namd.production.inp.log
+$dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES $inputFile > $outputFile
 ```
 
 **Example 1 GPU per GPU node request** (more likely to get through a high volume of jobs quickly, based on `m8g` architecture)
@@ -116,7 +116,7 @@ module purge
 module load compiler_gnu/6.4
 module load cuda/8.0
 export dir=/fslhome/mgleed/software/namd/exec/NAMD_Git-2017-11-04_Linux-x86_64-multicore-CUDA
-$dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES namd.production.inp > output/namd.production.inp.log
+$dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES $inputFile > $outputFile
 ```
 
 **Example non-GPU node request** (if the GPU nodes [are being hogged](https://marylou.byu.edu/utilization/), this is the most likely scheme to get through the highest volume of jobs quickly) `m7` has 16 cores per node, `m8` and `m9` have 24 cores per node. (3/2018)
@@ -129,7 +129,7 @@ $dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES namd
 # Run NAMD 
 module purge 
 module load namd/2.12_openmpi-1.8.5_gnu-5.2.0
-mpirun $(which namd2) step6.1_equilibration.inp > step6.1_equilibration.inp.log
+mpirun $(which namd2) $inputFile > $outputFile
 ```
 
 ### 6. Analysis with WHAM 
