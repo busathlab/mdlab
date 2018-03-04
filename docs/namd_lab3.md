@@ -76,35 +76,7 @@ cp -r ../namdlab2_m2amt/avg .
 cp -r ../namdlab2_m2amt/charmm-gui .
 ```
 
-One tip to start, make sure to use environment variables anywhere you have filenames within your configuration files. You do not want to perform your whole umbrella sampling protocol to find out all of the output files have the same name and overwrite each other! For good-practice's sake, you might also choose to use environment variables for any paramater that may potentially be of interest as some point, such as temperature, number of simulation steps, etc. If you were already using environment variables in the last lab, you will be a step ahead.
-
-Also, the scheduler submission script, `bash.pt4_simulation`, from last lab is written to utilize full GPU nodes. While you may keep this in your workflow as-is, the number of GPU nodes is very limited and it may be easier to either request portions of GPU nodes or full non-GPU nodes instead. Adjust the requested time as you see fit. 
-
-**Example full GPU node request** (as in lab 2, based on `m8g` architecture)
-```shell 
-#SBATCH --time=24:00:00   # walltime
-#SBATCH --ntasks=24   # number of processor cores (i.e. tasks)
-#SBATCH --nodes=1   # number of nodes
-#SBATCH --gres=gpu:4
-#SBATCH --mem=64G   # memory per CPU core
-```
-
-**Example 1 GPU per GPU node request** (more likely to get through a high volume of jobs quickly, based on `m8g` architecture)
-```shell 
-#SBATCH --time=24:00:00   # walltime
-#SBATCH --ntasks=6   # number of processor cores (i.e. tasks)
-#SBATCH --nodes=1   # number of nodes
-#SBATCH --gres=gpu:1
-#SBATCH --mem=16G   # memory per CPU core
-```
-
-**Example non-GPU node request** (if the GPU nodes [are being hogged](https://marylou.byu.edu/utilization/), this is the most likely scheme to get through the highest volume of jobs quickly) `m7` has 16 cores per node, `m8` and `m9` have 24 cores per node. (3/2018)
-```shell 
-#SBATCH --time=24:00:00   # walltime
-#SBATCH --ntasks=16   # number of processor cores (i.e. tasks)
-#SBATCH --nodes=1   # number of nodes
-#SBATCH --mem-per-cpu=2G   # memory per CPU core
-```
+One tip to start, make sure to use environment variables anywhere you have filenames within your configuration files. You do not want to perform your whole umbrella sampling protocol to find out all of the output files have the same name and overwrite each other! For good-practice's sake, you might also choose to use environment variables for any parameter that may potentially be of interest as some point, such as temperature, number of simulation steps, etc. If you were already using environment variables in the last lab, you will be a step ahead.
 
 Refer to the next section of the lab for helpful `bash` tips and guidance.
 
@@ -113,6 +85,52 @@ Refer to the next section of the lab for helpful `bash` tips and guidance.
 
 ### 5. Submitting 
 
+The scheduler submission script from last lab, `bash.pt4_simulation`, is written to utilize full GPU nodes. While you may keep this in your workflow as-is, the number of GPU nodes is very limited and it may be easier to either request portions of GPU nodes or full non-GPU nodes instead. Adjust the requested time as you see fit. 
+
+**Example full GPU node request** (as in lab 2, based on `m8g` architecture)
+```shell 
+#SBATCH --time=24:00:00   # walltime
+#SBATCH --ntasks=24   # number of processor cores (i.e. tasks)
+#SBATCH --nodes=1   # number of nodes
+#SBATCH --gres=gpu:4
+#SBATCH --mem=64G   # total memory
+...
+# Run NAMD 
+module purge
+module load compiler_gnu/6.4
+module load cuda/8.0
+export dir=/fslhome/mgleed/software/namd/exec/NAMD_Git-2017-11-04_Linux-x86_64-multicore-CUDA
+$dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES namd.production.inp > output/namd.production.inp.log
+```
+
+**Example 1 GPU per GPU node request** (more likely to get through a high volume of jobs quickly, based on `m8g` architecture)
+```shell 
+#SBATCH --time=24:00:00   # walltime
+#SBATCH --ntasks=6   # number of processor cores (i.e. tasks)
+#SBATCH --nodes=1   # number of nodes
+#SBATCH --gres=gpu:1
+#SBATCH --mem=16G   # total memory
+...
+# Run NAMD 
+module purge
+module load compiler_gnu/6.4
+module load cuda/8.0
+export dir=/fslhome/mgleed/software/namd/exec/NAMD_Git-2017-11-04_Linux-x86_64-multicore-CUDA
+$dir/namd2 +p${SLURM_CPUS_ON_NODE} +idlepoll +devices $CUDA_VISIBLE_DEVICES namd.production.inp > output/namd.production.inp.log
+```
+
+**Example non-GPU node request** (if the GPU nodes [are being hogged](https://marylou.byu.edu/utilization/), this is the most likely scheme to get through the highest volume of jobs quickly) `m7` has 16 cores per node, `m8` and `m9` have 24 cores per node. (3/2018)
+```shell 
+#SBATCH --time=24:00:00   # walltime
+#SBATCH --ntasks=16   # number of processor cores (i.e. tasks)
+#SBATCH --nodes=1   # number of nodes
+#SBATCH --mem-per-cpu=2G   # memory per CPU core
+...
+# Run NAMD 
+module purge 
+module load namd/2.12_openmpi-1.8.5_gnu-5.2.0
+mpirun $(which namd2) step6.1_equilibration.inp > step6.1_equilibration.inp.log
+```
 
 ### 6. Analysis with WHAM 
 
