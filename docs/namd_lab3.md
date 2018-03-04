@@ -33,7 +33,7 @@ This lab will investigate the free-energy profile of amantadine at different axi
 
 Let's go over the general approach of how we will accomplish umbrella sampling in this lab using our files from the previous lab.
 
-There are hundreds of different ways that the umbrella sampling protocol can be performed. If you are experienced and more comfortable with Python, C++, etc., you could technically do most of the template replacement, submission, and data aggregation presented here. For the purposes of the lab we will use `bash` for our code, the default Linux interpreter. You do not have to follow the methods described here if you are comfortable with coding and prefer other methods.
+There are hundreds of different ways that the umbrella sampling protocol can be performed. If you are experienced and more comfortable with Python, C++, etc., you could technically do most of the template replacement, submission, and data aggregation presented here. For the purposes of the lab we will use bash for our code, the default Linux interpreter. You do not have to follow the methods described here if you are comfortable with coding and prefer other methods.
 
 Here is a chart demonstrating the suggested general workflow:
 ![alt text](https://github.com/busathlab/mdlab/raw/master/images/namd03_f01.png "Figure 1")
@@ -76,11 +76,23 @@ cp -r ../namdlab2_m2amt/avg .
 cp -r ../namdlab2_m2amt/charmm-gui .
 ```
 
-One tip to start, make sure to use environment variables anywhere you have filenames within your configuration files. You do not want to perform your whole umbrella sampling protocol to find out all of the output files have the same name and overwrite each other! For good-practice's sake, you might also choose to use environment variables for any parameter that may potentially be of interest as some point, such as temperature, number of simulation steps, etc. If you were already using environment variables in the last lab, you will be a step ahead.
+One tip to start, make sure to use variables anywhere you have filenames within your configuration files **(CHECK ALL OUTPUT FILES!)**. You do not want to perform your whole umbrella sampling protocol to find out all of the output files have the same name and overwrite each other! For good-practice's sake, you might also choose to use variables for any parameter that may potentially be of interest as some point, such as temperature, number of simulation steps, etc. If you were already using environment variables in the last lab, you will be a step ahead.
 
-Refer to the next section of the lab for helpful `bash` tips and guidance.
+Refer to the next section of the lab for helpful bash tips and guidance.
 
-### 4. `bash` review and other helpful hints
+### 4. Bash review and other helpful hints
+
+#### Variables
+
+To set a variable in bash, just use the `=` sign. To create a variable named `channel` equal to `2l0j`, just do `channel=2l0j`.
+
+One time- and headache-saving tip is to use variables when defining other variables. Here's an example of using multiple variables to define a pattern.
+```shell 
+export pdbid=2l0j
+export runCount=1
+export inputFilePattern=${pdbid}_${runCount}
+```
+You can then call `$inputFilePattern` within a script to load `$inputFilePattern.psf`, `$inputFilePattern.crd`, etc.
 
 #### Environment variables 
 
@@ -94,6 +106,28 @@ In bash, variables stay within the environment of the bash script being run unle
 **NAMD/VMD**
 1. Use `export variableName=variableValue` in the bash script.
 2. In the NAMD/VMD script being run, use $::env(variableName) to refer to the environment variable.
+
+**Colvars** does *not* use environment variables. You will need to somehow tell colvars to use these variables, though. One option is to use a colvars "template" file, put unique words in the place of the values you would like to substitute, copy the template within the submission loop with `cp`, and then use do a find/replace with `sed` as described below.
+
+
+#### Find / Replace with `sed`
+There are multiple ways to do Find / Replace in Linux, and one utility is `sed`. 
+
+The following command will replace all occurences of `YES` in `foo.txt` with `NO` in a new file called `bar.txt`: `sed "s,YES,NO," foo.txt > bar.txt`.
+
+The following command will replace all occurences of `DRUGPOSITION` with the value of the variable `drugposition` with the filename pattern `output/colvars.${outputPattern}.inp` and save changes to the same file: `sed -i "s,DRUGPOSITION,${drugposition}," output/colvars.${outputPattern}.inp`.
+
+Advanced substitutions involving punctuation, special characters, ignoring case, etc. are possible but a bit more difficult. See the documentation [here](https://www.gnu.org/software/sed/manual/sed.html) for more information. 
+
+
+
+
+
+
+
+
+
+
 
 
 
