@@ -8,6 +8,9 @@
 #### Objectives:
 - Learn to create a protein-bilayer system using the CHARMM-GUI membrane builder 
 - Learn how to run pre-made CHARMM-GUI dynamics scripts 
+- Learn how to insert a drug into a protein-bilayer system using CHARMM 
+- Learn how to create restraint files in VMD for use in NAMD 
+- 
 
 ---
 
@@ -566,9 +569,11 @@ colvar {
   } 
 } 
 ```
-Since we only care about the drug adamantane cage position with respect to the channel axis, we create a `dummyAtom` group at the cartesian origin to give us a context for positive and negative values. In this collective variable, we use the file `colvar_drugcage.pdb` to define the atoms of interest. Also, like the last collective variable we discussed, `rmsd`, we will implement a `fittingGroup` to keep the drug position data with respect to the channel axis, rather than the cartesian axis. This allows for the distance to be calculated always  relative to the `colvar_bb.pdb` file--if the channel protein were to translate along the x-y plane, tilt away from the cartesian Z axis, or translate along the Z-axis; the distance from the drug carbon atoms to the cartesian origin would be "centered" and "rotated" to be with respect to the average protein backbone atoms created in VMD. 
+Since we only care about the drug adamantane cage position with respect to the channel axis, we create a `dummyAtom` group at the cartesian origin to give us a context for positive and negative values. In this collective variable, we use the file `colvar_drugcage.pdb` to define the atoms of interest. `axis (0.0, 0.0, 1.0)` is used to measure only the Z component of the distance between the two groups. 
 
-This concept of a moving frame of reference is more likely to be understood with visual context than in a brief explanation in a lab, so feel free to ask your TA's or professor if you would like to learn more. You can also learn more in the [colvars documentation](http://www.ks.uiuc.edu/Research/namd/2.12/ug/node56.html).
+Also, like the last collective variable we discussed, `rmsd`, we will implement a `fittingGroup` to keep the drug position data with respect to the channel axis, rather than the cartesian axis. This allows for the distance to be always computed relative to the `colvar_bb.pdb` atoms--if the channel protein were to translate along the x-y plane, tilt away from the cartesian Z axis, or translate along the Z-axis; the distance from the drug carbon atoms to the cartesian origin would be "centered" and "rotated" to be with respect to the average protein backbone atoms created in VMD. 
+
+> This concept of a moving frame of reference is more likely to be understood with visual context than in a brief explanation in a lab, so feel free to ask your TA's or professor if you would like to learn more. You can also learn more in the [colvars documentation](http://www.ks.uiuc.edu/Research/namd/2.12/ug/node56.html).
 
 > Perhaps a superior approach would be to make the `ref` group Histidine 37 backbone atoms instead of `dummyAtom`. If the `main` group were above the His atoms it would result in a positive number, and if it were below the His atoms, a negative number would be recorded. Since you can't do normal atom selections in colvars, you would need to create a PDB file of the system in which the beta column was flagged exclusively for all His 37 backbone atoms.
 
