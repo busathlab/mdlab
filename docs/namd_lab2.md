@@ -10,7 +10,7 @@
 - Learn how to run pre-made CHARMM-GUI dynamics scripts 
 - Learn how to insert a drug into a protein-bilayer system using CHARMM 
 - Learn how to create restraint files in VMD for use in NAMD 
-- 
+- Review how to run an NAMD simulation 
 
 ---
 
