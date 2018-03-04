@@ -36,7 +36,7 @@ Let's go over the general approach of how we will accomplish umbrella sampling i
 There are hundreds of different ways that the umbrella sampling protocol can be performed. If you are experienced and more comfortable with Python, C++, etc., you could technically do most of the template replacement, submission, and data aggregation presented here. For the purposes of the lab we will use `bash` for our code, the default Linux interpreter. You do not have to follow the methods described here if you are comfortable with coding and prefer other methods.
 
 Here is a chart demonstrating the suggested general workflow:
-![alt text](https://github.com/busathlab/mdlab/raw/master/images/namd03_f01.PNG "Figure 1")
+![alt text](https://github.com/busathlab/mdlab/raw/master/images/namd03_f01.png "Figure 1")
 
 One approach to performing umbrella sampling with this workflow is using a "master" submission script. The submission script contains all of the variables of interest and defines the reaction coordiante of interest. Its function is to loop over all of the simulation configuration files (CHARMM, VMD, NAMD, etc.; the files in the middle column of *Figure 1*) providing environment variables specific for each window along the reaction coordinate. The submission script carefully manages filenames so the output data can be intelligently extracted for analysis in WHAM.
 
@@ -62,7 +62,7 @@ Copy the following from the previous lab into the current lab directory. You may
 - `bash.pt3_compsets.sh`
 - `bash.pt4_simulation.sh`
 
-To save some time, here's some code you can execute within this lab's directory to grab these files from the previous lab, if you keep each of the lab directories within a directory together. Otherwise just modify the code to suit your directory structure. :
+To save some time, below is some code you can execute within this lab's directory to grab these files from the previous lab, if you keep each of the lab directories within a directory together. Otherwise just modify the code to suit your directory structure.
 ```shell 
 cp ../namdlab2_m2amt/charmm.adddrug.str .
 cp ../namdlab2_m2amt/colvars.production.inp .
