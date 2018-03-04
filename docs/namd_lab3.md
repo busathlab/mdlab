@@ -112,25 +112,32 @@ In bash, variables stay within the environment of the bash script being run unle
 #### Find / Replace with `sed`
 There are multiple ways to do Find / Replace in Linux. One utility capable of find/replace is `sed`. 
 
-The following command will replace all occurences of `YES` in `foo.txt` with `NO` in a new file called `bar.txt`: `sed "s,YES,NO," foo.txt > bar.txt`.
+The following command will replace all occurences of `YES` in `foo.txt` with `NO` in a new file called `bar.txt`: 
+```shell 
+sed "s,YES,NO," foo.txt > bar.txt
+````
 
-The following command will replace all occurences of `DRUGPOSITION` with the value of the variable `drugposition` and save changes to the same file: `sed -i "s,DRUGPOSITION,${drugposition}," output/colvars.${outputPattern}.inp`.
+The following command will replace all occurences of `DRUGPOSITION` with the value of the variable `drugposition` and save changes to the same file: 
+```shell 
+sed -i "s,DRUGPOSITION,${drugposition}," output/colvars.${outputPattern}.inp
+```
 
 Advanced substitutions involving punctuation, special characters, ignoring case, etc. are possible but a bit more complex. See the [`sed` documentation](https://www.gnu.org/software/sed/manual/sed.html) for more information. 
 
-#### Math
+#### Arithmetic
 
-Math is a huge limitation of bash, so occassionally other utilities are used to perform math. 
+Arithmetic is a huge limitation of bash, so occassionally other utilities are used to perform the math. 
 
 Here are two different ways to assign the sum of the exported variables `reactionCoordinateStart` and `reactionCoordinateIncrement` to the variable `umbrellaWindow`:
 ```shell
 export umbrellaWindow=`perl -E 'say ($ENV{reactionCoordinateStart}+$ENV{reactionCoordinateIncrement})'`
 ```
+
 ```shell 
 export umbrellaWindow=`echo "( $reactionCoordinateStart + $reactionCoordinateIncrement )" | bc`
 ```
 
-`perl` is better for more advanced calculations and the ` ... | bc ` method is a bit easier for very basic calcluations.
+`perl` is better for more advanced calculations and the ` echo ... | bc` method is a bit easier for very basic calcluations.
 
 Here's another example of using `perl` to compute the arccosine of the exported bash variable `cos`, converting to degrees, and assigning it to the bash variable `umbrellaTiltDegrees`.
 ```shell
