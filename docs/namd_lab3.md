@@ -129,6 +129,7 @@ Advanced substitutions involving punctuation, special characters, ignoring case,
 Arithmetic is a huge limitation of bash, so occassionally other utilities are used to perform the math. 
 
 Here are two different ways to assign the sum of the exported variables `reactionCoordinateStart` and `reactionCoordinateIncrement` to the variable `umbrellaWindow`:
+
 ```shell
 export umbrellaWindow=`perl -E 'say ($ENV{reactionCoordinateStart}+$ENV{reactionCoordinateIncrement})'`
 ```
@@ -137,9 +138,10 @@ export umbrellaWindow=`perl -E 'say ($ENV{reactionCoordinateStart}+$ENV{reaction
 export umbrellaWindow=`echo "( $reactionCoordinateStart + $reactionCoordinateIncrement )" | bc`
 ```
 
-`perl` is better for more advanced calculations and the ` echo ... | bc` method is a bit easier for very basic calcluations.
+`perl` is better for more advanced calculations and the `echo ... | bc` method is a bit easier for very basic calcluations.
 
-Here's another example of using `perl` to compute the arccosine of the exported bash variable `cos`, converting to degrees, and assigning it to the bash variable `umbrellaTiltDegrees`.
+Here's another example of using `perl` to compute the arccosine of the exported bash variable `cos`, converting to degrees, and assigning it to the bash variable `umbrellaTiltDegrees`:
+
 ```shell
 export umbrellaTiltDegrees=`perl -E 'use Math::Trig; say acos($ENV{cos})*180/pi'`
 ```
