@@ -46,11 +46,18 @@ An analysis script can be run after the simulations complete that extracts the m
 
 That's pretty much it! We have provided a couple skeleton scripts containing some suggested pseudocode to help guide you, but now that you've made it this far in the course you should be able to perform most of this on your own.
 
-The two scripts we have provided you are listed below, and they each contain some basic comments and pseudocode to help get you started:
+> **ASSIGNMENT**: Perform umbrella sampling on a reaction coordinate of your choice with a drug of your choice in the equilibrated M2 CHARMM-GUI system from the previous lab. 
+- Your simulations begin by adding the drug to the protein-bilayer system equilibrated in the first step of the lab. (`namdlab2_m2amt/charmm-gui/namd/step6.6_equilibration.coor` and `namdlab2_m2amt/charmm-gui/step5_assembly.xplor_ext.psf`). Your starting structure is __not__ the drug-protein-bilayer structure from the final step of the previous lab.
+- You should simulate between 6 and 10 umbrella windows, at any resolution you desire, though we recommend some proximity for meaningful results. (E.g. drug positions no more than 1 angstrom apart)
+- Each umbrella window should be simulated for at least 0.5 ns (250,000 steps with a 2fs timestep). 
+- Pass your output data to WHAM and plot the free-energy profile of your reaction coordinate. **Submit the plot to your TA.**
+- You are permitted to achieve this by whatever means you choose. You could either manually adjust each of the files and perform the simulations one-by-one (easier if you are extremely cautious with your file handling and well-organized), create a modified manual submission script with a lot of careful copy-pasting, or create a master submission script with loops (recommended).
+
+The two scripts we have provided you (which you are not *required* to use, but would probably be helpful) are listed below. They each contain some basic comments and pseudocode to help get you started:
 - `bash.umbrellasubmit.sh` - master submission script 
 - `bash.analyzeumbrellas.sh` - post-simulation analysis script that runs WHAM, discussed later 
 
-Copy the following from the previous lab into the current lab directory. You may rename any of them as you prefer:
+You will need the following files from the previous lab in your current lab directory. You may rename any of them as you prefer:
 - `amt/`
 - `alm/`
 - `charmm-gui/`
@@ -62,7 +69,7 @@ Copy the following from the previous lab into the current lab directory. You may
 - `bash.pt3_compsets.sh`
 - `bash.pt4_simulation.sh`
 
-To save some time, below is some code you can execute within this lab's directory to grab these files from the previous lab, if you keep each of the lab directories within a directory together. Otherwise just modify the code to suit your directory structure.
+To save some time, below is some code you can execute within the current lab's directory to copy these files from the previous lab, if you keep each of the lab directories within a directory together. Otherwise just modify the code to suit your directory structure.
 ```shell 
 cp ../namdlab2_m2amt/charmm.adddrug.str .
 cp ../namdlab2_m2amt/colvars.production.inp .
@@ -75,13 +82,6 @@ cp -r ../namdlab2_m2amt/alm .
 cp -r ../namdlab2_m2amt/avg .
 cp -r ../namdlab2_m2amt/charmm-gui .
 ```
-
-> **ASSIGNMENT**: Perform umbrella sampling on a reaction coordinate of your choice with a drug of your choice in the equilibrated M2 CHARMM-GUI system from the previous lab. 
-- Your simulations begin by adding the drug to the protein-bilayer system equilibrated in the first step of the lab. (`namdlab2_m2amt/charmm-gui/namd/step6.6_equilibration.coor` and `namdlab2_m2amt/charmm-gui/step5_assembly.xplor_ext.psf`). Your starting structure is __not__ the drug-protein-bilayer structure from the final step of the previous lab.
-- You should simulate between 6 and 10 umbrella windows, at any resolution you desire, though we recommend some proximity for meaningful results. (E.g. drug positions no more than 1 angstrom apart)
-- Each umbrella window should be simulated for at least 0.5 ns (250,000 steps with a 2fs timestep). 
-- Pass your output data to WHAM and plot the free-energy profile of your reaction coordinate. **Submit the plot to your TA.**
-- You are permitted to achieve this by whatever means you choose. You could either manually adjust each of the files and perform the simulations one-by-one (easier if you are extremely cautious with your file handling and well-organized), create a modified manual submission script with a lot of careful copy-pasting, or create a master submission script with loops (recommended).
 
 One tip to start, make sure to use variables anywhere you have filenames within your configuration files **(CHECK ALL OUTPUT FILES!)**. You do not want to perform your whole umbrella sampling protocol to find out all of the output files have the same name and overwrite each other! For good-practice's sake, you might also choose to use variables for any parameter that may potentially be of interest as some point, such as temperature, number of simulation steps, etc. If you were already using environment variables in the last lab, you will be a step ahead.
 
@@ -264,11 +264,12 @@ Here is an `if` statement that compares two variables:
 if [ $windowCount < $totalWindows ]; then 
 	echo "the current umbrella window count is less than the total number of umbrella windows"
 fi 
+```
 
-Here is an `if` statement that can be used to prompt the user from the command line:
+Here is an `if` statement that is used to interpret input from the user from the command line:
 ```shell 
 echo "The total number of umbrella windows to be simulated is $totalWindows, do you wish to continue? (y/n)"
-read proceed
+read proceed # waits for user input 
 if [[ $proceed == Y || $proceed == y || $proceed == Yes || $proceed == yes ]]; then 
 	echo -e "Proceeding with submission..." 
 	sleep 1
