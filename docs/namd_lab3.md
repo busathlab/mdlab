@@ -192,7 +192,7 @@ Find more information [here](https://www.computerhope.com/unix/uecho.htm).
 #### Loops 
 There are multiple types of loops and multiple ways of performing each loop in bash. 
 
-**For Loop**. A "for loop" is used to execute a list of commands and iterates through a series.
+**For Loop**. A `for` loop is used to execute a list of commands and iterates through a series.
 
 Let's use an example of iterating through umbrella windows with a for loop.
 ```shell 
@@ -220,7 +220,14 @@ current umbrella window is 5.5
 current umbrella window is 6
 ```
 
-**While Loop**. A "while loop" is used to execute a list of commands as long as a condition is met. These are used less frequently than for loops, but they have their utility. Let's recreate the same outcome of the previous for loop using a while loop:
+Here is a description of the `for` statement in the above example:
+1. `windowCount=0`: Start with a value of `0` for `windowCount`. 
+2. `windowCount<$totalWindows`: Continue running the loop until `windowCount` is no longer less than `totalWindows` 
+3. `++windowCount`: Increment `windowCount` by 1 for every loop iteration 
+
+`windowCount` is used within the loop as a multiplication factor for the variable `reactionCoordinateIncrement`; their product is added to the variable `reactionCoordinateStart` to give the value of `umbrellaWindow`. In the case of a distance reaction coordinate, `umbrellaWindow` would represent the desired location of the drug along the channel axis to be used for that particular simulation.
+
+**While Loop**. A `while` loop is used to execute a list of commands as long as a condition is met. These are used less frequently than `for` loops, but they have utility. Let's recreate the same outcome of the previous `for` loop using a `while` loop:
 
 ```shell 
 windowCount=0
@@ -233,7 +240,7 @@ done
 ```
 The while loop above performs the code until the condition `windowCount < $totalWindows` is false. The line `((windowCount += 1))` increments `windowCount` within the loop, similar to how the for loop increments it with `++windowCount` within the `for` statement.
 
-Other examples of while loops uses include performing code until a certain time of day, until a scheduled job starts, etc. Often the command `sleep` is used in conjunction with a while loop so the code isn't performed constantly.
+Other uses for `while` loops uses include performing code until a certain time of day, until a scheduled job starts, etc. Often the command `sleep` is used in conjunction with a while loop so the code isn't performed constantly.
 
 [Here is a helpful resource for learning more about loops](http://tldp.org/LDP/abs/html/loops1.html).
 
@@ -262,7 +269,7 @@ Here is an `if` statement that can be used to prompt the user from the command l
 ```shell 
 echo "The total number of umbrella windows to be simulated is $totalWindows, do you wish to continue? (y/n)"
 read proceed
-if [ $proceed == y ]; then
+if [[ $proceed == Y || $proceed == y || $proceed == Yes || $proceed == yes ]]; then 
 	echo -e "Proceeding with submission..." 
 	sleep 1
 else
@@ -271,6 +278,7 @@ else
 	exit 0
 fi
 ```
+Notice the use of the `||`, which are "OR" in boolean logic. `&&` is the "AND" operator.
 
 #### Arrays 
 
