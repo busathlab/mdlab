@@ -281,6 +281,8 @@ fi
 ```
 Notice the use of the `||`, which are "OR" in boolean logic. `&&` is the "AND" operator.
 
+See [this site](https://linuxacademy.com/blog/linux/conditions-in-bash-scripting-if-statements/) if you'd like to learn more.
+
 #### Arrays 
 
 An array is a variable that contains multiple values. 
@@ -308,11 +310,67 @@ The output of the above snippet is:
 -2
 ```
 
+For more information, visit [this site](http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_10_02.html).
+
 #### Functions
 
+Functions are reusable snippets of code that can be called at different points within a script. We will not go into great detail on functions, but simple functions can be very useful.
 
+The general formatting of a function is `functionName () { }` with the function code placed within the braces. To execute a function, just do `functionName`. Some prefer to name all functions in all caps for improved script readability.
 
+Here is an example of calling a function named `SUBMITFUNCTION` within a `for loop`, similar to example from the `for` loop section earlier:
 
+```shell 
+export pdbid=2kqt 
+export drugid=alm034
+export reactionCoordinateStart=3
+export reactionCoordinateIncrement=0.5
+export reactionCoordinateStop=6
+# calculate number of umbrella windows 
+totalWindows=`perl -E 'say 1+($ENV{reactionCoordinateStop}-$ENV{reactionCoordinateStart})/$ENV{reactionCoordinateIncrement}'`
+
+for (( windowCount=0; windowCount<$totalWindows; ++windowCount )); do 
+	export windowCount=$windowCount
+	export umbrellaWindow=`perl -E 'say ($ENV{windowCount}*$ENV{reactionCoordinateIncrement}+$ENV{reactionCoordinateStart})'`
+	SUBMITFUNCTION
+done	
+
+SUBMITFUNCTION () {
+	export umbrellaWindow=`printf "%07.3f" $umbrellaWindow`
+	export outputPattern=${pdbid}_${drugid}_${umbrellaWindow}
+	echo "outputPattern is $outputPattern"
+	mkdir -p output 
+	mkdir -p output/${outputPattern} 
+	# etc ...
+}
+```
+
+The output for the above snippet would be as follows:
+```shell 
+outputPattern is 2kqt_alm034_003.000
+outputPattern is 2kqt_alm034_003.500
+outputPattern is 2kqt_alm034_004.000
+outputPattern is 2kqt_alm034_004.500
+outputPattern is 2kqt_alm034_005.000
+outputPattern is 2kqt_alm034_005.500
+outputPattern is 2kqt_alm034_006.000
+```
+
+Calling `SUBMITFUNCTION` within the loop improves readability of the script. 
+
+Furthermore, if you wanted to test out the script before running through the loop, you could comment out the `for` loop, manually enter the parameter of interest, and call SUBMITFUNCTION.
+
+```shell
+... 
+# for (( windowCount=0; windowCount<$totalWindows; ++windowCount )); do 
+# 	export windowCount=$windowCount
+# 	export umbrellaWindow=`perl -E 'say ($ENV{windowCount}*$ENV{reactionCoordinateIncrement}+$ENV{reactionCoordinateStart})'`
+# 	SUBMITFUNCTION
+# done	
+export umbrellaWindow=3
+SUBMITFUNCTION 
+...
+```
 
 
 ### 5. Submitting 
