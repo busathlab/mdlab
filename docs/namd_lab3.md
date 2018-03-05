@@ -44,7 +44,7 @@ An analysis script can be run after the simulations complete that extracts the m
 
 ### 3. Design the protocol 
 
-That's pretty much it! We have provided a couple skeleton scripts containing some suggested pseudocode to help guide you, but now that you've made it this far in the course you should be able to perform most of this on your own, even if you were to do it all manually without special scripts. 
+That's pretty much it! We have provided a couple skeleton scripts containing some suggested pseudocode to help guide you, but now that you've made it this far in the course you should be able to perform most of this on your own.
 
 The two scripts we have provided you are listed below, and they each contain some basic comments and pseudocode to help get you started:
 - `bash.umbrellasubmit.sh` - master submission script 
@@ -75,6 +75,13 @@ cp -r ../namdlab2_m2amt/alm .
 cp -r ../namdlab2_m2amt/avg .
 cp -r ../namdlab2_m2amt/charmm-gui .
 ```
+
+> **ASSIGNMENT**: Perform umbrella sampling on a reaction coordinate of your choice with a drug of your choice in the equilibrated M2 CHARMM-GUI system from the previous lab. 
+- Your simulations begin by adding the drug to the protein-bilayer system equilibrated in the first step of the lab. (`namdlab2_m2amt/charmm-gui/namd/step6.6_equilibration.coor` and `namdlab2_m2amt/charmm-gui/step5_assembly.xplor_ext.psf`). Your starting structure is __not__ the drug-protein-bilayer structure from the final step of the previous lab.
+- You should simulate between 6 and 10 umbrella windows, at any resolution you desire, though we recommend some proximity for meaningful results. (E.g. drug positions no more than 1 angstrom apart)
+- Each umbrella window should be simulated for at least 0.5 ns (250,000 steps with a 2fs timestep). 
+- Pass your output data to WHAM and plot the free-energy profile of your reaction coordinate. **Submit the plot to your TA.**
+- You are permitted to achieve this by whatever means you choose. You could either manually adjust each of the files and perform the simulations one-by-one (easier if you are extremely cautious with your file handling and well-organized), create a modified manual submission script with a lot of careful copy-pasting, or create a master submission script with loops (recommended).
 
 One tip to start, make sure to use variables anywhere you have filenames within your configuration files **(CHECK ALL OUTPUT FILES!)**. You do not want to perform your whole umbrella sampling protocol to find out all of the output files have the same name and overwrite each other! For good-practice's sake, you might also choose to use variables for any parameter that may potentially be of interest as some point, such as temperature, number of simulation steps, etc. If you were already using environment variables in the last lab, you will be a step ahead.
 
@@ -126,7 +133,7 @@ Advanced substitutions involving punctuation, special characters, ignoring case,
 
 #### Arithmetic
 
-Arithmetic is a huge limitation of bash, so occassionally other utilities are used to perform the math. 
+Arithmetic is a significant limitation of bash, so other utilities are used to perform the math. 
 
 Here are two different ways to assign the sum of the exported variables `reactionCoordinateStart` and `reactionCoordinateIncrement` to the variable `umbrellaWindow`:
 
@@ -198,22 +205,72 @@ totalWindows=`perl -E 'say 1+($ENV{reactionCoordinateStop}-$ENV{reactionCoordina
 for (( windowCount=0; windowCount<$totalWindows; ++windowCount )); do 
 	export windowCount=$windowCount
 	umbrellaWindow=`perl -E 'say ($ENV{windowCount}*$ENV{reactionCoordinateIncrement}+$ENV{reactionCoordinateStart})'`
-	echo $umbrellaWindow # check the calculation and the loop counter 
+	echo "current umbrella window is $umbrellaWindow" # check the calculation and the loop counter 
 done	
 ```
 
 The output of above snippet is:
 ```shell 
-3
-3.5
-4
-4.5
-5
-5.5
-6
+current umbrella window is 3
+current umbrella window is 3.5
+current umbrella window is 4
+current umbrella window is 4.5
+current umbrella window is 5
+current umbrella window is 5.5
+current umbrella window is 6
 ```
 
+**While Loop**. A "while loop" is used to execute a list of commands as long as a condition is met. These are used less frequently than for loops, but they have their utility. Let's recreate the same outcome of the previous for loop using a while loop:
+
+```shell 
+windowCount=0
+while (( windowCount < $totalWindows )); do
+	export windowCount=$windowCount
+	umbrellaWindow=`perl -E 'say ($ENV{windowCount}*$ENV{reactionCoordinateIncrement}+$ENV{reactionCoordinateStart})'`
+	echo "current umbrella window is $umbrellaWindow" # check the calculation and the loop counter 
+	((windowCount += 1))
+done
+```
+The while loop above performs the code until the condition `windowCount < $totalWindows` is false. The line `((windowCount += 1))` increments `windowCount` within the loop, similar to how the for loop increments it with `++windowCount` within the `for` statement.
+
+Other examples of while loops uses include performing code until a certain time of day, until a scheduled job starts, etc. Often the command `sleep` is used in conjunction with a while loop so the code isn't performed constantly.
+
 [Here is a helpful resource for learning more about loops](http://tldp.org/LDP/abs/html/loops1.html).
+
+#### If statements
+
+The `if` command evaluates a conditional statement and performs code depending on the status of the condition. 
+
+For example, if you want to see if the output file already exists before running a simulation, you could do something like this:
+```shell 
+if [ -f output/${outputPattern}.log ]; then
+	echo "file exists already, exiting script"
+	exit 0
+else 
+	echo "file does not exist"
+fi 
+```
+The `-f` argument within the conditional statement (in brackets) denotes a boolean for a file that returns true or false. In a sense, the conditional statement is reduced, to true or false (so if the file exists, it would be like `if true; then ...`
+
+Here is an `if` statement that compares two variables:
+```shell 
+if [ $windowCount < $totalWindows ]; then 
+	echo "the current umbrella window count is less than the total number of umbrella windows"
+fi 
+
+Here is an `if` statement that can be used to prompt the user from the command line:
+```shell 
+echo "The total number of umbrella windows to be simulated is $totalWindows, do you wish to continue? (y/n)"
+read proceed
+if [ $proceed == y ]; then
+	echo -e "Proceeding with submission..." 
+	sleep 1
+else
+	echo -e "Terminating script"
+	sleep 1
+	exit 0
+fi
+```
 
 #### Arrays 
 
