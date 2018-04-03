@@ -83,7 +83,9 @@ cp -r ../namdlab2_m2amt/avg .
 cp -r ../namdlab2_m2amt/charmm-gui .
 ```
 
-One tip to start, make sure to use variables anywhere you have filenames within your configuration files **(CHECK ALL OUTPUT FILES!)**. You do not want to perform your whole umbrella sampling protocol to find out all of the output files have the same name and overwrite each other! For good-practice's sake, you might also choose to use variables for any parameter that may potentially be of interest as some point, such as temperature, number of simulation steps, etc. If you were already using environment variables in the last lab, you will be a step ahead.
+One tip to start, make sure to use variables anywhere you have filenames within your configuration files **(CHECK ALL OUTPUT FILE NAMES!)**. You do not want to perform your whole umbrella sampling protocol to find out all of the output files have the same name and overwrite each other! For good-practice's sake, you might also choose to use variables for any parameter that may potentially be of interest as some point, such as temperature, number of simulation steps, etc. If you were already using environment variables in the last lab, you will be a step ahead.
+
+You will need a collective variables configuration file that adds a harmonic constraint to the collective variable you are studying. Using the channel axis and drug position as an example reaction coordinate, each simulated umbrella window will have a harmonic restraint on the drug cage carbons at a specific point along the channel axis.
 
 Refer to the next section of the lab for helpful bash tips and guidance.
 
@@ -95,9 +97,9 @@ To set a variable in bash, just use the `=` sign. To create a variable named `ch
 
 One headache-saving tip is to use variables when defining other variables. Here's an example of using multiple variables to define a pattern.
 ```shell 
-export pdbid=2l0j
-export runCount=1
-export inputFilePattern=${pdbid}_${runCount}
+pdbid=2l0j
+runCount=1
+inputFilePattern=${pdbid}_${runCount}
 ```
 You can then call `$inputFilePattern` within a script to load `$inputFilePattern.psf`, `$inputFilePattern.crd`, etc.
 
@@ -107,7 +109,7 @@ In bash, variables stay within the environment of the bash script being run unle
 
 **CHARMM**
 1. Use `export variableName=variableValue` in the bash script.
-2. Add `variableName:$variableName` to the CHARMM run command. (see the end of `bash.pt2_adddrug.sh`). Alternatively you can skip `1.` and do `variableName:variableValue`, but other programs will not have access to this variable.
+2. Add `variableName:$variableName` to the CHARMM run command. (see the end of `bash.pt2_adddrug.sh`). Alternatively you can skip `1.` and do `variableName:variableValue`, but other programs will not have access to this variable. You need this for every variable you wish CHARMM to use from the environment!
 3. In the CHARMM script being run, you can simply refer to the variable with `@variableName`.
 
 **NAMD/VMD**
@@ -119,12 +121,12 @@ In bash, variables stay within the environment of the bash script being run unle
 #### Find / Replace with `sed`
 There are multiple ways to do Find / Replace in Linux. One utility capable of find/replace is `sed`. 
 
-The following command will replace all occurences of `YES` in `foo.txt` with `NO` in a new file called `bar.txt`: 
+The following command will replace all occurences of the string `YES` in `foo.txt` with the string `NO` in a new file called `bar.txt`: 
 ```shell 
 sed "s,YES,NO," foo.txt > bar.txt
 ````
 
-The following command will replace all occurences of `DRUGPOSITION` with the value of the variable `drugposition` and save changes to the same file: 
+The following command will replace all occurences of the string `DRUGPOSITION` with the value of the variable `drugposition` and save changes to the same file: 
 ```shell 
 sed -i "s,DRUGPOSITION,${drugposition}," output/colvars.${outputPattern}.inp
 ```
@@ -153,6 +155,39 @@ Here's another example of using `perl` to compute the arccosine of the exported 
 export umbrellaTiltDegrees=`perl -E 'use Math::Trig; say acos($ENV{cos})*180/pi'`
 ```
 
+#### Backticks
+
+In the above two examples with arithmetic, you'll notice the use of backticks ` ` ` within the code. In bash, the backticks are typically used to evaluate an expression and set it to a variable. 
+
+For example, type in `date` on the command line and see what happens. After that, try out the following code:
+```shell 
+currentDate=`date` 
+echo $date
+```
+
+The value of the variable `currentDate` is set to the output of the command `date`.
+
+Consider the `perl` arithmetic example from the section above:
+```shell
+export umbrellaWindow=`perl -E 'say ($ENV{reactionCoordinateStart}+$ENV{reactionCoordinateIncrement})'`
+```
+The portion of the command within the backticks is evaluated using the utility `perl`, and the output is set to the variable `umbrellaWindow`.
+
+An alterative to backticks that some consider superior is to encapsulate a command with `$` and parentheses, as in `$(command)`. See [this guide](http://wiki.bash-hackers.org/syntax/expansion/cmdsubst) for more information.
+
+#### Pipes 
+
+Pipes (`|`) are used in bash to pass the output of one command to another utility.
+
+For example, if you do `head -n 3 sample.txt` it will print out the top three lines of the file `sample.txt` to the standard output, the command line. If you do the command `tail -n 3 sample.txt`, it will print out the bottom three lines. 
+
+You can use pipes to combine the two commands. Say you want to print out the top three lines of a file, get the last line of the three you filtered, and write to a file named `edit.txt` you could do: 
+```shell 
+head -n 3 sample.txt | tail -n 3 > edit.txt 
+```
+
+Learn more [here](https://ryanstutorials.net/linuxtutorial/piping.php).
+
 #### Number formatting
 
 For analysis purposes and automation, managing your decimal places and floating zeros is important. For ease in the analysis stage, it may be helpful to you to be consistent with number length and decimal places.
@@ -173,16 +208,16 @@ Breaking down the formatting argument, `%07.3f`:
 #### Echo
 
 The `echo` command writes its arguments to the standard output. It is an essential tool for a variety of reasons. Here are a few:
-- Determining that calculations are performed properly.
+- Determining that calculations are performed properly. It is helpful to use `echo` when troubleshoot a script to see what values variables are set to when a script is being run.
 - Passing output to other commands. The second arithmetic approach described earlier is an example of this.
 - Outputting data to a file
 - Troubleshooting loops 
 
-Here is an example of using echo to write the value of a variable `umbrellaWindow` to a new file `window.txt`:
+Here is an example of using `echo` to write the value of a variable `umbrellaWindow` to a new file `window.txt`:
 ```shell 
 echo $umbrellaWindow > window.txt 
 ```
-If the file `window.txt` already exists, it will be overwritten. If you desire to append to the file instead, use two angular quote brackets `>>`:
+As in the above example, if the file `window.txt` already exists, it will be overwritten. If you desire to append to the file instead, use two angular quote brackets `>>`:
 ```shell 
 echo $umbrellaWindow >> window.txt 
 ```
@@ -434,8 +469,6 @@ mpirun $(which namd2) $inputFile > $outputFile
 export dir=/fslhome/mgleed/software/namd/exec/NAMD_Git-2017-11-04_Linux-x86_64-multicore
 $dir/namd2 +setcpuaffinity `numactl --show | awk '/^physcpubind/ {printf "+p%d +pemap %d",(NF-1),$2; for(i=3;i<=NF;++i){printf ",%d",$i}}'` $inputFile > $outputFile
 ```
-
-
 
 
 ### 6. Analysis with WHAM 
